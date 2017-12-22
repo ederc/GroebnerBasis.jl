@@ -7,46 +7,49 @@ const pkgdir  = realpath(joinpath(dirname(@__FILE__), ".."))
 const libdir   = joinpath(pkgdir, "local", "lib")
 const libgb   = joinpath(pkgdir, "local", "lib", "libgb")
 
-# function __init__()
-#    if "HOSTNAME" in keys(ENV) && ENV["HOSTNAME"] == "juliabox"
-#        push!(Libdl.DL_LOAD_PATH, "/usr/local/lib")
-#    elseif is_linux()
-#        push!(Libdl.DL_LOAD_PATH, libdir)
-#        Libdl.dlopen(libgb)
-#    else
-#       push!(Libdl.DL_LOAD_PATH, libdir)
-#    end
-#
-#    println("")
-#    println("GB comes with absolutely no warranty whatsoever")
-#    println("")
-# end
+function __init__()
+   if "HOSTNAME" in keys(ENV) && ENV["HOSTNAME"] == "juliabox"
+       push!(Libdl.DL_LOAD_PATH, "/usr/local/lib")
+   elseif is_linux()
+       push!(Libdl.DL_LOAD_PATH, libdir)
+       Libdl.dlopen(libgb)
+   else
+      push!(Libdl.DL_LOAD_PATH, libdir)
+   end
 
+   println("")
+   println("GB comes with absolutely no warranty whatsoever")
+   println("")
+end
+
+# we take a Singular ideal and extract the following data:
+# an int array lengths storing the lengths of each generator
+# an int array cfs storing the coefficients of each generator
+# an int array exps storing the exponent vectors of each generator
 function convert_singular_ideal_to_array(
-    I::Singular.sideal,
+    id::Singular.sideal,
     nvars::Int,
     ngens::Int
     )
   nterms  = 0
+  lens = Array{Int32,1}(ngens)
   for i=1:ngens
-    nterms  +=  length(I[i])
+    lens[i] =   length(id[i]) 
+    nterms  +=  length(id[i])
   end
-  len = nterms * (1+nvars) + ngens
-  ideal = Array{Int32,1}(len)
+  cfs   = Array{Int32,1}(nterms)
+  exps  = Array{Int32,1}(nvars*nterms)
   ctr = 1
-  for i=1:Singular.ngens(I)
-    ideal[ctr]  = length(I[i])
-    ctr +=  1
-    for (c,e) in Singular.coeffs_expos(I[i])
-      ideal[ctr]  = Base.Int(c)
-      ctr +=  1
+  for i=1:Singular.ngens(id)
+    for (c,e) in Singular.coeffs_expos(id[i])
+      cfs[ctr]  = Base.Int(c)
       for j=1:nvars
-        ideal[ctr]  =  Base.Int(e[j])
-        ctr +=  1
+        exps[nvars*(ctr-1)+j]  =  Base.Int(e[j])
       end
+      ctr +=  1
     end
   end
-  ideal
+  lens, cfs, exps
 end
 
 function convert_array_to_singular_ideal(
@@ -57,9 +60,10 @@ function convert_array_to_singular_ideal(
 end
 
 function f4(
-    I::Singular.sideal,
-    R::Singular.PolyRing
+    I::Singular.sideal,   # input generators
+    hts::Int=17           # hash table size, default 2^17
     )
+  R     = I.base_ring
   char  = Singular.characteristic(R)
   if 0 == char
     error("At the moment GB only supports finite characteristic.
@@ -68,12 +72,25 @@ function f4(
   # get number of variables
   nvars   = length(Singular.exponent(I[1], 1))
   ngens   = Singular.ngens(I)
-  # convert Singular ideal to flattened array of ints
-  ideal   = convert_singular_ideal_to_array(I, nvars, ngens)
+  # convert Singular ideal to flattened arrays of ints
+  lens, cfs, exps   = convert_singular_ideal_to_array(I, nvars, ngens)
   # call f4 in gb
-  basis   = ccall((:f4_julia, libgb), Array{Int32,1},
-      (Array{Int32,1}, Int, Int), ideal, nvars, ngens)
+  println(lens)
+  println(cfs)
+  println(exps)
+  hts = 12
+  # calling f4_julia with the following arguments:
+  # lengths of all generators
+  # coefficients of all generators
+  # exponents of all generators
+  # number of variables
+  # number of generators
+  # hash table size log_2, i.e. given 12 => 2^12
+  basis  = ccall((:f4_julia, libgb), Ptr{Cint},
+      (Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int, Int, Int),
+      lens, cfs, exps, nvars, ngens, hts)
   # convert flattened array of ints to Singular ideal
+  println("basis ", basis)
 end
 
 end # module
