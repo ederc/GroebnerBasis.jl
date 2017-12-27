@@ -86,11 +86,15 @@ function f4(
   # number of variables
   # number of generators
   # hash table size log_2, i.e. given 12 => 2^12
-  basis  = ccall((:f4_julia, libgb), Ptr{Cint},
-      (Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int, Int, Int),
-      lens, cfs, exps, nvars, ngens, hts)
+  basis_ptr  = ccall((:f4_julia, libgb), Ptr{Cint},
+      (Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int, Int, Int, Int),
+      lens, cfs, exps, char, nvars, ngens, hts)
+  # get length of pointer, i.e. first entry
+  sz  = unsafe_wrap(Array, basis_ptr, 1)
+  # convert to julia array, also give memory management to julia
+  basis = unsafe_wrap(Array, basis_ptr, sz[1], true)
+  println(basis)
   # convert flattened array of ints to Singular ideal
-  println("basis ", basis)
 end
 
 end # module
