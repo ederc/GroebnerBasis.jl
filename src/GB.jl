@@ -75,9 +75,12 @@ function f4(
   # convert Singular ideal to flattened arrays of ints
   lens, cfs, exps   = convert_singular_ideal_to_array(I, nvars, ngens)
   # call f4 in gb
+  println("Input data")
+  println("----------")
   println(lens)
   println(cfs)
   println(exps)
+  println("----------")
   hts = 12
   # calling f4_julia with the following arguments:
   # lengths of all generators
