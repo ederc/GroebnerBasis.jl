@@ -63,7 +63,7 @@ function f4(
     I::Singular.sideal,   # input generators
     hts::Int=17,          # hash table size, default 2^17
     nthrds::Int=1,        # number of threads
-    laopt:Int=1           # linear algebra option
+    laopt::Int=1          # linear algebra option
     )
   R     = I.base_ring
   char  = Singular.characteristic(R)
