@@ -61,7 +61,9 @@ end
 
 function f4(
     I::Singular.sideal,   # input generators
-    hts::Int=17           # hash table size, default 2^17
+    hts::Int=17,          # hash table size, default 2^17
+    nthrds::Int=1,        # number of threads
+    laopt:Int=1           # linear algebra option
     )
   R     = I.base_ring
   char  = Singular.characteristic(R)
@@ -81,7 +83,9 @@ function f4(
   println(cfs)
   println(exps)
   println("----------")
-  hts = 12
+  if hts > 30
+    hts = 24
+  end
   # calling f4_julia with the following arguments:
   # lengths of all generators
   # coefficients of all generators
@@ -90,8 +94,8 @@ function f4(
   # number of generators
   # hash table size log_2, i.e. given 12 => 2^12
   basis_ptr  = ccall((:f4_julia, libgb), Ptr{Cint},
-      (Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int, Int, Int, Int),
-      lens, cfs, exps, char, nvars, ngens, hts)
+      (Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int, Int, Int, Int, Int, Int),
+      lens, cfs, exps, char, nvars, ngens, hts, nthrds, laopt)
   # get length of pointer, i.e. first entry
   sz  = unsafe_wrap(Array, basis_ptr, 1)
   # convert to julia array, also give memory management to julia
