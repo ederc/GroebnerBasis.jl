@@ -2,6 +2,7 @@ oldwdir = pwd()
 
 # at the moment we only use the experimental plain branch of gb
 @show GB_BRANCH = "plain"
+ # @show GB_BRANCH = "plain-only-global-hash-table"
 
 pkgdir = dirname(dirname(@__FILE__))
 wdir = joinpath(pkgdir, "deps")

@@ -1,6 +1,7 @@
 module GB
 
 # package code goes here
+using Revise
 using Nemo
 using Singular
 
@@ -127,15 +128,17 @@ function f4(
   # number of variables
   # number of generators
   # hash table size log_2, i.e. given 12 => 2^12
+  println(char, nvars, ngens, hts, nthrds, laopt)
   gb_result  = ccall((:f4_julia, libgb), Ptr{Cint},
       (Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int, Int, Int, Int, Int, Int),
       lens, cfs, exps, char, nvars, ngens, hts, nthrds, laopt)
-  # get length of pointer, i.e. first entry
+
+   # get length of pointer, i.e. first entry
   sz  = unsafe_wrap(Array, gb_result, 1)
+
   # convert to julia array, also give memory management to julia
-  gb_basis = unsafe_wrap(Array, gb_result, sz[1], true)
-  println(gb_basis)
-  basis = convert_gb_array_to_singular_ideal(gb_basis, R)
+  gb_basis  = unsafe_wrap(Array, gb_result, sz[1], true)
+  basis     = convert_gb_array_to_singular_ideal(gb_basis, R)
 
   return basis
 end
