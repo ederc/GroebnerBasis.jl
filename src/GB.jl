@@ -129,9 +129,15 @@ function f4(
   # number of generators
   # hash table size log_2, i.e. given 12 => 2^12
   println(char, nvars, ngens, hts, nthrds, laopt)
-  gb_result  = ccall((:f4_julia, libgb), Ptr{Cint},
+  lib = Libdl.dlopen(libgb)
+  sym = Libdl.dlsym(lib, :f4_julia)
+  gb_result  = ccall(sym, Ptr{Cint},
       (Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int, Int, Int, Int, Int, Int),
       lens, cfs, exps, char, nvars, ngens, hts, nthrds, laopt)
+  Libdl.dlclose(lib)
+  #| gb_result  = ccall((:f4_julia, libgb), Ptr{Cint}, |#
+      #| (Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int, Int, Int, Int, Int, Int), |#
+      #| lens, cfs, exps, char, nvars, ngens, hts, nthrds, laopt) |#
 
    # get length of pointer, i.e. first entry
   sz  = unsafe_wrap(Array, gb_result, 1)
