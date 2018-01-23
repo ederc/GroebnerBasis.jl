@@ -98,6 +98,8 @@ function f4(
     I::Singular.sideal,   # input generators
     hts::Int=17,          # hash table size, default 2^17
     nthrds::Int=1,        # number of threads
+    maxpairs::Int=0,      # number of pairs maximally chosen
+                          # in symbolic preprocessing
     laopt::Int=1          # linear algebra option
     )
   R     = I.base_ring
@@ -128,12 +130,12 @@ function f4(
   # number of variables
   # number of generators
   # hash table size log_2, i.e. given 12 => 2^12
-  println(char, nvars, ngens, hts, nthrds, laopt)
+  println(char, nvars, ngens, hts, nthrds, maxpairs, laopt)
   lib = Libdl.dlopen(libgb)
   sym = Libdl.dlsym(lib, :f4_julia)
   gb_result  = ccall(sym, Ptr{Cint},
-      (Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int, Int, Int, Int, Int, Int),
-      lens, cfs, exps, char, nvars, ngens, hts, nthrds, laopt)
+      (Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int, Int, Int, Int, Int, Int, Int),
+      lens, cfs, exps, char, nvars, ngens, hts, nthrds, maxpairs, laopt)
   Libdl.dlclose(lib)
   #| gb_result  = ccall((:f4_julia, libgb), Ptr{Cint}, |#
       #| (Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int, Int, Int, Int, Int, Int), |#
