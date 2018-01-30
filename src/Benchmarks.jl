@@ -11,7 +11,6 @@ function cyclic_4(
   for i = 1:n
     vars[i] = "x$(i)"
   end
-    println(vars)
   if char == 0
     R, X = Singular.PolynomialRing(Singular.QQ, vars)
   else
@@ -39,7 +38,6 @@ function cyclic_5(
   for i = 1:n
     vars[i] = "x$(i)"
   end
-    println(vars)
   if char == 0
     R, X = Singular.PolynomialRing(Singular.QQ, vars)
   else
@@ -68,7 +66,6 @@ function cyclic_6(
   for i = 1:n
     vars[i] = "x$(i)"
   end
-    println(vars)
   if char == 0
     R, X = Singular.PolynomialRing(Singular.QQ, vars)
   else
@@ -98,7 +95,6 @@ function cyclic_7(
   for i = 1:n
     vars[i] = "x$(i)"
   end
-    println(vars)
   if char == 0
     R, X = Singular.PolynomialRing(Singular.QQ, vars)
   else
@@ -129,7 +125,6 @@ function cyclic_8(
   for i = 1:n
     vars[i] = "x$(i)"
   end
-    println(vars)
   if char == 0
     R, X = Singular.PolynomialRing(Singular.QQ, vars)
   else
@@ -160,7 +155,6 @@ function cyclic_9(
   for i = 1:n
     vars[i] = "x$(i)"
   end
-    println(vars)
   if char == 0
     R, X = Singular.PolynomialRing(Singular.QQ, vars)
   else
@@ -193,7 +187,6 @@ function cyclic_10(
   for i = 1:n
     vars[i] = "x$(i)"
   end
-    println(vars)
   if char == 0
     R, X = Singular.PolynomialRing(Singular.QQ, vars)
   else
@@ -227,7 +220,6 @@ function cyclic_11(
   for i = 1:n
     vars[i] = "x$(i)"
   end
-    println(vars)
   if char == 0
     R, X = Singular.PolynomialRing(Singular.QQ, vars)
   else
@@ -264,7 +256,6 @@ function katsura_10(
   for i = 1:n
     vars[i] = "x$(i)"
   end
-    println(vars)
   if char == 0
     R, X = Singular.PolynomialRing(Singular.QQ, vars)
   else
@@ -298,7 +289,6 @@ function katsura_11(
   for i = 1:n
     vars[i] = "x$(i)"
   end
-    println(vars)
   if char == 0
     R, X = Singular.PolynomialRing(Singular.QQ, vars)
   else
@@ -333,7 +323,6 @@ function katsura_12(
   for i = 1:n
     vars[i] = "x$(i)"
   end
-    println(vars)
   if char == 0
     R, X = Singular.PolynomialRing(Singular.QQ, vars)
   else
@@ -369,7 +358,6 @@ function katsura_13(
   for i = 1:n
     vars[i] = "x$(i)"
   end
-    println(vars)
   if char == 0
     R, X = Singular.PolynomialRing(Singular.QQ, vars)
   else
@@ -406,7 +394,6 @@ function katsura_14(
   for i = 1:n
     vars[i] = "x$(i)"
   end
-    println(vars)
   if char == 0
     R, X = Singular.PolynomialRing(Singular.QQ, vars)
   else
@@ -444,7 +431,6 @@ function katsura_15(
   for i = 1:n
     vars[i] = "x$(i)"
   end
-    println(vars)
   if char == 0
     R, X = Singular.PolynomialRing(Singular.QQ, vars)
   else
@@ -483,7 +469,6 @@ function mayr_42(
   for i = 1:n
     vars[i] = "x$(i)"
   end
-    println(vars)
   if char == 0
     R, X = Singular.PolynomialRing(Singular.QQ, vars)
   else
@@ -551,7 +536,6 @@ function jason_210(
   for i = 1:n
     vars[i] = "x$(i)"
   end
-    println(vars)
   if char == 0
     R, X = Singular.PolynomialRing(Singular.QQ, vars)
   else
