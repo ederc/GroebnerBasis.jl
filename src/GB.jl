@@ -130,7 +130,7 @@ function f4(
   # number of variables
   # number of generators
   # hash table size log_2, i.e. given 12 => 2^12
-  println(char, nvars, ngens, hts, nthrds, maxpairs, laopt)
+  # println(char, nvars, ngens, hts, nthrds, maxpairs, laopt)
   lib = Libdl.dlopen(libgb)
   sym = Libdl.dlsym(lib, :f4_julia)
   gb_result  = ccall(sym, Ptr{Cint},
