@@ -4,6 +4,7 @@ module GB
 using Revise
 using Nemo
 using Singular
+using Cxx
 
 include("Benchmarks.jl")
 
@@ -56,6 +57,9 @@ function convert_singular_ideal_to_array(
   lens, cfs, exps
 end
 
+# we know that the terms are already sorted and they are all different
+# coming from GB's F4 computation, so we do not need p_Add_q for the
+# terms, but we can directly set the next pointers of the polynomials
 function convert_gb_array_to_singular_ideal(
     gb::Array{Int32,1},
     R::Singular.PolyRing
@@ -72,22 +76,31 @@ function convert_gb_array_to_singular_ideal(
   j   = ngens + 2 + 1
   len = j
   for i = 1:ngens
-    p = C_NULL
     len = len + gb[i+2]
+    # do the first term
+    p = Singular.libSingular.p_Init(R.ptr)
+    Singular.libSingular.pSetCoeff0(p, Clong(gb[j]), R.ptr)
+    j += 1
+    for k = 1:nvars
+      exp[k+1]  = gb[j]
+      j += 1
+    end
+    Singular.libSingular.p_SetExpV(p, exp, R.ptr)
+    lp  = p
+    # do remaining terms
     while j < len
-      term  = Singular.libSingular.p_Init(R.ptr)
-      Singular.libSingular.pSetCoeff0(term, Clong(gb[j]), R.ptr)
+      pterm  = Singular.libSingular.p_Init(R.ptr)
+      Singular.libSingular.pSetCoeff0(pterm, Clong(gb[j]), R.ptr)
       j += 1
       for k = 1:nvars
         exp[k+1]  = gb[j]
         j += 1
       end
-      Singular.libSingular.p_SetExpV(term, exp, R.ptr)
-      if p == C_NULL
-        p = term
-      else
-        p = Singular.libSingular.p_Add_q(p, term, R.ptr)
-      end
+      Singular.libSingular.p_SetExpV(pterm, exp, R.ptr)
+      # setting the next pointer needs to be done in Singular itself,
+      # thus we need, for exactly this operation, inline cxx code
+      icxx"""$lp->next  = $pterm;"""
+      lp  = pterm
     end
     push!(list, R(p))
   end
