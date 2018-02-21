@@ -459,6 +459,45 @@ function katsura_15(
   R, id
 end
 
+function katsura_16(
+    char::Int
+    )
+  n = 16
+  vars = Array{String, 1}(n)
+  # generate dummy array of n strings for generating
+  # singular polynomial ring
+  for i = 1:n
+    vars[i] = "x$(i)"
+  end
+  if char == 0
+    R, X = Singular.PolynomialRing(Singular.QQ, vars)
+  else
+    R, X = Singular.PolynomialRing(Singular.N_ZpField(char), vars)
+  end
+  global X
+  # parses X[i] to xi
+  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  id = Singular.Ideal(R,
+			x1+2*x2+2*x3+2*x4+2*x5+2*x6+2*x7+2*x8+2*x9+2*x10+2*x11+2*x12+2*x13+2*x14+2*x15+2*x16-1,
+			x1^2+2*x2^2+2*x3^2+2*x4^2+2*x5^2+2*x6^2+2*x7^2+2*x8^2+2*x9^2+2*x10^2+2*x11^2+2*x12^2+2*x13^2+2*x14^2+2*x15^2+2*x16^2-x1,
+			2*x1*x2+2*x2*x3+2*x3*x4+2*x4*x5+2*x5*x6+2*x6*x7+2*x7*x8+2*x8*x9+2*x9*x10+2*x10*x11+2*x11*x12+2*x12*x13+2*x13*x14+2*x14*x15+2*x15*x16-x2,
+			x2^2+2*x1*x3+2*x2*x4+2*x3*x5+2*x4*x6+2*x5*x7+2*x6*x8+2*x7*x9+2*x8*x10+2*x9*x11+2*x10*x12+2*x11*x13+2*x12*x14+2*x13*x15+2*x14*x16-x3,
+			2*x2*x3+2*x1*x4+2*x2*x5+2*x3*x6+2*x4*x7+2*x5*x8+2*x6*x9+2*x7*x10+2*x8*x11+2*x9*x12+2*x10*x13+2*x11*x14+2*x12*x15+2*x13*x16-x4,
+			x3^2+2*x2*x4+2*x1*x5+2*x2*x6+2*x3*x7+2*x4*x8+2*x5*x9+2*x6*x10+2*x7*x11+2*x8*x12+2*x9*x13+2*x10*x14+2*x11*x15+2*x12*x16-x5,
+			2*x3*x4+2*x2*x5+2*x1*x6+2*x2*x7+2*x3*x8+2*x4*x9+2*x5*x10+2*x6*x11+2*x7*x12+2*x8*x13+2*x9*x14+2*x10*x15+2*x11*x16-x6,
+			x4^2+2*x3*x5+2*x2*x6+2*x1*x7+2*x2*x8+2*x3*x9+2*x4*x10+2*x5*x11+2*x6*x12+2*x7*x13+2*x8*x14+2*x9*x15+2*x10*x16-x7,
+			2*x4*x5+2*x3*x6+2*x2*x7+2*x1*x8+2*x2*x9+2*x3*x10+2*x4*x11+2*x5*x12+2*x6*x13+2*x7*x14+2*x8*x15+2*x9*x16-x8,
+			x5^2+2*x4*x6+2*x3*x7+2*x2*x8+2*x1*x9+2*x2*x10+2*x3*x11+2*x4*x12+2*x5*x13+2*x6*x14+2*x7*x15+2*x8*x16-x9,
+			2*x5*x6+2*x4*x7+2*x3*x8+2*x2*x9+2*x1*x10+2*x2*x11+2*x3*x12+2*x4*x13+2*x5*x14+2*x6*x15+2*x7*x16-x10,
+			x6^2+2*x5*x7+2*x4*x8+2*x3*x9+2*x2*x10+2*x1*x11+2*x2*x12+2*x3*x13+2*x4*x14+2*x5*x15+2*x6*x16-x11,
+			2*x6*x7+2*x5*x8+2*x4*x9+2*x3*x10+2*x2*x11+2*x1*x12+2*x2*x13+2*x3*x14+2*x4*x15+2*x5*x16-x12,
+			x7^2+2*x6*x8+2*x5*x9+2*x4*x10+2*x3*x11+2*x2*x12+2*x1*x13+2*x2*x14+2*x3*x15+2*x4*x16-x13,
+			2*x7*x8+2*x6*x9+2*x5*x10+2*x4*x11+2*x3*x12+2*x2*x13+2*x1*x14+2*x2*x15+2*x3*x16-x14,
+			x8^2+2*x7*x9+2*x6*x10+2*x5*x11+2*x4*x12+2*x3*x13+2*x2*x14+2*x1*x15+2*x2*x16-x15
+			)
+  R, id
+end
+
 function mayr_42(
     char::Int
     )
