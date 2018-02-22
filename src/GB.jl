@@ -64,7 +64,7 @@ function convert_gb_array_to_singular_ideal(
     gb::Array{Int32,1},
     R::Singular.PolyRing
     )
-  ngens = gb[2] # number of generators of basis
+  ngens = gb[1] # number of generators of basis
 
   nvars = Singular.ngens(R)
   basis = Singular.Ideal(R, ) # empty ideal
@@ -73,10 +73,10 @@ function convert_gb_array_to_singular_ideal(
   list  = elem_type(R)[]
   # we generate the singular polynomials low level in order
   # to avoid overhead due to many exponent operations etc.
-  j   = ngens + 2 + 1
+  j   = ngens + 1 + 1
   len = j
   for i = 1:ngens
-    len = len + gb[i+2]
+    len = len + gb[i+1]
     # do the first term
     p = Singular.libSingular.p_Init(R.ptr)
     Singular.libSingular.pSetCoeff0(p, Clong(gb[j]), R.ptr)
@@ -146,20 +146,22 @@ function f4(
   # println(char, nvars, ngens, hts, nthrds, maxpairs, laopt)
   lib = Libdl.dlopen(libgb)
   sym = Libdl.dlsym(lib, :f4_julia)
-  gb_result  = ccall(sym, Ptr{Cint},
-      (Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int, Int, Int, Int, Int, Int, Int),
-      lens, cfs, exps, char, nvars, ngens, hts, nthrds, maxpairs, laopt)
+  gb_basis  = ccall((:malloc, "libc"), Ptr{Ptr{Cint}}, (Csize_t, ), sizeof(Ptr{Cint}))
+  gb_basis_len  = ccall(sym, Int,
+      (Ptr{Ptr{Cint}}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int, Int, Int, Int, Int, Int, Int),
+      gb_basis, lens, cfs, exps, char, nvars, ngens, hts, nthrds, maxpairs, laopt)
   Libdl.dlclose(lib)
   #| gb_result  = ccall((:f4_julia, libgb), Ptr{Cint}, |#
       #| (Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int, Int, Int, Int, Int, Int), |#
       #| lens, cfs, exps, char, nvars, ngens, hts, nthrds, laopt) |#
 
    # get length of pointer, i.e. first entry
-  sz  = unsafe_wrap(Array, gb_result, 1)
+  # sz  = unsafe_wrap(Array, gb_result, 1)
 
   # convert to julia array, also give memory management to julia
-  gb_basis  = unsafe_wrap(Array, gb_result, sz[1], true)
-  basis     = convert_gb_array_to_singular_ideal(gb_basis, R)
+  jl_basis  = unsafe_wrap(Array, unsafe_load(gb_basis), (gb_basis_len, ), true)
+  ccall((:free, "libc"), Void, (Ptr{Ptr{Cint}}, ), gb_basis)
+  basis     = convert_gb_array_to_singular_ideal(jl_basis, R)
 
   return basis
 end
