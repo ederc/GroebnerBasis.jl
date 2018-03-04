@@ -108,12 +108,13 @@ function convert_gb_array_to_singular_ideal(
 end
 
 function f4(
-    I::Singular.sideal,   # input generators
-    hts::Int=17,          # hash table size, default 2^17
-    nthrds::Int=1,        # number of threads
-    maxpairs::Int=0,      # number of pairs maximally chosen
-                          # in symbolic preprocessing
-    laopt::Int=1          # linear algebra option
+    I::Singular.sideal,           # input generators
+    hts::Int=17,                  # hash table size, default 2^17
+    nthrds::Int=1,                # number of threads
+    maxpairs::Int=0,              # number of pairs maximally chosen
+                                  # in symbolic preprocessing
+    laopt::Int=1,                 # linear algebra option
+    monorder::Symbol=:dregrevlex  # monomial order
     )
   R     = I.base_ring
   char  = Singular.characteristic(R)
@@ -127,15 +128,16 @@ function f4(
   # convert Singular ideal to flattened arrays of ints
   lens, cfs, exps   = convert_singular_ideal_to_array(I, nvars, ngens)
   # call f4 in gb
-  # println("Input data")
-  # println("----------")
-  # println(lens)
-  # println(cfs)
-  # println(exps)
-  # println("----------")
+  println("Input data")
+  println("----------")
+  println(lens)
+  println(cfs)
+  println(exps)
+  println("----------")
   if hts > 30
     hts = 24
   end
+  ord = monorder
   # calling f4_julia with the following arguments:
   # lengths of all generators
   # coefficients of all generators
@@ -148,8 +150,8 @@ function f4(
   sym = Libdl.dlsym(lib, :f4_julia)
   gb_basis  = ccall((:malloc, "libc"), Ptr{Ptr{Cint}}, (Csize_t, ), sizeof(Ptr{Cint}))
   gb_basis_len  = ccall(sym, Int,
-      (Ptr{Ptr{Cint}}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int, Int, Int, Int, Int, Int, Int),
-      gb_basis, lens, cfs, exps, char, nvars, ngens, hts, nthrds, maxpairs, laopt)
+      (Ptr{Ptr{Cint}}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int, Int, Int, Int, Int, Int, Int, Int),
+      gb_basis, lens, cfs, exps, char, ord, nvars, ngens, hts, nthrds, maxpairs, laopt)
   Libdl.dlclose(lib)
   #| gb_result  = ccall((:f4_julia, libgb), Ptr{Cint}, |#
       #| (Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int, Int, Int, Int, Int, Int), |#
