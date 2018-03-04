@@ -128,16 +128,22 @@ function f4(
   # convert Singular ideal to flattened arrays of ints
   lens, cfs, exps   = convert_singular_ideal_to_array(I, nvars, ngens)
   # call f4 in gb
-  println("Input data")
-  println("----------")
-  println(lens)
-  println(cfs)
-  println(exps)
-  println("----------")
+  # println("Input data")
+  # println("----------")
+#  println(lens)
+#   println(cfs)
+#   println(exps)
+#   println("----------")
   if hts > 30
     hts = 24
   end
-  ord = monorder
+  ord = 0
+  if monorder == :degrevlex
+    ord = 0
+  end
+  if monorder == :lex
+    ord = 1
+  end
   # calling f4_julia with the following arguments:
   # lengths of all generators
   # coefficients of all generators
