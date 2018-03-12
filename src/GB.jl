@@ -130,10 +130,10 @@ function f4(
   # call f4 in gb
   # println("Input data")
   # println("----------")
-#  println(lens)
-#   println(cfs)
-#   println(exps)
-#   println("----------")
+  # println(lens)
+  # println(cfs)
+  # println(exps)
+  # println("----------")
   if hts > 30
     hts = 24
   end
@@ -169,7 +169,8 @@ function f4(
   # convert to julia array, also give memory management to julia
   jl_basis  = unsafe_wrap(Array, unsafe_load(gb_basis), (gb_basis_len, ), true)
   ccall((:free, "libc"), Void, (Ptr{Ptr{Cint}}, ), gb_basis)
-  basis     = convert_gb_array_to_singular_ideal(jl_basis, R)
+  basis       = convert_gb_array_to_singular_ideal(jl_basis, R)
+  basis.isGB  = true;
 
   return basis
 end
