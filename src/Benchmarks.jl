@@ -8,7 +8,7 @@ function zhang_1(
   if (ord != :lex) && (ord != :degrevlex)
     error("Order not known -- No ideal generated.")
   end
-  n = 4
+  n = 5
   vars = Array{String, 1}(n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
