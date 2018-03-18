@@ -175,4 +175,19 @@ function f4(
   return basis
 end
 
+# function modf4(
+#     I::Singular.sideal,           # input generators
+#     hts::Int=17,                  # hash table size, default 2^17
+#     nthrds::Int=1,                # number of threads
+#     maxpairs::Int=0,              # number of pairs maximally chosen
+#                                   # in symbolic preprocessing
+#     laopt::Int=1,                 # linear algebra option
+#     monorder::Symbol=:dregrevlex  # monomial order
+#     )
+#   # prime characteristic
+#   p = 2^30
+#   Ip  = ???
+#   Gp  = GB.f4(Ip, hts, nthrds, maxpairs, laopt, monorder)
+# end
+
 end # module
