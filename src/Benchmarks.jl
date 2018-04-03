@@ -1177,6 +1177,42 @@ function bayes_148(
   R, id
 end
 
+function reimer_8(
+    char::Int,
+    ord::Symbol=:degrevlex
+    )
+  if (ord != :lex) && (ord != :degrevlex)
+    error("Order not known -- No ideal generated.")
+  end
+  n = 8
+  vars = Array{String, 1}(n)
+  # generate dummy array of n strings for generating
+  # singular polynomial ring
+  for i = 1:n
+    vars[i] = "x$(i)"
+  end
+  if char == 0
+    R, X = Singular.PolynomialRing(Singular.QQ, vars, ordering = ord)
+  else
+    R, X = Singular.PolynomialRing(Singular.N_ZpField(char), vars, ordering = ord)
+  end
+  global X
+  # parses X[i] to xi
+  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  ps =
+    "2*x1^2 - 2*x2^2 + 2*x3^2 - 2*x4^2 + 2*x5^2 - 2*x6^2 + 2*x7^2 - 2*x8^2 - 1",
+    "2*x1^3 - 2*x2^3 + 2*x3^3 - 2*x4^3 + 2*x5^3 - 2*x6^3 + 2*x7^3 - 2*x8^3 - 1",
+    "2*x1^4 - 2*x2^4 + 2*x3^4 - 2*x4^4 + 2*x5^4 - 2*x6^4 + 2*x7^4 - 2*x8^4 - 1",
+    "2*x1^5 - 2*x2^5 + 2*x3^5 - 2*x4^5 + 2*x5^5 - 2*x6^5 + 2*x7^5 - 2*x8^5 - 1",
+    "2*x1^6 - 2*x2^6 + 2*x3^6 - 2*x4^6 + 2*x5^6 - 2*x6^6 + 2*x7^6 - 2*x8^6 - 1",
+    "2*x1^7 - 2*x2^7 + 2*x3^7 - 2*x4^7 + 2*x5^7 - 2*x6^7 + 2*x7^7 - 2*x8^7 - 1",
+    "2*x1^8 - 2*x2^8 + 2*x3^8 - 2*x4^8 + 2*x5^8 - 2*x6^8 + 2*x7^8 - 2*x8^8 - 1",
+    "2*x1^9 - 2*x2^9 + 2*x3^9 - 2*x4^9 + 2*x5^9 - 2*x6^9 + 2*x7^9 - 2*x8^9 - 1"
+
+  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  R, id
+end
+
 function gametwo_7(
     char::Int,
     ord::Symbol=:degrevlex
