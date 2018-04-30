@@ -1,6 +1,37 @@
 #=========================
 CYCLIC EXAMPLES -- affine
 =========================#
+function cyclic_3(
+    char::Int,
+    ord::Symbol=:degrevlex
+    )
+  if (ord != :lex) && (ord != :degrevlex)
+    error("Order not known -- No ideal generated.")
+  end
+  n = 3
+  vars = Array{String, 1}(n)
+  # generate dummy array of n strings for generating
+  # singular polynomial ring
+  for i = 1:n
+    vars[i] = "x$(i)"
+  end
+  if char == 0
+    R, X = Singular.PolynomialRing(Singular.QQ, vars, ordering = ord)
+  else
+    R, X = Singular.PolynomialRing(Singular.N_ZpField(char), vars, ordering = ord)
+  end
+  global X
+  # parses X[i] to xi
+  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  ps =
+    "x1+x2+x3",
+    "x1*x2+x2*x3+x1*x3",
+    "x1*x2*x3-1"
+
+  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  R, id
+end
+
 function cyclic_4(
     char::Int,
     ord::Symbol=:degrevlex
@@ -1571,6 +1602,45 @@ function yang_1(
     x11*x13*x2*x8- x11*x13*x4*x6+ x11*x14*x4*x5- x11*x16*x2*x5- x12*x13*x2*x7+
     x12*x13*x3*x6- x12*x14*x3*x5+ x12*x15*x2*x5+ x14*x3*x8*x9- x14*x4*x7*x9-
     x15*x2*x8*x9+ x15*x4*x6*x9+ x16*x2*x7*x9- x16*x3*x6*x9"
+
+  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  R, id
+end
+
+function ideal_q_andreas_gerhard(
+    char::Int,
+    ord::Symbol=:degrevlex
+    )
+  if (ord != :lex) && (ord != :degrevlex)
+    error("Order not known -- No ideal generated.")
+  end
+  n = 36
+  # generate dummy array of n strings for generating
+  # singular polynomial ring
+  vars = Array{String, 1}(n)
+  vars =
+    "x1","x2","x3","x4","x5","x6","x7","x8","x9","x10","x11","x12",
+    "y1","y2","y3","y4","y5","y6","y7","y8","y9","y10","y11","y12",
+    "z1","z2","z3","z4","z5","z6","z7","z8","z9","z10","z11","z12"
+  if char == 0
+    R, X = Singular.PolynomialRing(Singular.QQ, vars, ordering = ord)
+  else
+    R, X = Singular.PolynomialRing(Singular.N_ZpField(char), vars, ordering = ord)
+  end
+  global X
+  # parses X[i] to xi
+  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  ps =
+    "-x12*y4*y11*z1*z10+x11*y4*y12*z1*z10+x12*y1*y11*z4*z10-x11*y1*y12*z4*z10+x12*y4*y10*z1*z11-x4*y10*y12*z1*z11-x12*y1*y10*z4*z11+x1*y10*y12*z4*z11+x4*y1*y12*z10*z11-x1*y4*y12*z10*z11-x11*y4*y10*z1*z12+x4*y10*y11*z1*z12+x11*y1*y10*z4*z12-x1*y10*y11*z4*z12-x4*y1*y11*z10*z12+x1*y4*y11*z10*z12",
+    "-x9*y4*y8*z1*z7+x8*y4*y9*z1*z7+x9*y1*y8*z4*z7-x8*y1*y9*z4*z7+x9*y4*y7*z1*z8-x4*y7*y9*z1*z8-x9*y1*y7*z4*z8+x1*y7*y9*z4*z8+x4*y1*y9*z7*z8-x1*y4*y9*z7*z8-x8*y4*y7*z1*z9+x4*y7*y8*z1*z9+x8*y1*y7*z4*z9-x1*y7*y8*z4*z9-x4*y1*y8*z7*z9+x1*y4*y8*z7*z9",
+    "x11*x12*y5*y8*y9*z4*z6-x8*x12*y5*y9*y11*z4*z6-x9*x11*y5*y8*y12*z4*z6+x8*x9*y5*y11*y12*z4*z6-x11*x12*y4*y5*y9*z6*z8+x5*x12*y4*y9*y11*z6*z8+x9*x11*y4*y5*y12*z6*z8-x5*x9*y4*y11*y12*z6*z8-x11*x12*y5*y6*y8*z4*z9+x8*x12*y5*y6*y11*z4*z9+x5*x11*y6*y8*y12*z4*z9-x5*x8*y6*y11*y12*z4*z9-x5*x11*y4*y8*y12*z6*z9+x4*x11*y5*y8*y12*z6*z9+x5*x8*y4*y11*y12*z6*z9-x4*x8*y5*y11*y12*z6*z9+x11*x12*y4*y5*y6*z8*z9-x5*x12*y4*y6*y11*z8*z9-x4*x11*y5*y6*y12*z8*z9+x4*x5*y6*y11*y12*z8*z9+x8*x12*y4*y5*y9*z6*z11-x5*x12*y4*y8*y9*z6*z11-x8*x9*y4*y5*y12*z6*z11+x5*x9*y4*y8*y12*z6*z11-x8*x12*y4*y5*y6*z9*z11+x5*x12*y4*y6*y8*z9*z11+x4*x8*y5*y6*y12*z9*z11-x4*x5*y6*y8*y12*z9*z11+x9*x11*y5*y6*y8*z4*z12-x5*x11*y6*y8*y9*z4*z12-x8*x9*y5*y6*y11*z4*z12+x5*x8*y6*y9*y11*z4*z12+x5*x11*y4*y8*y9*z6*z12-x4*x11*y5*y8*y9*z6*z12-x5*x8*y4*y9*y11*z6*z12+x4*x8*y5*y9*y11*z6*z12-x9*x11*y4*y5*y6*z8*z12+x4*x11*y5*y6*y9*z8*z12+x5*x9*y4*y6*y11*z8*z12-x4*x5*y6*y9*y11*z8*z12+x8*x9*y4*y5*y6*z11*z12-x5*x9*y4*y6*y8*z11*z12-x4*x8*y5*y6*y9*z11*z12+x4*x5*y6*y8*y9*z11*z12",
+    "-x11*y8*z5+x8*y11*z5+x11*y5*z8-x5*y11*z8-x8*y5*z11+x5*y8*z11",
+    "x11*x12*y2*y8*y9*z1*z3-x8*x12*y2*y9*y11*z1*z3-x9*x11*y2*y8*y12*z1*z3+x8*x9*y2*y11*y12*z1*z3-x11*x12*y1*y2*y9*z3*z8+x2*x12*y1*y9*y11*z3*z8+x9*x11*y1*y2*y12*z3*z8-x2*x9*y1*y11*y12*z3*z8-x11*x12*y2*y3*y8*z1*z9+x8*x12*y2*y3*y11*z1*z9+x2*x11*y3*y8*y12*z1*z9-x2*x8*y3*y11*y12*z1*z9-x2*x11*y1*y8*y12*z3*z9+x1*x11*y2*y8*y12*z3*z9+x2*x8*y1*y11*y12*z3*z9-x1*x8*y2*y11*y12*z3*z9+x11*x12*y1*y2*y3*z8*z9-x2*x12*y1*y3*y11*z8*z9-x1*x11*y2*y3*y12*z8*z9+x1*x2*y3*y11*y12*z8*z9+x8*x12*y1*y2*y9*z3*z11-x2*x12*y1*y8*y9*z3*z11-x8*x9*y1*y2*y12*z3*z11+x2*x9*y1*y8*y12*z3*z11-x8*x12*y1*y2*y3*z9*z11+x2*x12*y1*y3*y8*z9*z11+x1*x8*y2*y3*y12*z9*z11-x1*x2*y3*y8*y12*z9*z11+x9*x11*y2*y3*y8*z1*z12-x2*x11*y3*y8*y9*z1*z12-x8*x9*y2*y3*y11*z1*z12+x2*x8*y3*y9*y11*z1*z12+x2*x11*y1*y8*y9*z3*z12-x1*x11*y2*y8*y9*z3*z12-x2*x8*y1*y9*y11*z3*z12+x1*x8*y2*y9*y11*z3*z12-x9*x11*y1*y2*y3*z8*z12+x1*x11*y2*y3*y9*z8*z12+x2*x9*y1*y3*y11*z8*z12-x1*x2*y3*y9*y11*z8*z12+x8*x9*y1*y2*y3*z11*z12-x2*x9*y1*y3*y8*z11*z12-x1*x8*y2*y3*y9*z11*z12+x1*x2*y3*y8*y9*z11*z12",
+    "-x11*y8*z2+x8*y11*z2+x11*y2*z8-x2*y11*z8-x8*y2*z11+x2*y8*z11",
+    "-x10*x12*y4*y11*z1+x4*x12*y10*y11*z1+x10*x11*y4*y12*z1-x4*x11*y10*y12*z1+x10*x12*y1*y11*z4-x1*x12*y10*y11*z4-x10*x11*y1*y12*z4+x1*x11*y10*y12*z4-x4*x12*y1*y10*z11+x1*x12*y4*y10*z11+x4*x10*y1*y12*z11-x1*x10*y4*y12*z11+x4*x11*y1*y10*z12-x1*x11*y4*y10*z12-x4*x10*y1*y11*z12+x1*x10*y4*y11*z12",
+    "-x7*x9*y4*y8*z1+x4*x9*y7*y8*z1+x7*x8*y4*y9*z1-x4*x8*y7*y9*z1+x7*x9*y1*y8*z4-x1*x9*y7*y8*z4-x7*x8*y1*y9*z4+x1*x8*y7*y9*z4-x4*x9*y1*y7*z8+x1*x9*y4*y7*z8+x4*x7*y1*y9*z8-x1*x7*y4*y9*z8+x4*x8*y1*y7*z9-x1*x8*y4*y7*z9-x4*x7*y1*y8*z9+x1*x7*y4*y8*z9",
+    "x6*x11*x12*y5*y8*y9*z4-x5*x11*x12*y6*y8*y9*z4-x6*x8*x12*y5*y9*y11*z4+x5*x8*x12*y6*y9*y11*z4-x6*x9*x11*y5*y8*y12*z4+x5*x9*x11*y6*y8*y12*z4+x6*x8*x9*y5*y11*y12*z4-x5*x8*x9*y6*y11*y12*z4-x6*x11*x12*y4*y5*y9*z8+x4*x11*x12*y5*y6*y9*z8+x5*x6*x12*y4*y9*y11*z8-x4*x5*x12*y6*y9*y11*z8+x6*x9*x11*y4*y5*y12*z8-x4*x9*x11*y5*y6*y12*z8-x5*x6*x9*y4*y11*y12*z8+x4*x5*x9*y6*y11*y12*z8+x5*x11*x12*y4*y6*y8*z9-x4*x11*x12*y5*y6*y8*z9-x5*x8*x12*y4*y6*y11*z9+x4*x8*x12*y5*y6*y11*z9-x5*x6*x11*y4*y8*y12*z9+x4*x6*x11*y5*y8*y12*z9+x5*x6*x8*y4*y11*y12*z9-x4*x6*x8*y5*y11*y12*z9+x6*x8*x12*y4*y5*y9*z11-x4*x8*x12*y5*y6*y9*z11-x5*x6*x12*y4*y8*y9*z11+x4*x5*x12*y6*y8*y9*z11-x6*x8*x9*y4*y5*y12*z11+x4*x8*x9*y5*y6*y12*z11+x5*x6*x9*y4*y8*y12*z11-x4*x5*x9*y6*y8*y12*z11-x5*x9*x11*y4*y6*y8*z12+x4*x9*x11*y5*y6*y8*z12+x5*x6*x11*y4*y8*y9*z12-x4*x6*x11*y5*y8*y9*z12+x5*x8*x9*y4*y6*y11*z12-x4*x8*x9*y5*y6*y11*z12-x5*x6*x8*y4*y9*y11*z12+x4*x6*x8*y5*y9*y11*z12",
+    "x3*x11*x12*y2*y8*y9*z1-x2*x11*x12*y3*y8*y9*z1-x3*x8*x12*y2*y9*y11*z1+x2*x8*x12*y3*y9*y11*z1-x3*x9*x11*y2*y8*y12*z1+x2*x9*x11*y3*y8*y12*z1+x3*x8*x9*y2*y11*y12*z1-x2*x8*x9*y3*y11*y12*z1-x3*x11*x12*y1*y2*y9*z8+x1*x11*x12*y2*y3*y9*z8+x2*x3*x12*y1*y9*y11*z8-x1*x2*x12*y3*y9*y11*z8+x3*x9*x11*y1*y2*y12*z8-x1*x9*x11*y2*y3*y12*z8-x2*x3*x9*y1*y11*y12*z8+x1*x2*x9*y3*y11*y12*z8+x2*x11*x12*y1*y3*y8*z9-x1*x11*x12*y2*y3*y8*z9-x2*x8*x12*y1*y3*y11*z9+x1*x8*x12*y2*y3*y11*z9-x2*x3*x11*y1*y8*y12*z9+x1*x3*x11*y2*y8*y12*z9+x2*x3*x8*y1*y11*y12*z9-x1*x3*x8*y2*y11*y12*z9+x3*x8*x12*y1*y2*y9*z11-x1*x8*x12*y2*y3*y9*z11-x2*x3*x12*y1*y8*y9*z11+x1*x2*x12*y3*y8*y9*z11-x3*x8*x9*y1*y2*y12*z11+x1*x8*x9*y2*y3*y12*z11+x2*x3*x9*y1*y8*y12*z11-x1*x2*x9*y3*y8*y12*z11-x2*x9*x11*y1*y3*y8*z12+x1*x9*x11*y2*y3*y8*z12+x2*x3*x11*y1*y8*y9*z12-x1*x3*x11*y2*y8*y9*z12+x2*x8*x9*y1*y3*y11*z12-x1*x8*x9*y2*y3*y11*z12-x2*x3*x8*y1*y9*y11*z12+x1*x3*x8*y2*y9*y11*z12"
 
   id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
   R, id
