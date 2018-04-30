@@ -1619,9 +1619,9 @@ function ideal_q_andreas_gerhard(
   # singular polynomial ring
   vars = Array{String, 1}(n)
   vars =
-    "x1","x2","x3","x4","x5","x6","x7","x8","x9","x10","x11","x12",
+    ["x1","x2","x3","x4","x5","x6","x7","x8","x9","x10","x11","x12",
     "y1","y2","y3","y4","y5","y6","y7","y8","y9","y10","y11","y12",
-    "z1","z2","z3","z4","z5","z6","z7","z8","z9","z10","z11","z12"
+    "z1","z2","z3","z4","z5","z6","z7","z8","z9","z10","z11","z12"]
   if char == 0
     R, X = Singular.PolynomialRing(Singular.QQ, vars, ordering = ord)
   else
