@@ -7,6 +7,7 @@ using Singular
 using Cxx
 
 include("Benchmarks.jl")
+include("Example.jl")
 
 const pkgdir  = realpath(joinpath(dirname(@__FILE__), ".."))
 const libdir   = joinpath(pkgdir, "local", "lib")
