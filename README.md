@@ -11,5 +11,6 @@ computation, see **Benchmarks.jl**.
 In **Example.jl** we provide a small example for how to call the main functions
 of the package. E.g. in your julia session call
 ```julia
+using GB
 GB.run_cyclic_8()
 ```
