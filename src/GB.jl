@@ -124,11 +124,15 @@ function f4(
     error("At the moment GB only supports finite characteristic.
        Prime must be < 2^32.")
   end
+  # skip zero generators in ideal
+  ptr = Singular.libSingular.id_Copy(I.ptr, R.ptr)
+  J   = Singular.Ideal(R, ptr)
+  Singular.libSingular.idSkipZeroes(J.ptr)
   # get number of variables
   nvars   = Singular.ngens(R)
-  ngens   = Singular.ngens(I)
+  ngens   = Singular.ngens(J)
   # convert Singular ideal to flattened arrays of ints
-  lens, cfs, exps   = convert_singular_ideal_to_array(I, nvars, ngens)
+  lens, cfs, exps   = convert_singular_ideal_to_array(J, nvars, ngens)
   # call f4 in gb
 # println("Input data")
 #  println("----------")
