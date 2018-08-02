@@ -1,7 +1,8 @@
 oldwdir = pwd()
 
 # at the moment we only use the experimental plain branch of gb
-@show GB_BRANCH = "hashing-structs"
+@show GB_BRANCH = "only-hash-data"
+ #@show GB_BRANCH = "hashing-structs"
  # @show GB_BRANCH = "structured-polynomials"
 
 pkgdir = dirname(dirname(@__FILE__))
