@@ -107,7 +107,44 @@ function convert_gb_array_to_singular_ideal(
   end
   return Singular.Ideal(R, list)
 end
+"""
+    f4(I[, hts[, nthrds[, maxpairs[, resetht[, laopt[, infolevel[, monorder]]]]]]])
 
+Compute a Groebner basis of the given ideal I w.r.t. to the given monomial
+order using Faugere's F4 algorithm. The function takes a Singular ideal as
+input and returns a Singular ideal.
+
+# Arguments
+- `I::Singular.sideal`: ideal to compute a Groebner basis for.
+- `hts:Int=17`: hash table size log_2; default is 17, i.e. 2^17 as initial hash\
+                table size.
+- `nthrds::Int=1`:  number of threads; default is 1.
+- `maxpairs::Int=0`:  maximal number of pairs selected for one matrix; default is\
+                      0, i.e. no restriction. If matrices get too big or consume\
+                      too much memory this is a good parameter to play with.
+- `resetht::Int=0`: Resets the hash table after `resetht` steps in the algorthm;\
+                    default is 0, i.e. no resetting at all. Since we add\
+                    monomials to the matrices which are only used for reduction\
+                    purposes, but have no further meaning in the basis, this\
+                    parameter might also help when memory get a problem.
+- `laopt::Int=1`: option for linear algebra to be used. there are different\
+                  linear algebra routines implemented:\\
+                   1: exact sparse-dense computation,\\
+                   2: exact sparse computation,\\
+                  42: probabilistic sparse-dense computation,\\
+                  43: exact sparse then probabilistic dense computation,\\
+                  44: probabilistic sparse computation.
+- `infolevel::Int=0`: info level for printout, default is 0, i.e. no printout.\
+                      If set to 1 a summary of the computational data is printed\
+                      at the beginning and the end of the computation; if set to\
+                      2 also dynamical information for each round resp. matrix\
+                      is printed.
+- `monorder::Symbol=:degrevlex`: monomial order w.r.t. which the computation is\
+                                done; default is the\
+                                degree-reverse-lexicographical (DRL) order; a\
+                                second possible option is the lexicographical\
+                                order (LEX).
+"""
 function f4(
     I::Singular.sideal,           # input generators
     hts::Int=17,                  # hash table size, default 2^17
