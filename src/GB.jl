@@ -116,6 +116,7 @@ function f4(
                                   # in symbolic preprocessing
     resetht::Int=0,               # resetting global hash table
     laopt::Int=1,                 # linear algebra option
+    infolevel::Int=0,             # info level for print outs
     monorder::Symbol=:dregrevlex  # monomial order
     )
   R     = I.base_ring
@@ -134,7 +135,7 @@ function f4(
   # convert Singular ideal to flattened arrays of ints
   lens, cfs, exps   = convert_singular_ideal_to_array(J, nvars, ngens)
   # call f4 in gb
-# println("Input data")
+#  println("Input data")
 #  println("----------")
 #  println(lens)
 #  println(cfs)
@@ -162,8 +163,10 @@ function f4(
   sym = Libdl.dlsym(lib, :f4_julia)
   gb_basis  = ccall((:malloc, "libc"), Ptr{Ptr{Cint}}, (Csize_t, ), sizeof(Ptr{Cint}))
   gb_basis_len  = ccall(sym, Int,
-      (Ptr{Ptr{Cint}}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int, Int, Int, Int, Int, Int, Int, Int, Int),
-      gb_basis, lens, cfs, exps, char, ord, nvars, ngens, hts, nthrds, maxpairs, resetht, laopt)
+      (Ptr{Ptr{Cint}}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int, Int, Int, Int, Int,
+       Int, Int, Int, Int, Int),
+      gb_basis, lens, cfs, exps, char, ord, nvars, ngens, hts, nthrds, maxpairs,
+      resetht, laopt, infolevel)
   Libdl.dlclose(lib)
   #| gb_result  = ccall((:f4_julia, libgb), Ptr{Cint}, |#
       #| (Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int, Int, Int, Int, Int, Int), |#
