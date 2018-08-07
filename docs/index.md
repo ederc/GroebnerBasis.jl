@@ -24,7 +24,7 @@ To use GB.jl we require Julia 0.6 or higher. Please see
 [http://julialang.org/downloads](http://julialang.org/downloads/) for instructions on
 how to obtain julia for your system. Due to GB's main usage at the moment
 (i.e. having a Singular ideal, compute a Groebner basis for it and return this basis in Singular format)
-GB.jl **depends on Singular.jl** [https://wbhart.github.io/Singular.jl/](https://wbhart.github.io/Singular.jl/).
+GB.jl **depends on Singular.jl** (see [https://wbhart.github.io/Singular.jl/](https://wbhart.github.io/Singular.jl/)).
 
 At the Julia prompt simply type
 
