@@ -129,11 +129,11 @@ input and returns a Singular ideal.
                     parameter might also help when memory get a problem.
 - `laopt::Int=1`: option for linear algebra to be used. there are different\
                   linear algebra routines implemented:\\
-                   1: exact sparse-dense computation,\\
-                   2: exact sparse computation,\\
-                  42: probabilistic sparse-dense computation,\\
-                  43: exact sparse then probabilistic dense computation,\\
-                  44: probabilistic sparse computation.
+                  >  1: exact sparse-dense computation,\\
+                  >  2: exact sparse computation,\\
+                  > 42: probabilistic sparse-dense computation,\\
+                  > 43: exact sparse then probabilistic dense computation,\\
+                  > 44: probabilistic sparse computation.
 - `infolevel::Int=0`: info level for printout, default is 0, i.e. no printout.\
                       If set to 1 a summary of the computational data is printed\
                       at the beginning and the end of the computation; if set to\
