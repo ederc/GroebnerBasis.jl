@@ -197,7 +197,7 @@ function f4(
   # hash table size log_2, i.e. given 12 => 2^12
   # println(char, nvars, ngens, hts, nthrds, maxpairs, laopt)
   lib = Libdl.dlopen(libgb)
-  sym = Libdl.dlsym(lib, :f4_julia)
+  sym = Libdl.dlsym(lib, :f4_julia_ff)
   gb_basis  = ccall((:malloc, "libc"), Ptr{Ptr{Cint}}, (Csize_t, ), sizeof(Ptr{Cint}))
   gb_basis_len  = ccall(sym, Int,
       (Ptr{Ptr{Cint}}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int, Int, Int, Int, Int,
