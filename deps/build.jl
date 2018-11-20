@@ -1,3 +1,5 @@
+using Libdl
+
 oldwdir = pwd()
 
 # at the moment we only use the experimental plain branch of gb
@@ -9,7 +11,7 @@ pkgdir = dirname(dirname(@__FILE__))
 wdir = joinpath(pkgdir, "deps")
 vdir = joinpath(pkgdir, "local")
 
-if is_apple() && !("CC" in keys(ENV))
+if Sys.isapple() && !("CC" in keys(ENV))
    ENV["CC"] = "clang"
    ENV["CXX"] = "clang++"
 end
@@ -43,7 +45,7 @@ end
 
 # install gb - start
 
-if !is_windows()
+if !Sys.iswindows()
   println("Cloning gb ... ")
   if !ispath(joinpath("$wdir", "gb"))
     run(`git clone https://github.com/ederc/gb.git`)
