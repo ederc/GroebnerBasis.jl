@@ -4,8 +4,6 @@ oldwdir = pwd()
 
 # at the moment we only use the experimental plain branch of gb
 @show GB_BRANCH = "master"
- #@show GB_BRANCH = "hashing-structs"
- # @show GB_BRANCH = "structured-polynomials"
 
 pkgdir = dirname(dirname(@__FILE__))
 wdir = joinpath(pkgdir, "deps")
