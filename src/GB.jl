@@ -205,23 +205,17 @@ function f4(
   # println(char, nvars, ngens, hts, nthrds, maxpairs, laopt)
   lib = Libdl.dlopen(libgb)
   sym = Libdl.dlsym(lib, :f4_julia)
-  gb_basis  = ccall((:malloc, "libc"), Ptr{Ptr{Cint}}, (Csize_t, ), sizeof(Ptr{Cint}))
+  gb_basis  = ccall((:malloc, "libc.so.6"), Ptr{Ptr{Cint}}, (Csize_t, ), sizeof(Ptr{Cint}))
   gb_basis_len  = ccall(sym, Int,
       (Ptr{Ptr{Cint}}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int, Int, Int, Int, Int,
        Int, Int, Int, Int, Int),
       gb_basis, lens, cfs, exps, char, ord, nvars, ngens, hts, nthrds, maxpairs,
       resetht, laopt, infolevel)
   Libdl.dlclose(lib)
-  #| gb_result  = ccall((:f4_julia, libgb), Ptr{Cint}, |#
-      #| (Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int, Int, Int, Int, Int, Int), |#
-      #| lens, cfs, exps, char, nvars, ngens, hts, nthrds, laopt) |#
-
-   # get length of pointer, i.e. first entry
-  # sz  = unsafe_wrap(Array, gb_result, 1)
 
   # convert to julia array, also give memory management to julia
-  jl_basis  = unsafe_wrap(Array, unsafe_load(gb_basis), (gb_basis_len, ), true)
-  ccall((:free, "libc"), Nothing , (Ptr{Ptr{Cint}}, ), gb_basis)
+  jl_basis  = Base.unsafe_wrap(Array, unsafe_load(gb_basis), gb_basis_len; own=true)
+  ccall((:free, "libc.so.6"), Nothing , (Ptr{Ptr{Cint}}, ), gb_basis)
   basis       = convert_gb_array_to_singular_ideal(jl_basis, R)
   basis.isGB  = true;
 
