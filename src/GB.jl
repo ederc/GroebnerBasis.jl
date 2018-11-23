@@ -1,22 +1,28 @@
 module GB
 
-# package code goes here
-using Revise
-using Nemo
-using Singular
-using Cxx
-
+# other files
 include("Benchmarks.jl")
 include("Example.jl")
+
+# package code goes here
+using CxxWrap
+using Revise
+using Singular
+using Libdl
+
+export Singular
+
+@wrapmodule(joinpath(@__DIR__, "../local/lib", "libgbcpp"))
 
 const pkgdir  = realpath(joinpath(dirname(@__FILE__), ".."))
 const libdir   = joinpath(pkgdir, "local", "lib")
 const libgb   = joinpath(pkgdir, "local", "lib", "libgb")
 
 function __init__()
+   @initcxx
    if "HOSTNAME" in keys(ENV) && ENV["HOSTNAME"] == "juliabox"
        push!(Libdl.DL_LOAD_PATH, "/usr/local/lib")
-   elseif is_linux()
+   elseif Sys.islinux()
        push!(Libdl.DL_LOAD_PATH, libdir)
        Libdl.dlopen(libgb)
    else
@@ -38,13 +44,13 @@ function convert_singular_ideal_to_array(
     ngens::Int
     )
   nterms  = 0
-  lens = Array{Int32,1}(ngens)
+  lens = Array{Int32,1}(undef, ngens)
   for i = 1:ngens
     lens[i] =   length(id[i]) 
     nterms  +=  length(id[i])
   end
-  cfs   = Array{Int32,1}(nterms)
-  exps  = Array{Int32,1}(nvars*nterms)
+  cfs   = Array{Int32,1}(undef, nterms)
+  exps  = Array{Int32,1}(undef, nvars*nterms)
   ctr = 1
   for i = 1:Singular.ngens(id)
     for (c,e) in Singular.coeffs_expos(id[i])
@@ -100,7 +106,8 @@ function convert_gb_array_to_singular_ideal(
       Singular.libSingular.p_SetExpV(pterm, exp, R.ptr)
       # setting the next pointer needs to be done in Singular itself,
       # thus we need, for exactly this operation, inline cxx code
-      icxx"""$lp->next  = $pterm;"""
+      GB.np(lp, pterm)
+      #| icxx"""$lp->next  = $pterm;""" |#
       lp  = pterm
     end
     push!(list, R(p))
@@ -116,33 +123,33 @@ input and returns a Singular ideal.
 
 # Arguments
 - `I::Singular.sideal`: ideal to compute a Groebner basis for.
-- `hts:Int=17`: hash table size log_2; default is 17, i.e. 2^17 as initial hash\
+- `hts:Int=17`: hash table size log_2; default is 17, i.e. 2^17 as initial hash
                 table size.
 - `nthrds::Int=1`:  number of threads; default is 1.
-- `maxpairs::Int=0`:  maximal number of pairs selected for one matrix; default is\
-                      0, i.e. no restriction. If matrices get too big or consume\
+- `maxpairs::Int=0`:  maximal number of pairs selected for one matrix; default is
+                      0, i.e. no restriction. If matrices get too big or consume
                       too much memory this is a good parameter to play with.
-- `resetht::Int=0`: Resets the hash table after `resetht` steps in the algorthm;\
-                    default is 0, i.e. no resetting at all. Since we add\
-                    monomials to the matrices which are only used for reduction\
-                    purposes, but have no further meaning in the basis, this\
+- `resetht::Int=0`: Resets the hash table after `resetht` steps in the algorthm;
+                    default is 0, i.e. no resetting at all. Since we add
+                    monomials to the matrices which are only used for reduction
+                    purposes, but have no further meaning in the basis, this
                     parameter might also help when memory get a problem.
-- `laopt::Int=1`: option for linear algebra to be used. there are different\
-                  linear algebra routines implemented:\\
-                  >  1: exact sparse-dense computation,\\
-                  >  2: exact sparse computation,\\
-                  > 42: probabilistic sparse-dense computation,\\
-                  > 43: exact sparse then probabilistic dense computation,\\
+- `laopt::Int=1`: option for linear algebra to be used. there are different
+                  linear algebra routines implemented:
+                  >  1: exact sparse-dense computation,
+                  >  2: exact sparse computation,
+                  > 42: probabilistic sparse-dense computation,
+                  > 43: exact sparse then probabilistic dense computation,
                   > 44: probabilistic sparse computation.
-- `infolevel::Int=0`: info level for printout, default is 0, i.e. no printout.\
-                      If set to 1 a summary of the computational data is printed\
-                      at the beginning and the end of the computation; if set to\
-                      2 also dynamical information for each round resp. matrix\
+- `infolevel::Int=0`: info level for printout, default is 0, i.e. no printout.
+                      If set to 1 a summary of the computational data is printed
+                      at the beginning and the end of the computation; if set to
+                      2 also dynamical information for each round resp. matrix
                       is printed.
-- `monorder::Symbol=:degrevlex`: monomial order w.r.t. which the computation is\
-                                done; default is the\
-                                degree-reverse-lexicographical (DRL) order; a\
-                                second possible option is the lexicographical\
+- `monorder::Symbol=:degrevlex`: monomial order w.r.t. which the computation is
+                                done; default is the
+                                degree-reverse-lexicographical (DRL) order; a
+                                second possible option is the lexicographical
                                 order (LEX).
 """
 function f4(
@@ -214,7 +221,7 @@ function f4(
 
   # convert to julia array, also give memory management to julia
   jl_basis  = unsafe_wrap(Array, unsafe_load(gb_basis), (gb_basis_len, ), true)
-  ccall((:free, "libc"), Void, (Ptr{Ptr{Cint}}, ), gb_basis)
+  ccall((:free, "libc"), Nothing , (Ptr{Ptr{Cint}}, ), gb_basis)
   basis       = convert_gb_array_to_singular_ideal(jl_basis, R)
   basis.isGB  = true;
 

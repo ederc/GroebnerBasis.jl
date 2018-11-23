@@ -9,7 +9,7 @@ function cyclic_3(
     error("Order not known -- No ideal generated.")
   end
   n = 3
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -22,13 +22,13 @@ function cyclic_3(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "x1+x2+x3",
     "x1*x2+x2*x3+x1*x3",
     "x1*x2*x3-1"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -40,7 +40,7 @@ function cyclic_4(
     error("Order not known -- No ideal generated.")
   end
   n = 4
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -53,14 +53,14 @@ function cyclic_4(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "x1+x2+x3+x4",
     "x1*x2+x2*x3+x1*x4+x3*x4",
     "x1*x2*x3+x1*x2*x4+x1*x3*x4+x2*x3*x4",
     "x1*x2*x3*x4-1"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -72,7 +72,7 @@ function cyclic_5(
     error("Order not known -- No ideal generated.")
   end
   n = 5
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -85,7 +85,7 @@ function cyclic_5(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "x1+x2+x3+x4+x5",
     "x1*x2+x2*x3+x3*x4+x1*x5+x4*x5",
@@ -93,7 +93,7 @@ function cyclic_5(
     "x1*x2*x3*x4+x1*x2*x3*x5+x1*x2*x4*x5+x1*x3*x4*x5+x2*x3*x4*x5",
     "x1*x2*x3*x4*x5-1"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -105,7 +105,7 @@ function cyclic_6(
     error("Order not known -- No ideal generated.")
   end
   n = 6
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -118,7 +118,7 @@ function cyclic_6(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "x1+x2+x3+x4+x5+x6",
     "x1*x2+x2*x3+x3*x4+x4*x5+x1*x6+x5*x6",
@@ -127,7 +127,7 @@ function cyclic_6(
     "x1*x2*x3*x4*x5+x1*x2*x3*x4*x6+x1*x2*x3*x5*x6+x1*x2*x4*x5*x6+x1*x3*x4*x5*x6+x2*x3*x4*x5*x6",
     "x1*x2*x3*x4*x5*x6-1"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -139,7 +139,7 @@ function cyclic_7(
     error("Order not known -- No ideal generated.")
   end
   n = 7
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -152,7 +152,7 @@ function cyclic_7(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "x1+x2+x3+x4+x5+x6+x7",
     "x1*x2+x2*x3+x3*x4+x4*x5+x5*x6+x1*x7+x6*x7",
@@ -162,7 +162,7 @@ function cyclic_7(
     "x1*x2*x3*x4*x5*x6+x1*x2*x3*x4*x5*x7+x1*x2*x3*x4*x6*x7+x1*x2*x3*x5*x6*x7+x1*x2*x4*x5*x6*x7+x1*x3*x4*x5*x6*x7+x2*x3*x4*x5*x6*x7",
     "x1*x2*x3*x4*x5*x6*x7-1"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -174,7 +174,7 @@ function cyclic_8(
     error("Order not known -- No ideal generated.")
   end
   n = 8
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -187,7 +187,7 @@ function cyclic_8(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "x1+x2+x3+x4+x5+x6+x7+x8",
     "x1*x2+x2*x3+x3*x4+x4*x5+x5*x6+x6*x7+x1*x8+x7*x8",
@@ -198,7 +198,7 @@ function cyclic_8(
     "x1*x2*x3*x4*x5*x6*x7+x1*x2*x3*x4*x5*x6*x8+x1*x2*x3*x4*x5*x7*x8+x1*x2*x3*x4*x6*x7*x8+x1*x2*x3*x5*x6*x7*x8+x1*x2*x4*x5*x6*x7*x8+x1*x3*x4*x5*x6*x7*x8+x2*x3*x4*x5*x6*x7*x8",
     "x1*x2*x3*x4*x5*x6*x7*x8-1"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -210,7 +210,7 @@ function cyclic_9(
     error("Order not known -- No ideal generated.")
   end
   n = 9
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -223,7 +223,7 @@ function cyclic_9(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "x1+x2+x3+x4+x5+x6+x7+x8+x9",
     "x1*x2+x2*x3+x3*x4+x4*x5+x5*x6+x6*x7+x7*x8+x1*x9+x8*x9",
@@ -235,7 +235,7 @@ function cyclic_9(
     "x1*x2*x3*x4*x5*x6*x7*x8+x1*x2*x3*x4*x5*x6*x7*x9+x1*x2*x3*x4*x5*x6*x8*x9+x1*x2*x3*x4*x5*x7*x8*x9+x1*x2*x3*x4*x6*x7*x8*x9+x1*x2*x3*x5*x6*x7*x8*x9+x1*x2*x4*x5*x6*x7*x8*x9+x1*x3*x4*x5*x6*x7*x8*x9+x2*x3*x4*x5*x6*x7*x8*x9",
     "x1*x2*x3*x4*x5*x6*x7*x8*x9-1"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -247,7 +247,7 @@ function cyclic_10(
     error("Order not known -- No ideal generated.")
   end
   n = 10
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -260,7 +260,7 @@ function cyclic_10(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "x1+x2+x3+x4+x5+x6+x7+x8+x9+x10",
     "x1*x2+x2*x3+x3*x4+x4*x5+x5*x6+x6*x7+x7*x8+x8*x9+x1*x10+x9*x10",
@@ -273,7 +273,7 @@ function cyclic_10(
     "x1*x2*x3*x4*x5*x6*x7*x8*x9+x1*x2*x3*x4*x5*x6*x7*x8*x10+x1*x2*x3*x4*x5*x6*x7*x9*x10+x1*x2*x3*x4*x5*x6*x8*x9*x10+x1*x2*x3*x4*x5*x7*x8*x9*x10+x1*x2*x3*x4*x6*x7*x8*x9*x10+x1*x2*x3*x5*x6*x7*x8*x9*x10+x1*x2*x4*x5*x6*x7*x8*x9*x10+x1*x3*x4*x5*x6*x7*x8*x9*x10+x2*x3*x4*x5*x6*x7*x8*x9*x10",
     "x1*x2*x3*x4*x5*x6*x7*x8*x9*x10-1"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -285,7 +285,7 @@ function cyclic_11(
     error("Order not known -- No ideal generated.")
   end
   n = 11
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -298,7 +298,7 @@ function cyclic_11(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "x1+x2+x3+x4+x5+x6+x7+x8+x9+x10+x11",
     "x1*x2+x2*x3+x3*x4+x4*x5+x5*x6+x6*x7+x7*x8+x8*x9+x9*x10+x1*x11+x10*x11",
@@ -312,7 +312,7 @@ function cyclic_11(
     "x1*x2*x3*x4*x5*x6*x7*x8*x9*x10+x1*x2*x3*x4*x5*x6*x7*x8*x9*x11+x1*x2*x3*x4*x5*x6*x7*x8*x10*x11+x1*x2*x3*x4*x5*x6*x7*x9*x10*x11+x1*x2*x3*x4*x5*x6*x8*x9*x10*x11+x1*x2*x3*x4*x5*x7*x8*x9*x10*x11+x1*x2*x3*x4*x6*x7*x8*x9*x10*x11+x1*x2*x3*x5*x6*x7*x8*x9*x10*x11+x1*x2*x4*x5*x6*x7*x8*x9*x10*x11+x1*x3*x4*x5*x6*x7*x8*x9*x10*x11+x2*x3*x4*x5*x6*x7*x8*x9*x10*x11",
     "x1*x2*x3*x4*x5*x6*x7*x8*x9*x10*x11-1"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -327,7 +327,7 @@ function katsura_4(
     error("Order not known -- No ideal generated.")
   end
   n = 4
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -340,14 +340,14 @@ function katsura_4(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "x1+2*x2+2*x3+2*x4-1",
     "x1^2+2*x2^2+2*x3^2+2*x4^2-x1",
     "2*x1*x2+2*x2*x3+2*x3*x4-x2",
     "x2^2+2*x1*x3+2*x2*x4-x3"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -359,7 +359,7 @@ function katsura_5(
     error("Order not known -- No ideal generated.")
   end
   n = 5
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -372,7 +372,7 @@ function katsura_5(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "x1+2*x2+2*x3+2*x4+2*x5-1",
     "x1^2+2*x2^2+2*x3^2+2*x4^2+2*x5^2-x1",
@@ -380,7 +380,7 @@ function katsura_5(
     "x2^2+2*x1*x3+2*x2*x4+2*x3*x5-x3",
     "2*x2*x3+2*x1*x4+2*x2*x5-x4"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -392,7 +392,7 @@ function katsura_6(
     error("Order not known -- No ideal generated.")
   end
   n = 6
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -405,7 +405,7 @@ function katsura_6(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "x1+2*x2+2*x3+2*x4+2*x5+2*x6-1",
     "x1^2+2*x2^2+2*x3^2+2*x4^2+2*x5^2+2*x6^2-x1",
@@ -414,7 +414,7 @@ function katsura_6(
     "2*x2*x3+2*x1*x4+2*x2*x5+2*x3*x6-x4",
     "x3^2+2*x2*x4+2*x1*x5+2*x2*x6-x5"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -426,7 +426,7 @@ function katsura_7(
     error("Order not known -- No ideal generated.")
   end
   n = 7
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -439,7 +439,7 @@ function katsura_7(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "x1+2*x2+2*x3+2*x4+2*x5+2*x6+2*x7-1",
     "x1^2+2*x2^2+2*x3^2+2*x4^2+2*x5^2+2*x6^2+2*x7^2-x1",
@@ -449,7 +449,7 @@ function katsura_7(
     "x3^2+2*x2*x4+2*x1*x5+2*x2*x6+2*x3*x7-x5",
     "2*x3*x4+2*x2*x5+2*x1*x6+2*x2*x7-x6"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -461,7 +461,7 @@ function katsura_8(
     error("Order not known -- No ideal generated.")
   end
   n = 8
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -474,7 +474,7 @@ function katsura_8(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "x1+2*x2+2*x3+2*x4+2*x5+2*x6+2*x7+2*x8-1",
     "x1^2+2*x2^2+2*x3^2+2*x4^2+2*x5^2+2*x6^2+2*x7^2+2*x8^2-x1",
@@ -485,7 +485,7 @@ function katsura_8(
     "2*x3*x4+2*x2*x5+2*x1*x6+2*x2*x7+2*x3*x8-x6",
     "x4^2+2*x3*x5+2*x2*x6+2*x1*x7+2*x2*x8-x7"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -497,7 +497,7 @@ function katsura_9(
     error("Order not known -- No ideal generated.")
   end
   n = 9
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -510,7 +510,7 @@ function katsura_9(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "x1+2*x2+2*x3+2*x4+2*x5+2*x6+2*x7+2*x8+2*x9-1",
     "x1^2+2*x2^2+2*x3^2+2*x4^2+2*x5^2+2*x6^2+2*x7^2+2*x8^2+2*x9^2-x1",
@@ -522,7 +522,7 @@ function katsura_9(
     "x4^2+2*x3*x5+2*x2*x6+2*x1*x7+2*x2*x8+2*x3*x9-x7",
     "2*x4*x5+2*x3*x6+2*x2*x7+2*x1*x8+2*x2*x9-x8"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -534,7 +534,7 @@ function katsura_10(
     error("Order not known -- No ideal generated.")
   end
   n = 10
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -547,7 +547,7 @@ function katsura_10(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "x1+2*x2+2*x3+2*x4+2*x5+2*x6+2*x7+2*x8+2*x9+2*x10-1",
     "x1^2+2*x2^2+2*x3^2+2*x4^2+2*x5^2+2*x6^2+2*x7^2+2*x8^2+2*x9^2+2*x10^2-x1",
@@ -560,7 +560,7 @@ function katsura_10(
     "2*x4*x5+2*x3*x6+2*x2*x7+2*x1*x8+2*x2*x9+2*x3*x10-x8",
     "x5^2+2*x4*x6+2*x3*x7+2*x2*x8+2*x1*x9+2*x2*x10-x9"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -572,7 +572,7 @@ function katsura_11(
     error("Order not known -- No ideal generated.")
   end
   n = 11
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -585,7 +585,7 @@ function katsura_11(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "x1+2*x2+2*x3+2*x4+2*x5+2*x6+2*x7+2*x8+2*x9+2*x10+2*x11-1",
     "x1^2+2*x2^2+2*x3^2+2*x4^2+2*x5^2+2*x6^2+2*x7^2+2*x8^2+2*x9^2+2*x10^2+2*x11^2-x1",
@@ -599,7 +599,7 @@ function katsura_11(
     "x5^2+2*x4*x6+2*x3*x7+2*x2*x8+2*x1*x9+2*x2*x10+2*x3*x11-x9",
     "2*x5*x6+2*x4*x7+2*x3*x8+2*x2*x9+2*x1*x10+2*x2*x11-x10"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -611,7 +611,7 @@ function katsura_12(
     error("Order not known -- No ideal generated.")
   end
   n = 12
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -624,7 +624,7 @@ function katsura_12(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "x1+2*x2+2*x3+2*x4+2*x5+2*x6+2*x7+2*x8+2*x9+2*x10+2*x11+2*x12-1",
     "x1^2+2*x2^2+2*x3^2+2*x4^2+2*x5^2+2*x6^2+2*x7^2+2*x8^2+2*x9^2+2*x10^2+2*x11^2+2*x12^2-x1",
@@ -639,7 +639,7 @@ function katsura_12(
     "2*x5*x6+2*x4*x7+2*x3*x8+2*x2*x9+2*x1*x10+2*x2*x11+2*x3*x12-x10",
     "x6^2+2*x5*x7+2*x4*x8+2*x3*x9+2*x2*x10+2*x1*x11+2*x2*x12-x11"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -651,7 +651,7 @@ function katsura_13(
     error("Order not known -- No ideal generated.")
   end
   n = 13
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -664,7 +664,7 @@ function katsura_13(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "x1+2*x2+2*x3+2*x4+2*x5+2*x6+2*x7+2*x8+2*x9+2*x10+2*x11+2*x12+2*x13-1",
     "x1^2+2*x2^2+2*x3^2+2*x4^2+2*x5^2+2*x6^2+2*x7^2+2*x8^2+2*x9^2+2*x10^2+2*x11^2+2*x12^2+2*x13^2-x1",
@@ -680,7 +680,7 @@ function katsura_13(
     "x6^2+2*x5*x7+2*x4*x8+2*x3*x9+2*x2*x10+2*x1*x11+2*x2*x12+2*x3*x13-x11",
     "2*x6*x7+2*x5*x8+2*x4*x9+2*x3*x10+2*x2*x11+2*x1*x12+2*x2*x13-x12"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -692,7 +692,7 @@ function katsura_14(
     error("Order not known -- No ideal generated.")
   end
   n = 14
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -705,7 +705,7 @@ function katsura_14(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "x1+2*x2+2*x3+2*x4+2*x5+2*x6+2*x7+2*x8+2*x9+2*x10+2*x11+2*x12+2*x13+2*x14-1",
     "x1^2+2*x2^2+2*x3^2+2*x4^2+2*x5^2+2*x6^2+2*x7^2+2*x8^2+2*x9^2+2*x10^2+2*x11^2+2*x12^2+2*x13^2+2*x14^2-x1",
@@ -722,7 +722,7 @@ function katsura_14(
     "2*x6*x7+2*x5*x8+2*x4*x9+2*x3*x10+2*x2*x11+2*x1*x12+2*x2*x13+2*x3*x14-x12",
     "x7^2+2*x6*x8+2*x5*x9+2*x4*x10+2*x3*x11+2*x2*x12+2*x1*x13+2*x2*x14-x13"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -734,7 +734,7 @@ function katsura_15(
     error("Order not known -- No ideal generated.")
   end
   n = 15
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -747,7 +747,7 @@ function katsura_15(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "x1+2*x2+2*x3+2*x4+2*x5+2*x6+2*x7+2*x8+2*x9+2*x10+2*x11+2*x12+2*x13+2*x14+2*x15-1",
     "x1^2+2*x2^2+2*x3^2+2*x4^2+2*x5^2+2*x6^2+2*x7^2+2*x8^2+2*x9^2+2*x10^2+2*x11^2+2*x12^2+2*x13^2+2*x14^2+2*x15^2-x1",
@@ -765,7 +765,7 @@ function katsura_15(
     "x7^2+2*x6*x8+2*x5*x9+2*x4*x10+2*x3*x11+2*x2*x12+2*x1*x13+2*x2*x14+2*x3*x15-x13",
     "2*x7*x8+2*x6*x9+2*x5*x10+2*x4*x11+2*x3*x12+2*x2*x13+2*x1*x14+2*x2*x15-x14"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -777,7 +777,7 @@ function katsura_16(
     error("Order not known -- No ideal generated.")
   end
   n = 16
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -790,7 +790,7 @@ function katsura_16(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "x1+2*x2+2*x3+2*x4+2*x5+2*x6+2*x7+2*x8+2*x9+2*x10+2*x11+2*x12+2*x13+2*x14+2*x15+2*x16-1",
     "x1^2+2*x2^2+2*x3^2+2*x4^2+2*x5^2+2*x6^2+2*x7^2+2*x8^2+2*x9^2+2*x10^2+2*x11^2+2*x12^2+2*x13^2+2*x14^2+2*x15^2+2*x16^2-x1",
@@ -809,7 +809,7 @@ function katsura_16(
     "2*x7*x8+2*x6*x9+2*x5*x10+2*x4*x11+2*x3*x12+2*x2*x13+2*x1*x14+2*x2*x15+2*x3*x16-x14",
     "x8^2+2*x7*x9+2*x6*x10+2*x5*x11+2*x4*x12+2*x3*x13+2*x2*x14+2*x1*x15+2*x2*x16-x15"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -821,7 +821,7 @@ function katsura_17(
     error("Order not known -- No ideal generated.")
   end
   n = 17
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -834,7 +834,7 @@ function katsura_17(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "x1+2*x2+2*x3+2*x4+2*x5+2*x6+2*x7+2*x8+2*x9+2*x10+2*x11+2*x12+2*x13+2*x14+2*x15+2*x16+2*x17-1",
     "x1^2+2*x2^2+2*x3^2+2*x4^2+2*x5^2+2*x6^2+2*x7^2+2*x8^2+2*x9^2+2*x10^2+2*x11^2+2*x12^2+2*x13^2+2*x14^2+2*x15^2+2*x16^2+2*x17^2-x1",
@@ -854,7 +854,7 @@ function katsura_17(
     "x8^2+2*x7*x9+2*x6*x10+2*x5*x11+2*x4*x12+2*x3*x13+2*x2*x14+2*x1*x15+2*x2*x16+2*x3*x17-x15",
     "2*x8*x9+2*x7*x10+2*x6*x11+2*x5*x12+2*x4*x13+2*x3*x14+2*x2*x15+2*x1*x16+2*x2*x17-x16"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -866,7 +866,7 @@ function katsura_18(
     error("Order not known -- No ideal generated.")
   end
   n = 18
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -879,7 +879,7 @@ function katsura_18(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "x1+2*x2+2*x3+2*x4+2*x5+2*x6+2*x7+2*x8+2*x9+2*x10+2*x11+2*x12+2*x13+2*x14+2*x15+2*x16+2*x17+2*x18-1",
     "x1^2+2*x2^2+2*x3^2+2*x4^2+2*x5^2+2*x6^2+2*x7^2+2*x8^2+2*x9^2+2*x10^2+2*x11^2+2*x12^2+2*x13^2+2*x14^2+2*x15^2+2*x16^2+2*x17^2+2*x18^2-x1",
@@ -900,7 +900,7 @@ function katsura_18(
     "2*x8*x9+2*x7*x10+2*x6*x11+2*x5*x12+2*x4*x13+2*x3*x14+2*x2*x15+2*x1*x16+2*x2*x17+2*x3*x18-x16",
     "x9^2+2*x8*x10+2*x7*x11+2*x6*x12+2*x5*x13+2*x4*x14+2*x3*x15+2*x2*x16+2*x1*x17+2*x2*x18-x17"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -915,7 +915,7 @@ function mayr_42(
     error("Order not known -- No ideal generated.")
   end
   n = 51
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -928,7 +928,7 @@ function mayr_42(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "-x10*x51+x4*x49",
     "x3*x48-x51*x9",
@@ -975,7 +975,7 @@ function mayr_42(
     "x13*x22*x33*x37*x7-x27*x33*x42*x51*x7",
     "x12*x21*x32*x36*x6-x26*x32*x41*x51*x6"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -987,7 +987,7 @@ function jason_210(
     error("Order not known -- No ideal generated.")
   end
   n = 8
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -1000,13 +1000,13 @@ function jason_210(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "x1^2*x3^4+x1*x2*x3^2*x5^2+x1*x2*x3*x4*x5*x7+x1*x2*x3*x4*x6*x8+x1*x2*x4^2*x6^2+x2^2*x4^4",
     "x2^6",
     "x1^6"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -1022,7 +1022,7 @@ function pearson_9(
   n3  = 3
   n4  = 8
   n   = n1 + n2 + n3 + n4
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   ctr = 1
@@ -1049,7 +1049,7 @@ function pearson_9(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "a1+a2+a3-1",
     "a1*x1+a2*x2+a3*x3-m1",
@@ -1069,7 +1069,7 @@ function pearson_9(
     210*a1*x1^4*s1^2+210*a2*x2^4*s2^2+210*a3*x3^4*s3^2+420*a1*x1^2*s1^3+
     420*a2*x2^2*s2^3+420*a3*x3^2*s3^3+105*a1*s1^4+105*a2*s2^4+105*a3*s3^4-m8"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -1085,7 +1085,7 @@ function pearson_12(
   n3  = 4
   n4  = 11
   n   = n1 + n2 + n3 + n4
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   ctr = 1
@@ -1112,7 +1112,7 @@ function pearson_12(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "a1+ a2+ a3+ a4- 1",
     "a1*x1+ a2*x2+ a3*x3+ a4*x4- m1",
@@ -1155,7 +1155,7 @@ function pearson_12(
     17325*a2*x2^3*s2^4+ 17325*a3*x3^3*s3^4+ 17325*a4*x4^3*s4^4+
     10395*a1*x1*s1^5+ 10395*a2*x2*s2^5+ 10395*a3*x3*s3^5+ 10395*a4*x4*s4^5- m11"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -1167,7 +1167,7 @@ function bayes_148(
     error("Order not known -- No ideal generated.")
   end
   n = 32
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -1180,7 +1180,7 @@ function bayes_148(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "-x23*x32+x24*x31",
     "-x22*x32+x24*x30",
@@ -1204,7 +1204,7 @@ function bayes_148(
     "x18*x6-x2*x22",
     "-x1*x21+x17*x5"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -1216,7 +1216,7 @@ function reimer_8(
     error("Order not known -- No ideal generated.")
   end
   n = 8
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -1229,7 +1229,7 @@ function reimer_8(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "2*x1^2 - 2*x2^2 + 2*x3^2 - 2*x4^2 + 2*x5^2 - 2*x6^2 + 2*x7^2 - 2*x8^2 - 1",
     "2*x1^3 - 2*x2^3 + 2*x3^3 - 2*x4^3 + 2*x5^3 - 2*x6^3 + 2*x7^3 - 2*x8^3 - 1",
@@ -1240,7 +1240,7 @@ function reimer_8(
     "2*x1^8 - 2*x2^8 + 2*x3^8 - 2*x4^8 + 2*x5^8 - 2*x6^8 + 2*x7^8 - 2*x8^8 - 1",
     "2*x1^9 - 2*x2^9 + 2*x3^9 - 2*x4^9 + 2*x5^9 - 2*x6^9 + 2*x7^9 - 2*x8^9 - 1"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -1252,7 +1252,7 @@ function gametwo_7(
     error("Order not known -- No ideal generated.")
   end
   n = 7
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -1265,7 +1265,7 @@ function gametwo_7(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "3821*p2*p3*p4*p5*p6*p7- 7730*p2*p3*p4*p5*p6- 164*p2*p3*p4*p5*p7-
     2536*p2*p3*p4*p6*p7- 4321*p2*p3*p5*p6*p7- 2161*p2*p4*p5*p6*p7-
@@ -1365,7 +1365,7 @@ function gametwo_7(
     481*p3*p6+ 759*p4*p6- 595*p5*p6+ 3233*p1- 1978*p2+ 729*p3- 1184*p4- 40*p5+
     446*p6+ 282"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -1377,7 +1377,7 @@ function yang_1(
     error("Order not known -- No ideal generated.")
   end
   n = 48
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -1390,7 +1390,7 @@ function yang_1(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "x21*x45+ x22*x46+ x23*x47+ x24*x48",
     "x17*x45+ x18*x46+ x19*x47+ x20*x48",
@@ -1603,7 +1603,7 @@ function yang_1(
     x12*x13*x3*x6- x12*x14*x3*x5+ x12*x15*x2*x5+ x14*x3*x8*x9- x14*x4*x7*x9-
     x15*x2*x8*x9+ x15*x4*x6*x9+ x16*x2*x7*x9- x16*x3*x6*x9"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -1617,7 +1617,7 @@ function ideal_q_andreas_gerhard(
   n = 36
   # generate dummy array of n strings for generating
   # singular polynomial ring
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   vars =
     ["x1","x2","x3","x4","x5","x6","x7","x8","x9","x10","x11","x12",
     "y1","y2","y3","y4","y5","y6","y7","y8","y9","y10","y11","y12",
@@ -1629,7 +1629,7 @@ function ideal_q_andreas_gerhard(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "-x12*y4*y11*z1*z10+x11*y4*y12*z1*z10+x12*y1*y11*z4*z10-x11*y1*y12*z4*z10+x12*y4*y10*z1*z11-x4*y10*y12*z1*z11-x12*y1*y10*z4*z11+x1*y10*y12*z4*z11+x4*y1*y12*z10*z11-x1*y4*y12*z10*z11-x11*y4*y10*z1*z12+x4*y10*y11*z1*z12+x11*y1*y10*z4*z12-x1*y10*y11*z4*z12-x4*y1*y11*z10*z12+x1*y4*y11*z10*z12",
     "-x9*y4*y8*z1*z7+x8*y4*y9*z1*z7+x9*y1*y8*z4*z7-x8*y1*y9*z4*z7+x9*y4*y7*z1*z8-x4*y7*y9*z1*z8-x9*y1*y7*z4*z8+x1*y7*y9*z4*z8+x4*y1*y9*z7*z8-x1*y4*y9*z7*z8-x8*y4*y7*z1*z9+x4*y7*y8*z1*z9+x8*y1*y7*z4*z9-x1*y7*y8*z4*z9-x4*y1*y8*z7*z9+x1*y4*y8*z7*z9",
@@ -1642,7 +1642,7 @@ function ideal_q_andreas_gerhard(
     "x6*x11*x12*y5*y8*y9*z4-x5*x11*x12*y6*y8*y9*z4-x6*x8*x12*y5*y9*y11*z4+x5*x8*x12*y6*y9*y11*z4-x6*x9*x11*y5*y8*y12*z4+x5*x9*x11*y6*y8*y12*z4+x6*x8*x9*y5*y11*y12*z4-x5*x8*x9*y6*y11*y12*z4-x6*x11*x12*y4*y5*y9*z8+x4*x11*x12*y5*y6*y9*z8+x5*x6*x12*y4*y9*y11*z8-x4*x5*x12*y6*y9*y11*z8+x6*x9*x11*y4*y5*y12*z8-x4*x9*x11*y5*y6*y12*z8-x5*x6*x9*y4*y11*y12*z8+x4*x5*x9*y6*y11*y12*z8+x5*x11*x12*y4*y6*y8*z9-x4*x11*x12*y5*y6*y8*z9-x5*x8*x12*y4*y6*y11*z9+x4*x8*x12*y5*y6*y11*z9-x5*x6*x11*y4*y8*y12*z9+x4*x6*x11*y5*y8*y12*z9+x5*x6*x8*y4*y11*y12*z9-x4*x6*x8*y5*y11*y12*z9+x6*x8*x12*y4*y5*y9*z11-x4*x8*x12*y5*y6*y9*z11-x5*x6*x12*y4*y8*y9*z11+x4*x5*x12*y6*y8*y9*z11-x6*x8*x9*y4*y5*y12*z11+x4*x8*x9*y5*y6*y12*z11+x5*x6*x9*y4*y8*y12*z11-x4*x5*x9*y6*y8*y12*z11-x5*x9*x11*y4*y6*y8*z12+x4*x9*x11*y5*y6*y8*z12+x5*x6*x11*y4*y8*y9*z12-x4*x6*x11*y5*y8*y9*z12+x5*x8*x9*y4*y6*y11*z12-x4*x8*x9*y5*y6*y11*z12-x5*x6*x8*y4*y9*y11*z12+x4*x6*x8*y5*y9*y11*z12",
     "x3*x11*x12*y2*y8*y9*z1-x2*x11*x12*y3*y8*y9*z1-x3*x8*x12*y2*y9*y11*z1+x2*x8*x12*y3*y9*y11*z1-x3*x9*x11*y2*y8*y12*z1+x2*x9*x11*y3*y8*y12*z1+x3*x8*x9*y2*y11*y12*z1-x2*x8*x9*y3*y11*y12*z1-x3*x11*x12*y1*y2*y9*z8+x1*x11*x12*y2*y3*y9*z8+x2*x3*x12*y1*y9*y11*z8-x1*x2*x12*y3*y9*y11*z8+x3*x9*x11*y1*y2*y12*z8-x1*x9*x11*y2*y3*y12*z8-x2*x3*x9*y1*y11*y12*z8+x1*x2*x9*y3*y11*y12*z8+x2*x11*x12*y1*y3*y8*z9-x1*x11*x12*y2*y3*y8*z9-x2*x8*x12*y1*y3*y11*z9+x1*x8*x12*y2*y3*y11*z9-x2*x3*x11*y1*y8*y12*z9+x1*x3*x11*y2*y8*y12*z9+x2*x3*x8*y1*y11*y12*z9-x1*x3*x8*y2*y11*y12*z9+x3*x8*x12*y1*y2*y9*z11-x1*x8*x12*y2*y3*y9*z11-x2*x3*x12*y1*y8*y9*z11+x1*x2*x12*y3*y8*y9*z11-x3*x8*x9*y1*y2*y12*z11+x1*x8*x9*y2*y3*y12*z11+x2*x3*x9*y1*y8*y12*z11-x1*x2*x9*y3*y8*y12*z11-x2*x9*x11*y1*y3*y8*z12+x1*x9*x11*y2*y3*y8*z12+x2*x3*x11*y1*y8*y9*z12-x1*x3*x11*y2*y8*y9*z12+x2*x8*x9*y1*y3*y11*z12-x1*x8*x9*y2*y3*y11*z12-x2*x3*x8*y1*y9*y11*z12+x1*x3*x8*y2*y9*y11*z12"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -1657,7 +1657,7 @@ function zhang_xxz_10_5(
     error("Order not known -- No ideal generated.")
   end
   n = 18
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -1670,7 +1670,7 @@ function zhang_xxz_10_5(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps  =
     "x14*(-2 + x3)",
     "680*x14 - 257*x15 + 16*x15*x3 + 16*x14*x4",
@@ -1691,7 +1691,7 @@ function zhang_xxz_10_5(
     "-1024 + 1024*x1 + 1048577*x1*x14 + 1024*x1*x14^2 + 262148*x1*x15 + 4352*x1*x14*x15 + 1024*x1*x15^2 + 65552*x1*x16 + 16448*x1*x14*x16 + 4352*x1*x15*x16 + 1024*x1*x16^2 + 16448*x1*x17 + 65552*x1*x14*x17 + 16448*x1*x15*x17 + 4352*x1*x16*x17 + 1024*x1*x17^2 + 4352*x1*x18 + 262148*x1*x14*x18 + 65552*x1*x15*x18 + 16448*x1*x16*x18 + 4352*x1*x17*x18 + 1024*x1*x18^2",
     "-1 + x14*x2"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -1704,7 +1704,7 @@ function zhang_xxz_11_5(
     error("Order not known -- No ideal generated.")
   end
   n = 19
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -1717,7 +1717,7 @@ function zhang_xxz_11_5(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps  =
       "x15*(5 + 2*x3)",
       "-880*x15 + 1025*x16 + 32*x16*x3 + 32*x15*x4",
@@ -1739,7 +1739,7 @@ function zhang_xxz_11_5(
       "-1024 + 1024*x1 + 1048577*x1*x15 + 1024*x1*x15^2 + 262148*x1*x16 + 4352*x1*x15*x16 + 1024*x1*x16^2 + 65552*x1*x17 + 16448*x1*x15*x17 + 4352*x1*x16*x17 + 1024*x1*x17^2 + 16448*x1*x18 + 65552*x1*x15*x18 + 16448*x1*x16*x18 + 4352*x1*x17*x18 + 1024*x1*x18^2 + 4352*x1*x19 + 262148*x1*x15*x19 + 65552*x1*x16*x19 + 16448*x1*x17*x19 + 4352*x1*x18*x19 + 1024*x1*x19^2",
       "-1 + x15*x2"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -1752,7 +1752,7 @@ function zhang_xxz_12_6(
     error("Order not known -- No ideal generated.")
   end
   n = 21
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -1765,7 +1765,7 @@ function zhang_xxz_12_6(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps  =
     "x16*(-2 + x3)",
     "816*x16 - 257*x17 + 16*x17*x3 + 16*x16*x4",
@@ -1789,7 +1789,7 @@ function zhang_xxz_12_6(
     "-4096 + 4096*x1 + 16777217*x1*x16 + 4096*x1*x16^2 + 4194308*x1*x17 + 17408*x1*x16*x17 + 4096*x1*x17^2 + 1048592*x1*x18 + 65792*x1*x16*x18 + 17408*x1*x17*x18 + 4096*x1*x18^2 + 262208*x1*x19 + 262208*x1*x16*x19 + 65792*x1*x17*x19 + 17408*x1*x18*x19 + 4096*x1*x19^2 + 65792*x1*x20 + 1048592*x1*x16*x20 + 262208*x1*x17*x20 + 65792*x1*x18*x20 + 17408*x1*x19*x20 + 4096*x1*x20^2 + 17408*x1*x21 + 4194308*x1*x16*x21 + 1048592*x1*x17*x21 + 262208*x1*x18*x21 + 65792*x1*x19*x21 + 17408*x1*x20*x21 + 4096*x1*x21^2",
     "-1 + x16*x2"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -1802,7 +1802,7 @@ function zhang_xxz_13_6(
     error("Order not known -- No ideal generated.")
   end
   n = 22
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -1815,7 +1815,7 @@ function zhang_xxz_13_6(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps  =
     "x17*(5 + 2*x3)",
     "-1040*x17 + 1025*x18 + 32*x18*x3 + 32*x17*x4",
@@ -1840,7 +1840,7 @@ function zhang_xxz_13_6(
     "-4096 + 4096*x1 + 16777217*x1*x17 + 4096*x1*x17^2 + 4194308*x1*x18 + 17408*x1*x17*x18 + 4096*x1*x18^2 + 1048592*x1*x19 + 65792*x1*x17*x19 + 17408*x1*x18*x19 + 4096*x1*x19^2 + 262208*x1*x20 + 262208*x1*x17*x20 + 65792*x1*x18*x20 + 17408*x1*x19*x20 + 4096*x1*x20^2 + 65792*x1*x21 + 1048592*x1*x17*x21 + 262208*x1*x18*x21 + 65792*x1*x19*x21 + 17408*x1*x20*x21 + 4096*x1*x21^2 + 17408*x1*x22 + 4194308*x1*x17*x22 + 1048592*x1*x18*x22 + 262208*x1*x19*x22 + 65792*x1*x20*x22 + 17408*x1*x21*x22 + 4096*x1*x22^2",
     "-1 + x17*x2"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -1853,7 +1853,7 @@ function zhang_xxz_14_7(
     error("Order not known -- No ideal generated.")
   end
   n = 24
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -1866,7 +1866,7 @@ function zhang_xxz_14_7(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps  =
     "x18*(-2 + x3)",
     "952*x18 - 257*x19 + 16*x19*x3 + 16*x18*x4",
@@ -1894,7 +1894,7 @@ function zhang_xxz_14_7(
     "-16384 + 16384*x1 + 268435457*x1*x18 + 16384*x1*x18^2 + 67108868*x1*x19 + 69632*x1*x18*x19 + 16384*x1*x19^2 + 16777232*x1*x20 + 263168*x1*x18*x20 + 69632*x1*x19*x20 + 16384*x1*x20^2 + 4194368*x1*x21 + 1048832*x1*x18*x21 + 263168*x1*x19*x21 + 69632*x1*x20*x21 + 16384*x1*x21^2 + 1048832*x1*x22 + 4194368*x1*x18*x22 + 1048832*x1*x19*x22 + 263168*x1*x20*x22 + 69632*x1*x21*x22 + 16384*x1*x22^2 + 263168*x1*x23 + 16777232*x1*x18*x23 + 4194368*x1*x19*x23 + 1048832*x1*x20*x23 + 263168*x1*x21*x23 + 69632*x1*x22*x23 + 16384*x1*x23^2 + 69632*x1*x24 + 67108868*x1*x18*x24 + 16777232*x1*x19*x24 + 4194368*x1*x20*x24 + 1048832*x1*x21*x24 + 263168*x1*x22*x24 + 69632*x1*x23*x24 + 16384*x1*x24^2",
     "-1 + x18*x2"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -1907,7 +1907,7 @@ function zhang_xxz_15_7(
     error("Order not known -- No ideal generated.")
   end
   n = 25
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -1920,7 +1920,7 @@ function zhang_xxz_15_7(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps  =
       "x19*(5 + 2*x3)",
       "-1200*x19 + 1025*x20 + 32*x20*x3 + 32*x19*x4",
@@ -1948,7 +1948,7 @@ function zhang_xxz_15_7(
       "-16384 + 16384*x1 + 268435457*x1*x19 + 16384*x1*x19^2 + 67108868*x1*x20 + 69632*x1*x19*x20 + 16384*x1*x20^2 + 16777232*x1*x21 + 263168*x1*x19*x21 + 69632*x1*x20*x21 + 16384*x1*x21^2 + 4194368*x1*x22 + 1048832*x1*x19*x22 + 263168*x1*x20*x22 + 69632*x1*x21*x22 + 16384*x1*x22^2 + 1048832*x1*x23 + 4194368*x1*x19*x23 + 1048832*x1*x20*x23 + 263168*x1*x21*x23 + 69632*x1*x22*x23 + 16384*x1*x23^2 + 263168*x1*x24 + 16777232*x1*x19*x24 + 4194368*x1*x20*x24 + 1048832*x1*x21*x24 + 263168*x1*x22*x24 + 69632*x1*x23*x24 + 16384*x1*x24^2 + 69632*x1*x25 + 67108868*x1*x19*x25 + 16777232*x1*x20*x25 + 4194368*x1*x21*x25 + 1048832*x1*x22*x25 + 263168*x1*x23*x25 + 69632*x1*x24*x25 + 16384*x1*x25^2",
       "-1 + x19*x2"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -1961,7 +1961,7 @@ function zhang_xxz_16_8(
     error("Order not known -- No ideal generated.")
   end
   n = 27
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -1974,7 +1974,7 @@ function zhang_xxz_16_8(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps  =
     "x20*(-2 + x3)",
     "1088*x20 - 257*x21 + 16*x21*x3 + 16*x20*x4",
@@ -2004,7 +2004,7 @@ function zhang_xxz_16_8(
     "-65536 + 65536*x1 + 4294967297*x1*x20 + 65536*x1*x20^2 + 1073741828*x1*x21 + 278528*x1*x20*x21 + 65536*x1*x21^2 + 268435472*x1*x22 + 1052672*x1*x20*x22 + 278528*x1*x21*x22 + 65536*x1*x22^2 + 67108928*x1*x23 + 4195328*x1*x20*x23 + 1052672*x1*x21*x23 + 278528*x1*x22*x23 + 65536*x1*x23^2 + 16777472*x1*x24 + 16777472*x1*x20*x24 + 4195328*x1*x21*x24 + 1052672*x1*x22*x24 + 278528*x1*x23*x24 + 65536*x1*x24^2 + 4195328*x1*x25 + 67108928*x1*x20*x25 + 16777472*x1*x21*x25 + 4195328*x1*x22*x25 + 1052672*x1*x23*x25 + 278528*x1*x24*x25 + 65536*x1*x25^2 + 1052672*x1*x26 + 268435472*x1*x20*x26 + 67108928*x1*x21*x26 + 16777472*x1*x22*x26 + 4195328*x1*x23*x26 + 1052672*x1*x24*x26 + 278528*x1*x25*x26 + 65536*x1*x26^2 + 278528*x1*x27 + 1073741828*x1*x20*x27 + 268435472*x1*x21*x27 + 67108928*x1*x22*x27 + 16777472*x1*x23*x27 + 4195328*x1*x24*x27 + 1052672*x1*x25*x27 + 278528*x1*x26*x27 + 65536*x1*x27^2",
     "-1 + x2*x20"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -2017,7 +2017,7 @@ function zhang_gb_1(
     error("Order not known -- No ideal generated.")
   end
   n = 5
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -2030,7 +2030,7 @@ function zhang_gb_1(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps  =
     "10*x5",
     "1000*x5+41813*x4*x5+80*x5^3",
@@ -2048,7 +2048,7 @@ function zhang_gb_1(
     "7040*x1+16413*x1*x2+40573*x3+22813*x2*x3+6144*x3^3+40733*x1*x4+29853*x3*x4+38912*x2*x3*x4+21504*x1*x4^2+29440*x3*x4^2+26653*x3*x4^3+41697*x5+37533*x2*x5+21504*x2^2*x5+3043*x1*x3*x5+27136*x3^2*x5+38653*x4*x5+41472*x2*x4*x5+34874*x3^2*x4*x5+21120*x4^2*x5+31802*x2*x4^2*x5+11037*x4^3*x5+13312*x4^4*x5+512*x1*x5^2+15360*x3*x5^2+28730*x2*x3*x5^2+22586*x1*x4*x5^2+40023*x3*x4*x5^2+1990*x3*x4^2*x5^2+2496*x5^3+22045*x2*x5^3+30720*x3^2*x5^3+17693*x4*x5^3+23523*x2*x4*x5^3+18403*x4^2*x5^3+1053*x4^3*x5^3+19456*x1*x5^4+27904*x3*x5^4+17466*x3*x4*x5^4+5504*x5^5+26653*x2*x5^5+12573*x4*x5^5+33792*x4^2*x5^5+12288*x3*x5^6+4096*x5^7+31773*x4*x5^7+1024*x5^9",
     "800*x3+12800*x2*x3+28800*x1*x4+8800*x3*x4+32413*x3*x4^2+23153*x5+3840*x2*x5+35840*x2^2*x5+30720*x1*x3*x5+25600*x3^2*x5+1587*x4*x5+39680*x2*x4*x5+2077*x3^2*x4*x5+18557*x4^2*x5+27194*x2*x4^2*x5+31773*x4^3*x5+9216*x4^4*x5+30493*x1*x5^2+19456*x3*x5^2+30295*x2*x3*x5^2+9303*x1*x4*x5^2+1751*x3*x4*x5^2+32710*x3*x4^2*x5^2+29501*x5^3+34874*x2*x5^3+16355*x3^2*x5^3+24669*x4*x5^3+18345*x2*x4*x5^3+11206*x4^2*x5^3+16442*x4^3*x5^3+13283*x1*x5^4+25315*x3*x5^4+23668*x3*x4*x5^4+9728*x5^5+39994*x2*x5^5+15546*x4*x5^5+34787*x4^2*x5^5+33280*x3*x5^6+11520*x5^7+14365*x4*x5^7+3072*x5^9"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -2060,7 +2060,7 @@ function zhang_gb_2(
     error("Order not known -- No ideal generated.")
   end
   n = 8
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -2073,7 +2073,7 @@ function zhang_gb_2(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps  =
     "32+32*x7+41965*x8^2",
     "2688+2560*x7+41885*x7^2+38037*x8^2+248*x7*x8^2+41929*x8^4",
@@ -2112,7 +2112,7 @@ function zhang_gb_2(
     "31502+39359*x1+33224*x2^2+1828*x3+15330*x1*x3+22562*x3^2+36586*x2*x4+25603*x4^2+10087*x3*x4^2+21627*x5+17575*x1*x5+4574*x3*x5+41421*x3^2*x5+33019*x2*x4*x5+34755*x4^2*x5+8972*x5^2+25838*x1*x5^2+6697*x3*x5^2+6216*x5^3+296*x5^4+10570*x2*x6+18842*x2*x3*x6+6308*x4*x6+16844*x1*x4*x6+31809*x3*x4*x6+22832*x2*x5*x6+25517*x4*x5*x6+14379*x4*x5^2*x6+7643*x6^2+27016*x1*x6^2+13658*x3*x6^2+33591*x4^2*x6^2+35512*x5*x6^2+15526*x3*x5*x6^2+39127*x5^2*x6^2+23504*x2*x6^3+41690*x4*x6^3+7000*x6^4+19249*x5*x6^4+2343*x7+15954*x1*x7+39662*x2^2*x7+18025*x3*x7+1628*x1*x3*x7+24315*x3^2*x7+20535*x2*x4*x7+28888*x4^2*x7+6070*x5*x7+36969*x1*x5*x7+19550*x3*x5*x7+31815*x4^2*x5*x7+19617*x5^2*x7+851*x3*x5^2*x7+14994*x5^3*x7+5700*x2*x6*x7+22523*x4*x6*x7+33332*x3*x4*x6*x7+4810*x2*x5*x6*x7+36569*x4*x5*x6*x7+20744*x6^2*x7+36736*x1*x6^2*x7+12575*x3*x6^2*x7+38954*x5*x6^2*x7+4944*x5^2*x6^2*x7+1066*x4*x6^3*x7+31324*x6^4*x7+22971*x7^2+4806*x1*x7^2+28309*x3*x7^2+29854*x3^2*x7^2+39238*x2*x4*x7^2+11250*x4^2*x7^2+10333*x5*x7^2+40792*x1*x5*x7^2+2030*x3*x5*x7^2+8484*x5^2*x7^2+20914*x5^3*x7^2+33290*x2*x6*x7^2+31865*x4*x6*x7^2+9199*x4*x5*x6*x7^2+24288*x6^2*x7^2+29484*x3*x6^2*x7^2+21289*x5*x6^2*x7^2+33406*x6^4*x7^2+23232*x7^3+27859*x1*x7^3+18930*x3*x7^3+17480*x4^2*x7^3+26553*x5*x7^3+13602*x3*x5*x7^3+14336*x5^2*x7^3+2109*x2*x6*x7^3+23758*x4*x6*x7^3+7908*x6^2*x7^3+1036*x5*x6^2*x7^3+3806*x7^4+12307*x1*x7^4+26276*x3*x7^4+28714*x5*x7^4+33500*x5^2*x7^4+7608*x4*x6*x7^4+8892*x6^2*x7^4+30020*x7^5+19619*x3*x7^5+17069*x5*x7^5+32666*x6^2*x7^5+6888*x7^6+962*x5*x7^6+15731*x7^7+31371*x7^8+29408*x2*x8+23225*x1*x2*x8+37169*x2*x3*x8+39356*x4*x8+5465*x1*x4*x8+15397*x3*x4*x8+34483*x4^3*x8+22966*x2*x5*x8+30929*x4*x5*x8+30022*x3*x4*x5*x8+40755*x2*x5^2*x8+36255*x4*x5^2*x8+16290*x6*x8+20588*x1*x6*x8+16508*x3*x6*x8+18805*x3^2*x6*x8+13896*x2*x4*x6*x8+31679*x4^2*x6*x8+9029*x5*x6*x8+37126*x1*x5*x6*x8+5483*x3*x5*x6*x8+23588*x5^2*x6*x8+20026*x5^3*x6*x8+37185*x2*x6^2*x8+19348*x4*x6^2*x8+2572*x4*x5*x6^2*x8+11126*x6^3*x8+27645*x3*x6^3*x8+40603*x5*x6^3*x8+8814*x6^5*x8+40741*x2*x7*x8+32450*x2*x3*x7*x8+19214*x4*x7*x8+31135*x1*x4*x7*x8+2492*x3*x4*x7*x8+22599*x2*x5*x7*x8+31433*x4*x5*x7*x8+39104*x4*x5^2*x7*x8+6424*x6*x7*x8+21035*x1*x6*x7*x8+435*x3*x6*x7*x8+8573*x4^2*x6*x7*x8+20479*x5*x6*x7*x8+21631*x3*x5*x6*x7*x8+34605*x5^2*x6*x7*x8+12555*x2*x6^2*x7*x8+23926*x4*x6^2*x7*x8+6594*x6^3*x7*x8+3949*x5*x6^3*x7*x8+6974*x2*x7^2*x8+36922*x4*x7^2*x8+29845*x3*x4*x7^2*x8+6526*x2*x5*x7^2*x8+5244*x4*x5*x7^2*x8+32836*x6*x7^2*x8+12765*x1*x6*x7^2*x8+19964*x3*x6*x7^2*x8+39329*x5*x6*x7^2*x8+8482*x5^2*x6*x7^2*x8+38950*x4*x6^2*x7^2*x8+13124*x6^3*x7^2*x8+31562*x2*x7^3*x8+8555*x4*x7^3*x8+32806*x4*x5*x7^3*x8+9394*x6*x7^3*x8+41245*x3*x6*x7^3*x8+33271*x5*x6*x7^3*x8+38934*x6^3*x7^3*x8+24805*x2*x7^4*x8+41944*x4*x7^4*x8+23161*x6*x7^4*x8+10354*x5*x6*x7^4*x8+40251*x4*x7^5*x8+6865*x6*x7^5*x8+3427*x6*x7^6*x8+24446*x8^2+5343*x1*x8^2+27586*x2^2*x8^2+35741*x3*x8^2+35595*x1*x3*x8^2+31365*x3^2*x8^2+29896*x2*x4*x8^2+40601*x4^2*x8^2+11641*x5*x8^2+35604*x1*x5*x8^2+17952*x3*x5*x8^2+15078*x4^2*x5*x8^2+30862*x5^2*x8^2+39363*x3*x5^2*x8^2+37127*x5^3*x8^2+16884*x2*x6*x8^2+35746*x4*x6*x8^2+28972*x3*x4*x6*x8^2+25124*x2*x5*x6*x8^2+27180*x4*x5*x6*x8^2+28464*x6^2*x8^2+19467*x1*x6^2*x8^2+31988*x3*x6^2*x8^2+14365*x5*x6^2*x8^2+25214*x5^2*x6^2*x8^2+8829*x4*x6^3*x8^2+481*x6^4*x8^2+22677*x7*x8^2+26244*x1*x7*x8^2+17012*x3*x7*x8^2+41294*x3^2*x7*x8^2+26181*x2*x4*x7*x8^2+32327*x4^2*x7*x8^2+25930*x5*x7*x8^2+4172*x1*x5*x7*x8^2+22079*x3*x5*x7*x8^2+8468*x5^2*x7*x8^2+11146*x5^3*x7*x8^2+9906*x2*x6*x7*x8^2+1772*x4*x6*x7*x8^2+37133*x4*x5*x6*x7*x8^2+41311*x6^2*x7*x8^2+33334*x3*x6^2*x7*x8^2+4506*x5*x6^2*x7*x8^2+21538*x6^4*x7*x8^2+20572*x7^2*x8^2+12258*x1*x7^2*x8^2+8884*x3*x7^2*x8^2+1904*x4^2*x7^2*x8^2+3400*x5*x7^2*x8^2+10498*x3*x5*x7^2*x8^2+10767*x5^2*x7^2*x8^2+9173*x2*x6*x7^2*x8^2+24420*x4*x6*x7^2*x8^2+31796*x6^2*x7^2*x8^2+41224*x5*x6^2*x7^2*x8^2+11177*x7^3*x8^2+14078*x1*x7^3*x8^2+28064*x3*x7^3*x8^2+33635*x5*x7^3*x8^2+27838*x5^2*x7^3*x8^2+4733*x4*x6*x7^3*x8^2+30170*x6^2*x7^3*x8^2+4261*x7^4*x8^2+16274*x3*x7^4*x8^2+15553*x5*x7^4*x8^2+3826*x6^2*x7^4*x8^2+16325*x7^5*x8^2+1808*x5*x7^5*x8^2+37754*x7^6*x8^2+414*x7^7*x8^2+33921*x2*x8^3+20406*x2*x3*x8^3+7512*x4*x8^3+30049*x1*x4*x8^3+31796*x3*x4*x8^3+1649*x2*x5*x8^3+1316*x4*x5*x8^3+5971*x4*x5^2*x8^3+23610*x6*x8^3+537*x1*x6*x8^3+27688*x3*x6*x8^3+10362*x4^2*x6*x8^3+23702*x5*x6*x8^3+27821*x3*x5*x6*x8^3+7730*x5^2*x6*x8^3+13877*x2*x6^2*x8^3+41881*x4*x6^2*x8^3+18943*x6^3*x8^3+36595*x5*x6^3*x8^3+28636*x2*x7*x8^3+15307*x4*x7*x8^3+7989*x3*x4*x7*x8^3+17168*x2*x5*x7*x8^3+11687*x4*x5*x7*x8^3+19318*x6*x7*x8^3+35045*x1*x6*x7*x8^3+18344*x3*x6*x7*x8^3+41248*x5*x6*x7*x8^3+17808*x5^2*x6*x7*x8^3+39810*x4*x6^2*x7*x8^3+23119*x6^3*x7*x8^3+15226*x2*x7^2*x8^3+38452*x4*x7^2*x8^3+5298*x4*x5*x7^2*x8^3+29829*x6*x7^2*x8^3+24917*x3*x6*x7^2*x8^3+31602*x5*x6*x7^2*x8^3+13118*x6^3*x7^2*x8^3+29613*x2*x7^3*x8^3+16204*x4*x7^3*x8^3+19523*x6*x7^3*x8^3+2345*x5*x6*x7^3*x8^3+16697*x4*x7^4*x8^3+1079*x6*x7^4*x8^3+10899*x6*x7^5*x8^3+11275*x8^4+22027*x1*x8^4+29973*x3*x8^4+4885*x3^2*x8^4+39836*x2*x4*x8^4+24220*x4^2*x8^4+29895*x5*x8^4+24946*x1*x5*x8^4+28996*x3*x5*x8^4+21087*x5^2*x8^4+31807*x5^3*x8^4+39033*x2*x6*x8^4+12925*x4*x6*x8^4+24317*x4*x5*x6*x8^4+28886*x6^2*x8^4+38903*x3*x6^2*x8^4+5823*x5*x6^2*x8^4+8574*x6^4*x8^4+27876*x7*x8^4+36575*x1*x7*x8^4+17637*x3*x7*x8^4+9470*x4^2*x7*x8^4+20506*x5*x7*x8^4+30554*x3*x5*x7*x8^4+26374*x5^2*x7*x8^4+34210*x2*x6*x7*x8^4+7869*x4*x6*x7*x8^4+27663*x6^2*x7*x8^4+23558*x5*x6^2*x7*x8^4+28555*x7^2*x8^4+38035*x1*x7^2*x8^4+38951*x3*x7^2*x8^4+15563*x5*x7^2*x8^4+22364*x5^2*x7^2*x8^4+38112*x4*x6*x7^2*x8^4+4565*x6^2*x7^2*x8^4+32859*x7^3*x8^4+35618*x3*x7^3*x8^4+36224*x5*x7^3*x8^4+18895*x6^2*x7^3*x8^4+29717*x7^4*x8^4+4610*x5*x7^4*x8^4+7219*x7^5*x8^4+13109*x7^6*x8^4+17002*x2*x8^5+10630*x4*x8^5+6817*x3*x4*x8^5+31007*x2*x5*x8^5+11687*x4*x5*x8^5+36644*x6*x8^5+26991*x1*x6*x8^5+35014*x3*x6*x8^5+12770*x5*x6*x8^5+10985*x5^2*x6*x8^5+41368*x4*x6^2*x8^5+35259*x6^3*x8^5+26950*x2*x7*x8^5+39567*x4*x7*x8^5+17317*x4*x5*x7*x8^5+13368*x6*x7*x8^5+27330*x3*x6*x7*x8^5+30995*x5*x6*x7*x8^5+22193*x6^3*x7*x8^5+11683*x2*x7^2*x8^5+14572*x4*x7^2*x8^5+24793*x6*x7^2*x8^5+13759*x5*x6*x7^2*x8^5+24753*x4*x7^3*x8^5+29526*x6*x7^3*x8^5+23914*x6*x7^4*x8^5+34754*x8^6+6138*x1*x8^6+8519*x3*x8^6+17899*x4^2*x8^6+39893*x5*x8^6+38440*x3*x5*x8^6+21287*x5^2*x8^6+35798*x2*x6*x8^6+39362*x4*x6*x8^6+41134*x6^2*x8^6+28463*x5*x6^2*x8^6+25252*x7*x8^6+10052*x1*x7*x8^6+32110*x3*x7*x8^6+10871*x5*x7*x8^6+3432*x5^2*x7*x8^6+38896*x4*x6*x7*x8^6+35447*x6^2*x7*x8^6+36694*x7^2*x8^6+5071*x3*x7^2*x8^6+39794*x5*x7^2*x8^6+35293*x6^2*x7^2*x8^6+7946*x7^3*x8^6+26536*x5*x7^3*x8^6+37601*x7^4*x8^6+27036*x7^5*x8^6+1443*x2*x8^7+23019*x4*x8^7+15161*x4*x5*x8^7+30870*x6*x8^7+8461*x3*x6*x8^7+1314*x5*x6*x8^7+3709*x6^3*x8^7+16685*x2*x7*x8^7+267*x4*x7*x8^7+5045*x6*x7*x8^7+16511*x5*x6*x7*x8^7+3766*x4*x7^2*x8^7+18981*x6*x7^2*x8^7+3381*x6*x7^3*x8^7+39511*x8^8+36910*x1*x8^8+40333*x3*x8^8+2880*x5*x8^8+5677*x5^2*x8^8+25050*x4*x6*x8^8+22979*x6^2*x8^8+28644*x7*x8^8+19389*x3*x7*x8^8+25292*x5*x7*x8^8+34022*x6^2*x7*x8^8+34871*x7^2*x8^8+35819*x5*x7^2*x8^8+36584*x7^3*x8^8+9819*x7^4*x8^8+12226*x2*x8^9+34636*x4*x8^9+11350*x6*x8^9+25486*x5*x6*x8^9+19839*x4*x7*x8^9+6801*x6*x7*x8^9+8881*x6*x7^2*x8^9+41336*x8^10+8281*x3*x8^10+23715*x5*x8^10+22850*x6^2*x8^10+37999*x7*x8^10+11078*x5*x7*x8^10+34928*x7^2*x8^10+31723*x7^3*x8^10+14472*x4*x8^11+24322*x6*x8^11+5022*x6*x7*x8^11+17944*x8^12+16677*x5*x8^12+14822*x7*x8^12+16223*x7^2*x8^12+11175*x6*x8^13+5310*x8^14+30838*x7*x8^14+22198*x8^16",
     "20283+4323*x1+31730*x2^2+15304*x3+14991*x1*x3+34393*x3^2+41717*x3^3+15065*x2*x4+4591*x2*x3*x4+4372*x4^2+8422*x1*x4^2+37600*x3*x4^2+24568*x5+28243*x1*x5+10494*x2^2*x5+32364*x3*x5+13215*x1*x3*x5+33981*x3^2*x5+9088*x2*x4*x5+6335*x4^2*x5+40609*x5^2+14029*x1*x5^2+32370*x3*x5^2+27271*x4^2*x5^2+25411*x5^3+41939*x3*x5^3+41791*x5^4+36213*x2*x6+25818*x1*x2*x6+7075*x2*x3*x6+40401*x4*x6+37131*x1*x4*x6+6026*x3*x4*x6+2209*x4^3*x6+39930*x2*x5*x6+14840*x4*x5*x6+14954*x3*x4*x5*x6+19286*x2*x5^2*x6+34948*x4*x5^2*x6+41829*x6^2+27835*x1*x6^2+37923*x3*x6^2+15112*x3^2*x6^2+14182*x2*x4*x6^2+30399*x4^2*x6^2+18429*x5*x6^2+7497*x1*x5*x6^2+28125*x3*x5*x6^2+18531*x5^2*x6^2+22283*x5^3*x6^2+15418*x2*x6^3+32972*x4*x6^3+32307*x4*x5*x6^3+37349*x6^4+7530*x3*x6^4+38453*x5*x6^4+7704*x6^6+34863*x7+34646*x1*x7+22890*x2^2*x7+40192*x3*x7+14547*x1*x3*x7+23075*x3^2*x7+27421*x2*x4*x7+12055*x4^2*x7+32429*x3*x4^2*x7+25521*x5*x7+17433*x1*x5*x7+12847*x3*x5*x7+36053*x3^2*x5*x7+19071*x2*x4*x5*x7+38808*x4^2*x5*x7+36689*x5^2*x7+41495*x1*x5^2*x7+21728*x3*x5^2*x7+17685*x5^3*x7+185*x5^4*x7+22633*x2*x6*x7+1083*x2*x3*x6*x7+32713*x4*x6*x7+38912*x1*x4*x6*x7+18496*x3*x4*x6*x7+18926*x2*x5*x6*x7+31206*x4*x5*x6*x7+40074*x4*x5^2*x6*x7+8687*x6^2*x7+20359*x1*x6^2*x7+19323*x3*x6^2*x7+21643*x4^2*x6^2*x7+10424*x5*x6^2*x7+13661*x3*x5*x6^2*x7+850*x5^2*x6^2*x7+21396*x2*x6^3*x7+21434*x4*x6^3*x7+33226*x6^4*x7+17288*x5*x6^4*x7+23870*x7^2+10435*x1*x7^2+23889*x2^2*x7^2+29293*x3*x7^2+1332*x1*x3*x7^2+11002*x3^2*x7^2+14157*x2*x4*x7^2+32353*x4^2*x7^2+18789*x5*x7^2+21469*x1*x5*x7^2+28100*x3*x5*x7^2+14683*x4^2*x5*x7^2+39919*x5^2*x7^2+20877*x3*x5^2*x7^2+32370*x5^3*x7^2+777*x2*x6*x7^2+21412*x4*x6*x7^2+23275*x3*x4*x6*x7^2+40799*x2*x5*x6*x7^2+39571*x4*x5*x6*x7^2+16845*x6^2*x7^2+22231*x1*x6^2*x7^2+29957*x3*x6^2*x7^2+32231*x5*x6^2*x7^2+9303*x5^2*x6^2*x7^2+41288*x4*x6^3*x7^2+15342*x6^4*x7^2+5335*x7^3+25648*x1*x7^3+19529*x3*x7^3+41273*x3^2*x7^3+30229*x2*x4*x7^3+9594*x4^2*x7^3+360*x5*x7^3+21247*x1*x5*x7^3+38155*x3*x5*x7^3+212*x5^2*x7^3+41680*x5^3*x7^3+15250*x2*x6*x7^3+6737*x4*x6*x7^3+10753*x4*x5*x6*x7^3+32899*x6^2*x7^3+2139*x3*x6^2*x7^3+14536*x5*x6^2*x7^3+7911*x6^4*x7^3+21736*x7^4+4951*x1*x7^4+36470*x3*x7^4+11863*x4^2*x7^4+26928*x5*x7^4+28317*x3*x5*x7^4+17157*x5^2*x7^4+37479*x2*x6*x7^4+29422*x4*x6*x7^4+11714*x6^2*x7^4+20218*x5*x6^2*x7^4+5534*x7^5+18156*x3*x7^5+27688*x5*x7^5+148*x5^2*x7^5+2383*x4*x6*x7^5+16910*x6^2*x7^5+18124*x7^6+41939*x3*x7^6+20951*x5*x7^6+7149*x6^2*x7^6+25342*x7^7+20988*x5*x7^7+15778*x7^8+25358*x2*x8+18581*x1*x2*x8+20876*x2*x3*x8+11751*x4*x8+12459*x1*x4*x8+41118*x3*x4*x8+1100*x3^2*x4*x8+10194*x2*x4^2*x8+11254*x4^3*x8+37034*x2*x5*x8+11900*x2*x3*x5*x8+40824*x4*x5*x8+35700*x1*x4*x5*x8+3933*x3*x4*x5*x8+8858*x2*x5^2*x8+40863*x4*x5^2*x8+36137*x4*x5^3*x8+14802*x6*x8+18967*x1*x6*x8+30483*x2^2*x6*x8+39545*x3*x6*x8+3017*x1*x3*x6*x8+20531*x3^2*x6*x8+9379*x2*x4*x6*x8+11255*x4^2*x6*x8+31988*x5*x6*x8+13727*x1*x5*x6*x8+12373*x3*x5*x6*x8+38128*x4^2*x5*x6*x8+39181*x5^2*x6*x8+29491*x3*x5^2*x6*x8+37506*x5^3*x6*x8+3608*x2*x6^2*x8+11066*x4*x6^2*x8+9913*x3*x4*x6^2*x8+27474*x2*x5*x6^2*x8+1623*x4*x5*x6^2*x8+15643*x6^3*x8+27552*x1*x6^3*x8+38809*x3*x6^3*x8+17258*x5*x6^3*x8+30476*x5^2*x6^3*x8+10435*x4*x6^4*x8+29510*x6^5*x8+17971*x2*x7*x8+6098*x1*x2*x7*x8+41903*x2*x3*x7*x8+16339*x4*x7*x8+2012*x1*x4*x7*x8+29398*x3*x4*x7*x8+4955*x4^3*x7*x8+20702*x2*x5*x7*x8+34813*x4*x5*x7*x8+35827*x3*x4*x5*x7*x8+3789*x2*x5^2*x7*x8+15225*x4*x5^2*x7*x8+4457*x6*x7*x8+21189*x1*x6*x7*x8+33850*x3*x6*x7*x8+23038*x3^2*x6*x7*x8+26487*x2*x4*x6*x7*x8+8752*x4^2*x6*x7*x8+27172*x5*x6*x7*x8+35707*x1*x5*x6*x7*x8+11680*x3*x5*x6*x7*x8+19544*x5^2*x6*x7*x8+4611*x5^3*x6*x7*x8+624*x2*x6^2*x7*x8+33553*x4*x6^2*x7*x8+14950*x4*x5*x6^2*x7*x8+23960*x6^3*x7*x8+28007*x3*x6^3*x7*x8+13215*x5*x6^3*x7*x8+27737*x6^5*x7*x8+37943*x2*x7^2*x8+6942*x2*x3*x7^2*x8+28133*x4*x7^2*x8+2428*x1*x4*x7^2*x8+41905*x3*x4*x7^2*x8+23708*x2*x5*x7^2*x8+34420*x4*x5*x7^2*x8+5328*x4*x5^2*x7^2*x8+20497*x6*x7^2*x8+6070*x1*x6*x7^2*x8+34732*x3*x6*x7^2*x8+10101*x4^2*x6*x7^2*x8+12355*x5*x6*x7^2*x8+33059*x3*x5*x6*x7^2*x8+18990*x5^2*x6*x7^2*x8+10569*x2*x6^2*x7^2*x8+2489*x4*x6^2*x7^2*x8+2951*x6^3*x7^2*x8+11047*x5*x6^3*x7^2*x8+11889*x2*x7^3*x8+31837*x4*x7^3*x8+26555*x3*x4*x7^3*x8+31001*x2*x5*x7^3*x8+37609*x4*x5*x7^3*x8+31125*x6*x7^3*x8+26561*x1*x6*x7^3*x8+1491*x3*x6*x7^3*x8+11684*x5*x6*x7^3*x8+16976*x5^2*x6*x7^3*x8+40599*x4*x6^2*x7^3*x8+4072*x6^3*x7^3*x8+28985*x2*x7^4*x8+10774*x4*x7^4*x8+21055*x4*x5*x7^4*x8+24916*x6*x7^4*x8+14759*x3*x6*x7^4*x8+25495*x5*x6*x7^4*x8+38617*x6^3*x7^4*x8+18309*x2*x7^5*x8+4567*x4*x7^5*x8+3678*x6*x7^5*x8+10302*x5*x6*x7^5*x8+32592*x4*x7^6*x8+21654*x6*x7^6*x8+3308*x6*x7^7*x8+6783*x8^2+26052*x1*x8^2+20967*x2^2*x8^2+38392*x3*x8^2+28977*x1*x3*x8^2+11037*x3^2*x8^2+41060*x2*x4*x8^2+10759*x4^2*x8^2+6154*x3*x4^2*x8^2+7906*x5*x8^2+9520*x1*x5*x8^2+10211*x3*x5*x8^2+35027*x3^2*x5*x8^2+7771*x2*x4*x5*x8^2+20030*x4^2*x5*x8^2+32401*x5^2*x8^2+16518*x1*x5^2*x8^2+9859*x3*x5^2*x8^2+38630*x5^3*x8^2+31149*x5^4*x8^2+25540*x2*x6*x8^2+22975*x2*x3*x6*x8^2+38870*x4*x6*x8^2+29177*x1*x4*x6*x8^2+12159*x3*x4*x6*x8^2+37749*x2*x5*x6*x8^2+1929*x4*x5*x6*x8^2+17458*x4*x5^2*x6*x8^2+32361*x6^2*x8^2+11859*x1*x6^2*x8^2+38917*x3*x6^2*x8^2+1776*x4^2*x6^2*x8^2+34408*x5*x6^2*x8^2+30913*x3*x5*x6^2*x8^2+2246*x5^2*x6^2*x8^2+40526*x2*x6^3*x8^2+9857*x4*x6^3*x8^2+29344*x6^4*x8^2+1176*x5*x6^4*x8^2+19715*x7*x8^2+39596*x1*x7*x8^2+13569*x2^2*x7*x8^2+15577*x3*x7*x8^2+35153*x1*x3*x7*x8^2+12879*x3^2*x7*x8^2+4887*x2*x4*x7*x8^2+22578*x4^2*x7*x8^2+14168*x5*x7*x8^2+10327*x1*x5*x7*x8^2+7710*x3*x5*x7*x8^2+41701*x4^2*x5*x7*x8^2+39724*x5^2*x7*x8^2+27012*x3*x5^2*x7*x8^2+26700*x5^3*x7*x8^2+41189*x2*x6*x7*x8^2+20968*x4*x6*x7*x8^2+29098*x3*x4*x6*x7*x8^2+127*x2*x5*x6*x7*x8^2+34543*x4*x5*x6*x7*x8^2+16318*x6^2*x7*x8^2+16386*x1*x6^2*x7*x8^2+5059*x3*x6^2*x7*x8^2+18222*x5*x6^2*x7*x8^2+15672*x5^2*x6^2*x7*x8^2+26367*x4*x6^3*x7*x8^2+33618*x6^4*x7*x8^2+18255*x7^2*x8^2+11376*x1*x7^2*x8^2+14355*x3*x7^2*x8^2+9946*x3^2*x7^2*x8^2+29283*x2*x4*x7^2*x8^2+3551*x4^2*x7^2*x8^2+5727*x5*x7^2*x8^2+9088*x1*x5*x7^2*x8^2+26007*x3*x5*x7^2*x8^2+3154*x5^2*x7^2*x8^2+18183*x5^3*x7^2*x8^2+24316*x2*x6*x7^2*x8^2+11098*x4*x6*x7^2*x8^2+9695*x4*x5*x6*x7^2*x8^2+3837*x6^2*x7^2*x8^2+11928*x3*x6^2*x7^2*x8^2+16300*x5*x6^2*x7^2*x8^2+24024*x6^4*x7^2*x8^2+35977*x7^3*x8^2+27750*x1*x7^3*x8^2+30022*x3*x7^3*x8^2+30706*x4^2*x7^3*x8^2+37091*x5*x7^3*x8^2+12448*x3*x5*x7^3*x8^2+27363*x5^2*x7^3*x8^2+17879*x2*x6*x7^3*x8^2+8633*x4*x6*x7^3*x8^2+17807*x6^2*x7^3*x8^2+485*x5*x6^2*x7^3*x8^2+377*x7^4*x8^2+22108*x3*x7^4*x8^2+30831*x5*x7^4*x8^2+3101*x5^2*x7^4*x8^2+29021*x4*x6*x7^4*x8^2+10196*x6^2*x7^4*x8^2+12476*x7^5*x8^2+3974*x3*x7^5*x8^2+40531*x5*x7^5*x8^2+22689*x6^2*x7^5*x8^2+22933*x7^6*x8^2+29321*x5*x7^6*x8^2+40511*x7^7*x8^2+38581*x2*x8^3+35857*x1*x2*x8^3+8090*x2*x3*x8^3+1963*x4*x8^3+1708*x1*x4*x8^3+34890*x3*x4*x8^3+8207*x4^3*x8^3+11036*x2*x5*x8^3+2421*x4*x5*x8^3+30840*x3*x4*x5*x8^3+38668*x2*x5^2*x8^3+37154*x4*x5^2*x8^3+40878*x6*x8^3+37852*x1*x6*x8^3+6010*x3*x6*x8^3+5876*x3^2*x6*x8^3+31869*x2*x4*x6*x8^3+20760*x4^2*x6*x8^3+12033*x5*x6*x8^3+4315*x1*x5*x6*x8^3+21790*x3*x5*x6*x8^3+22928*x5^2*x6*x8^3+31045*x5^3*x6*x8^3+3264*x2*x6^2*x8^3+937*x4*x6^2*x8^3+3374*x4*x5*x6^2*x8^3+30606*x6^3*x8^3+18967*x3*x6^3*x8^3+16496*x5*x6^3*x8^3+9140*x6^5*x8^3+13036*x2*x7*x8^3+34839*x2*x3*x7*x8^3+5446*x4*x7*x8^3+26952*x1*x4*x7*x8^3+15462*x3*x4*x7*x8^3+21118*x2*x5*x7*x8^3+8076*x4*x5*x7*x8^3+35331*x4*x5^2*x7*x8^3+3508*x6*x7*x8^3+7069*x1*x6*x7*x8^3+2817*x3*x6*x7*x8^3+18932*x4^2*x6*x7*x8^3+35033*x5*x6*x7*x8^3+10451*x3*x5*x6*x7*x8^3+20315*x5^2*x6*x7*x8^3+24699*x2*x6^2*x7*x8^3+9492*x4*x6^2*x7*x8^3+31746*x6^3*x7*x8^3+21399*x5*x6^3*x7*x8^3+32730*x2*x7^2*x8^3+14707*x4*x7^2*x8^3+31728*x3*x4*x7^2*x8^3+35234*x2*x5*x7^2*x8^3+34846*x4*x5*x7^2*x8^3+15295*x6*x7^2*x8^3+6889*x1*x6*x7^2*x8^3+16316*x3*x6*x7^2*x8^3+38408*x5*x6*x7^2*x8^3+23566*x5^2*x6*x7^2*x8^3+29574*x4*x6^2*x7^2*x8^3+29173*x6^3*x7^2*x8^3+11119*x2*x7^3*x8^3+11517*x4*x7^3*x8^3+15954*x4*x5*x7^3*x8^3+9780*x6*x7^3*x8^3+22121*x3*x6*x7^3*x8^3+20450*x5*x6*x7^3*x8^3+3726*x6^3*x7^3*x8^3+7831*x2*x7^4*x8^3+30883*x4*x7^4*x8^3+28411*x6*x7^4*x8^3+33463*x5*x6*x7^4*x8^3+27897*x4*x7^5*x8^3+27525*x6*x7^5*x8^3+4352*x6*x7^6*x8^3+32222*x8^4+17776*x1*x8^4+10827*x2^2*x8^4+37168*x3*x8^4+34748*x1*x3*x8^4+31376*x3^2*x8^4+27925*x2*x4*x8^4+24126*x4^2*x8^4+4370*x5*x8^4+10561*x1*x5*x8^4+21877*x3*x5*x8^4+19575*x4^2*x5*x8^4+11569*x5^2*x8^4+17976*x3*x5^2*x8^4+15657*x5^3*x8^4+12281*x2*x6*x8^4+35168*x4*x6*x8^4+19274*x3*x4*x6*x8^4+14179*x2*x5*x6*x8^4+37651*x4*x5*x6*x8^4+21460*x6^2*x8^4+19315*x1*x6^2*x8^4+33714*x3*x6^2*x8^4+10861*x5*x6^2*x8^4+24090*x5^2*x6^2*x8^4+22687*x4*x6^3*x8^4+37519*x6^4*x8^4+4101*x7*x8^4+35718*x1*x7*x8^4+3880*x3*x7*x8^4+39655*x3^2*x7*x8^4+17148*x2*x4*x7*x8^4+14737*x4^2*x7*x8^4+15045*x5*x7*x8^4+32666*x1*x5*x7*x8^4+27396*x3*x5*x7*x8^4+27521*x5^2*x7*x8^4+29151*x5^3*x7*x8^4+8895*x2*x6*x7*x8^4+5278*x4*x6*x7*x8^4+36366*x4*x5*x6*x7*x8^4+37215*x6^2*x7*x8^4+33578*x3*x6^2*x7*x8^4+16834*x5*x6^2*x7*x8^4+7924*x6^4*x7*x8^4+39117*x7^2*x8^4+38536*x1*x7^2*x8^4+20904*x3*x7^2*x8^4+18707*x4^2*x7^2*x8^4+27326*x5*x7^2*x8^4+10501*x3*x5*x7^2*x8^4+2318*x5^2*x7^2*x8^4+40608*x2*x6*x7^2*x8^4+12465*x4*x6*x7^2*x8^4+9312*x6^2*x7^2*x8^4+14861*x5*x6^2*x7^2*x8^4+36929*x7^3*x8^4+38124*x3*x7^3*x8^4+12037*x5*x7^3*x8^4+36366*x5^2*x7^3*x8^4+31653*x4*x6*x7^3*x8^4+20369*x6^2*x7^3*x8^4+36367*x7^4*x8^4+41124*x3*x7^4*x8^4+31667*x5*x7^4*x8^4+20518*x6^2*x7^4*x8^4+28035*x7^5*x8^4+19323*x5*x7^5*x8^4+26521*x7^6*x8^4+14540*x2*x8^5+38039*x2*x3*x8^5+31542*x4*x8^5+36485*x1*x4*x8^5+21235*x3*x4*x8^5+40809*x2*x5*x8^5+16111*x4*x5*x8^5+281*x4*x5^2*x8^5+25261*x6*x8^5+164*x1*x6*x8^5+17954*x3*x6*x8^5+10871*x4^2*x6*x8^5+14459*x5*x6*x8^5+27597*x3*x5*x6*x8^5+13676*x5^2*x6*x8^5+39760*x2*x6^2*x8^5+38602*x4*x6^2*x8^5+11245*x6^3*x8^5+36106*x5*x6^3*x8^5+6422*x2*x7*x8^5+38901*x4*x7*x8^5+3973*x3*x4*x7*x8^5+9939*x2*x5*x7*x8^5+23291*x4*x5*x7*x8^5+2918*x6*x7*x8^5+40119*x1*x6*x7*x8^5+28814*x3*x6*x7*x8^5+34967*x5*x6*x7*x8^5+15384*x5^2*x6*x7*x8^5+36236*x4*x6^2*x7*x8^5+8461*x6^3*x7*x8^5+41856*x2*x7^2*x8^5+31886*x4*x7^2*x8^5+11554*x4*x5*x7^2*x8^5+39743*x6*x7^2*x8^5+40769*x3*x6*x7^2*x8^5+27870*x5*x6*x7^2*x8^5+35283*x6^3*x7^2*x8^5+30927*x2*x7^3*x8^5+39904*x4*x7^3*x8^5+31984*x6*x7^3*x8^5+15234*x5*x6*x7^3*x8^5+9738*x4*x7^4*x8^5+38803*x6*x7^4*x8^5+10774*x6*x7^5*x8^5+3632*x8^6+10822*x1*x8^6+19188*x3*x8^6+13987*x3^2*x8^6+33068*x2*x4*x8^6+41230*x4^2*x8^6+37226*x5*x8^6+5025*x1*x5*x8^6+5575*x3*x5*x8^6+381*x5^2*x8^6+3160*x5^3*x8^6+31149*x2*x6*x8^6+33841*x4*x6*x8^6+18261*x4*x5*x6*x8^6+16260*x6^2*x8^6+33724*x3*x6^2*x8^6+18589*x5*x6^2*x8^6+24711*x6^4*x8^6+17933*x7*x8^6+35172*x1*x7*x8^6+9972*x3*x7*x8^6+27949*x4^2*x7*x8^6+3826*x5*x7*x8^6+29822*x3*x5*x7*x8^6+8252*x5^2*x7*x8^6+8763*x2*x6*x7*x8^6+17387*x4*x6*x7*x8^6+25361*x6^2*x7*x8^6+17306*x5*x6^2*x7*x8^6+11517*x7^2*x8^6+28397*x3*x7^2*x8^6+1993*x5*x7^2*x8^6+17251*x5^2*x7^2*x8^6+14090*x4*x6*x7^2*x8^6+25524*x6^2*x7^2*x8^6+37052*x7^3*x8^6+14712*x3*x7^3*x8^6+33242*x5*x7^3*x8^6+2845*x6^2*x7^3*x8^6+20229*x7^4*x8^6+18183*x5*x7^4*x8^6+15237*x7^5*x8^6+34266*x2*x8^7+21830*x4*x8^7+25970*x3*x4*x8^7+25025*x2*x5*x8^7+1586*x4*x5*x8^7+16152*x6*x8^7+40555*x1*x6*x8^7+35294*x3*x6*x8^7+13945*x5*x6*x8^7+6202*x5^2*x6*x8^7+40052*x4*x6^2*x8^7+29882*x6^3*x8^7+10706*x2*x7*x8^7+529*x4*x7*x8^7+19189*x4*x5*x7*x8^7+25594*x6*x7*x8^7+31687*x3*x6*x7*x8^7+10850*x5*x6*x7*x8^7+35062*x6^3*x7*x8^7+26605*x2*x7^2*x8^7+40559*x4*x7^2*x8^7+30390*x6*x7^2*x8^7+19217*x5*x6*x7^2*x8^7+34569*x4*x7^3*x8^7+32981*x6*x7^3*x8^7+18377*x6*x7^4*x8^7+1291*x8^8+28661*x1*x8^8+28035*x3*x8^8+17221*x4^2*x8^8+32908*x5*x8^8+31889*x3*x5*x8^8+23873*x5^2*x8^8+25347*x2*x6*x8^8+35029*x4*x6*x8^8+13362*x6^2*x8^8+33376*x5*x6^2*x8^8+35966*x7*x8^8+26116*x3*x7*x8^8+17577*x5*x7*x8^8+22172*x5^2*x7*x8^8+36411*x4*x6*x7*x8^8+35182*x6^2*x7*x8^8+20224*x7^2*x8^8+13743*x3*x7^2*x8^8+34023*x5*x7^2*x8^8+10770*x6^2*x7^2*x8^8+14705*x7^3*x8^8+40348*x5*x7^3*x8^8+31641*x7^4*x8^8+16715*x2*x8^9+32076*x4*x8^9+19915*x4*x5*x8^9+18511*x6*x8^9+16148*x3*x6*x8^9+25438*x5*x6*x8^9+20337*x6^3*x8^9+37548*x2*x7*x8^9+37608*x4*x7*x8^9+31024*x6*x7*x8^9+18280*x5*x6*x7*x8^9+20958*x4*x7^2*x8^9+19076*x6*x7^2*x8^9+23940*x6*x7^3*x8^9+22802*x8^10+15322*x3*x8^10+21641*x5*x8^10+15630*x5^2*x8^10+1654*x4*x6*x8^10+20567*x6^2*x8^10+34532*x7*x8^10+25823*x3*x7*x8^10+21232*x5*x7*x8^10+19870*x6^2*x7*x8^10+23450*x7^2*x8^10+29469*x5*x7^2*x8^10+16034*x7^3*x8^10+1321*x2*x8^11+6477*x4*x8^11+27574*x6*x8^11+29654*x5*x6*x8^11+31804*x4*x7*x8^11+11448*x6*x7*x8^11+33362*x6*x7^2*x8^11+37267*x8^12+30161*x3*x8^12+18263*x5*x8^12+17791*x6^2*x8^12+23255*x7*x8^12+31408*x5*x7*x8^12+16661*x7^2*x8^12+18457*x4*x8^13+1491*x6*x8^13+34679*x6*x7*x8^13+4468*x8^14+13136*x5*x8^14+1077*x7*x8^14+18346*x6*x8^15+8716*x8^16"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -2124,7 +2124,7 @@ function zhang_l10_m5(
     error("Order not known -- No ideal generated.")
   end
   n = 11
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -2137,7 +2137,7 @@ function zhang_l10_m5(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "2*z2^13- 4*z2^12*z3- 4*z2^12*z4+ 6*z2^11*z3*z4- 4*z2^12*z5+ 6*z2^11*z3*z5+
     6*z2^11*z4*z5- 8*z2^10*z3*z4*z5- 4*z2^12*z6+ 6*z2^11*z3*z6+ 6*z2^11*z4*z6-
@@ -3060,7 +3060,7 @@ function zhang_l10_m5(
     z3*z4*z5*z6+ z10",
     "- z2*z3*z4*z5*z6+ z11"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -3072,7 +3072,7 @@ function zhang_l10_m5_v2(
     error("Order not known -- No ideal generated.")
   end
   n = 12
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -3085,7 +3085,7 @@ function zhang_l10_m5_v2(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "2*z3^13- 4*z3^12*z4- 4*z3^12*z5+ 6*z3^11*z4*z5- 4*z3^12*z6+ 6*z3^11*z4*z6+
     6*z3^11*z5*z6- 8*z3^10*z4*z5*z6- 4*z3^12*z7+ 6*z3^11*z4*z7+ 6*z3^11*z5*z7-
@@ -3261,7 +3261,7 @@ function zhang_l10_m5_v2(
     z4*z5*z6*z7+ z11",
     "- z3*z4*z5*z6*z7+ z12"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -3273,7 +3273,7 @@ function zhang_l12_m5(
     error("Order not known -- No ideal generated.")
   end
   n = 11
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -3286,7 +3286,7 @@ function zhang_l12_m5(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "4*z2^15- 6*z2^14*z3- 6*z2^14*z4+ 8*z2^13*z3*z4- 6*z2^14*z5+ 8*z2^13*z3*z5+
     8*z2^13*z4*z5- 10*z2^12*z3*z4*z5- 6*z2^14*z6+ 8*z2^13*z3*z6+ 8*z2^13*z4*z6-
@@ -4499,7 +4499,7 @@ function zhang_l12_m5(
     "- z2*z3*z4*z5- z2*z3*z4*z6- z2*z3*z5*z6- z2*z4*z5*z6-z3*z4*z5*z6+ z10",
    "- z2*z3*z4*z5*z6+ z11"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
 
@@ -4511,7 +4511,7 @@ function zhang_l12_m6(
     error("Order not known -- No ideal generated.")
   end
   n = 13
-  vars = Array{String, 1}(n)
+  vars = Array{String, 1}(undef, n)
   # generate dummy array of n strings for generating
   # singular polynomial ring
   for i = 1:n
@@ -4524,7 +4524,7 @@ function zhang_l12_m6(
   end
   global X
   # parses X[i] to xi
-  [ eval(parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
     "2*z2^16- 4*z2^15*z3- 4*z2^15*z4+ 6*z2^14*z3*z4- 4*z2^15*z5+ 6*z2^14*z3*z5+
     6*z2^14*z4*z5- 8*z2^13*z3*z4*z5- 4*z2^15*z6+ 6*z2^14*z3*z6+ 6*z2^14*z4*z6-
@@ -8670,6 +8670,6 @@ function zhang_l12_m6(
     z2*z4*z5*z6*z7- z3*z4*z5*z6*z7+ z12",
     "- z2*z3*z4*z5*z6*z7+ z13"
 
-  id = Singular.Ideal(R, [eval(parse("$p")) for p in ps])
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
 end
