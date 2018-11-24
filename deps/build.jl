@@ -51,7 +51,7 @@ cd(joinpath("$sdir"))
 run(`g++ GB.cpp -DJULIA_ENABLE_THREADING -Dgbcpp_EXPORTS -I$(Sys.BINDIR)/../include/julia -I$(jlcxx_dir)/include -I$(singular_dir)/include -I$(singular_dir)/include/singular -L$(singular_dir)/lib -L$(jlcxx_dir)/lib -lcxxwrap_julia -ldl -shared -fPIC -o $(vdir)/lib/libgbcpp.so`)
 
 # install gb - start
-
+cd(joinpath("$wdir"))
 if !Sys.iswindows()
   println("Cloning gb ... ")
   if !ispath(joinpath("$wdir", "gb"))
