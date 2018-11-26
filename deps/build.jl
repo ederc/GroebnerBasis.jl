@@ -11,8 +11,6 @@ pkgdir = dirname(dirname(@__FILE__))
 sdir = joinpath(pkgdir, "src")
 wdir = joinpath(pkgdir, "deps")
 vdir = joinpath(pkgdir, "local")
-jlcxx_dir = realpath(joinpath(dirname(pathof(CxxWrap)), "..", "deps", "usr"))
-singular_dir = realpath(joinpath(dirname(pathof(Singular)), "..", "local"))
 
 if Sys.isapple() && !("CC" in keys(ENV))
    ENV["CC"] = "clang"
@@ -45,10 +43,6 @@ function download_dll(url_string, location_string)
       download(url_string, location_string)
    end
 end
-
-# build gbcppwrap
-cd(joinpath("$sdir"))
-run(`g++ GB.cpp -DJULIA_ENABLE_THREADING -Dgbcpp_EXPORTS -I$(Sys.BINDIR)/../include/julia -I$(jlcxx_dir)/include -I$(singular_dir)/include -I$(singular_dir)/include/singular -L$(singular_dir)/lib -L$(jlcxx_dir)/lib -lcxxwrap_julia -ldl -shared -fPIC -o $(vdir)/lib/libgbcpp.so`)
 
 # install gb - start
 cd(joinpath("$wdir"))

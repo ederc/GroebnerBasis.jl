@@ -5,21 +5,17 @@ include("Benchmarks.jl")
 include("Example.jl")
 
 # package code goes here
-using CxxWrap
 using Revise
 using Singular
 using Libdl
 
 export Singular
 
-@wrapmodule(joinpath(@__DIR__, "../local/lib", "libgbcpp"))
-
 const pkgdir  = realpath(joinpath(dirname(@__FILE__), ".."))
 const libdir   = joinpath(pkgdir, "local", "lib")
 const libgb   = joinpath(pkgdir, "local", "lib", "libgb")
 
 function __init__()
-   @initcxx
    if "HOSTNAME" in keys(ENV) && ENV["HOSTNAME"] == "juliabox"
        push!(Libdl.DL_LOAD_PATH, "/usr/local/lib")
    elseif Sys.islinux()
@@ -106,8 +102,7 @@ function convert_gb_array_to_singular_ideal(
       Singular.libSingular.p_SetExpV(pterm, exp, R.ptr)
       # setting the next pointer needs to be done in Singular itself,
       # thus we need, for exactly this operation, inline cxx code
-      GB.np(lp, pterm)
-      #| icxx"""$lp->next  = $pterm;""" |#
+      Singular.libSingular.SetpNext(lp, pterm)
       lp  = pterm
     end
     push!(list, R(p))
