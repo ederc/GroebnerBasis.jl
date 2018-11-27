@@ -148,7 +148,7 @@ input and returns a Singular ideal.
                                 order (LEX).
 """
 function f4(
-    I::Singular.sideal,           # input generators
+    I::Singular.sideal;           # input generators
     hts::Int=17,                  # hash table size, default 2^17
     nthrds::Int=1,                # number of threads
     maxpairs::Int=0,              # number of pairs maximally chosen
