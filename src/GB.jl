@@ -110,7 +110,8 @@ function convert_gb_array_to_singular_ideal(
   return Singular.Ideal(R, list)
 end
 """
-    f4(I[, hts[, nthrds[, maxpairs[, resetht[, laopt[, infolevel[, monorder]]]]]]])
+    f4(I[, hts::Int=17, nthrds::Int=1, maxpairs::Int=0, resetht::Int=0,
+            laopt::Int=1, infolevel::Int=0, monorder::Symbol=:degrevlex])
 
 Compute a Groebner basis of the given ideal I w.r.t. to the given monomial
 order using Faugere's F4 algorithm. The function takes a Singular ideal as
@@ -118,7 +119,7 @@ input and returns a Singular ideal.
 
 # Arguments
 * `I::Singular.sideal`: ideal to compute a Groebner basis for.
-* `hts:Int=17`: hash table size log_2; default is 17, i.e. 2^17 as initial hash
+* `hts::Int=17`: hash table size log_2; default is 17, i.e. 2^17 as initial hash
                 table size.
 * `nthrds::Int=1`:  number of threads; default is 1.
 * `maxpairs::Int=0`:  maximal number of pairs selected for one matrix; default is
