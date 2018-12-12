@@ -1,4 +1,3 @@
-import CxxWrap
 import Singular
 import Libdl
 
