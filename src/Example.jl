@@ -23,7 +23,7 @@ function run_cyclic_8()
   # . using exact linear algebra (option 1); probabilistic
   #   linear algebra would be option 42
   println("------------- F4 computation using parameters ----------------")
-  H = GB.f4(I, 15, 1, 100, 4, 1);
+  H = GB.f4(I, hts=15, nthrds=1, maxpairs=100, resetht=4, laopt=1);
   
   # prints the Gröbner basis; note this is huge, so uncomment
   # only if you really want to see it
