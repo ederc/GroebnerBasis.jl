@@ -137,6 +137,9 @@ input and returns a Singular ideal.
     - `42`: probabilistic sparse-dense computation,
     - `43`: exact sparse then probabilistic dense computation,
     - `44`: probabilistic sparse computation.
+* `pbmfiles::Int=0`: option for generating pbm files of matrices:
+    - `0`: off (default),
+    - `1`:  on.
 * `infolevel::Int=0`: info level for printout:
     - `0`: no printout (default),
     - `1`:  a summary of the computational data is printed at the beginning and
@@ -155,6 +158,7 @@ function f4(
                                   # in symbolic preprocessing
     resetht::Int=0,               # resetting global hash table
     laopt::Int=1,                 # linear algebra option
+    pbmfiles::Int=0,              # generation of pbm files
     infolevel::Int=0,             # info level for print outs
     monorder::Symbol=:dregrevlex  # monomial order
     )
@@ -203,9 +207,9 @@ function f4(
   gb_basis  = ccall((:malloc, "libc.so.6"), Ptr{Ptr{Cint}}, (Csize_t, ), sizeof(Ptr{Cint}))
   gb_basis_len  = ccall(sym, Int,
       (Ptr{Ptr{Cint}}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int, Int, Int, Int, Int,
-       Int, Int, Int, Int, Int),
+       Int, Int, Int, Int, Int, Int),
       gb_basis, lens, cfs, exps, char, ord, nvars, ngens, hts, nthrds, maxpairs,
-      resetht, laopt, infolevel)
+      resetht, laopt, pbmfiles, infolevel)
   Libdl.dlclose(lib)
 
   # convert to julia array, also give memory management to julia
