@@ -1010,6 +1010,64 @@ function jason_210(
   R, id
 end
 
+function lfour_non_convex(
+    char::Int,
+    ord::Symbol=:degrevlex
+    )
+  if (ord != :lex) && (ord != :degrevlex)
+    error("Order not known -- No ideal generated.")
+  end
+  n   = 4 + 4 + 4 + 4
+  vars = Array{String, 1}(undef, n)
+  # generate dummy array of n strings for generating
+  # singular polynomial ring
+  ctr = 1
+  for i in [11,12,13,14]
+    vars[ctr] = "y$(i)"
+    ctr = ctr + 1
+  end
+  for i in [21,22,23,24]
+    vars[ctr] = "y$(i)"
+    ctr = ctr + 1
+  end
+  for i in [31,32,33,34]
+    vars[ctr] = "y$(i)"
+    ctr = ctr + 1
+  end
+  for i in [41,42,43,44]
+    vars[ctr] = "y$(i)"
+    ctr = ctr + 1
+  end
+    if char == 0
+    R, X = Singular.PolynomialRing(Singular.QQ, vars, ordering = ord)
+  else
+    R, X = Singular.PolynomialRing(Singular.N_ZpField(char), vars, ordering = ord)
+  end
+  global X
+  # parses X[i] to xi
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  ps =
+"y41^2+y42^2+y43^2+y44^2-1",
+"y31*y41+y32*y42+y33*y43+y34*y44",
+"y21*y41+y22*y42+y23*y43+y24*y44",
+"y11*y41+y12*y42+y13*y43+y14*y44",
+"y31^2+y32^2+y33^2+y34^2-1",
+"y21*y31+y22*y32+y23*y33+y24*y34",
+"y11*y31+y12*y32+y13*y33+y14*y34",
+"y21^2+y22^2+y23^2+y24^2-1",
+"y11*y21+y12*y22+y13*y23+y14*y24",
+"y14*y23*y32*y41-y13*y24*y32*y41-y14*y22*y33*y41+y12*y24*y33*y41+y13*y22*y34*y41-y12*y23*y34*y41-y14*y23*y31*y42+y13*y24*y31*y42+y14*y21*y33*y42-y11*y24*y33*y42-y13*y21*y34*y42+y11*y23*y34*y42+y14*y22*y31*y43-y12*y24*y31*y43-y14*y21*y32*y43+y11*y24*y32*y43+y12*y21*y34*y43-y11*y22*y34*y43-y13*y22*y31*y44+y12*y23*y31*y44+y13*y21*y32*y44-y11*y23*y32*y44-y12*y21*y33*y44+y11*y22*y33*y44-1",
+"y11^2+y12^2+y13^2+y14^2-1",
+"y13^3*y14-y13*y14^3+y23^3*y24-y23*y24^3+y33^3*y34-y33*y34^3+y43^3*y44-y43*y44^3",
+"y12^3*y14-y12*y14^3+y22^3*y24-y22*y24^3+y32^3*y34-y32*y34^3+y42^3*y44-y42*y44^3",
+"y11^3*y14-y11*y14^3+y21^3*y24-y21*y24^3+y31^3*y34-y31*y34^3+y41^3*y44-y41*y44^3",
+"y12^3*y13-y12*y13^3+y22^3*y23-y22*y23^3+y32^3*y33-y32*y33^3+y42^3*y43-y42*y43^3",
+"y11^3*y13-y11*y13^3+y21^3*y23-y21*y23^3+y31^3*y33-y31*y33^3+y41^3*y43-y41*y43^3",
+"y11^3*y12-y11*y12^3+y21^3*y22-y21*y22^3+y31^3*y32-y31*y32^3+y41^3*y42-y41*y42^3"
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
+  R, id
+end
+
 function pearson_9(
     char::Int,
     ord::Symbol=:degrevlex
