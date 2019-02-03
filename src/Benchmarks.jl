@@ -1010,6 +1010,53 @@ function jason_210(
   R, id
 end
 
+function lthree_non_convex(
+    char::Int,
+    ord::Symbol=:degrevlex
+    )
+  if (ord != :lex) && (ord != :degrevlex)
+    error("Order not known -- No ideal generated.")
+  end
+  n   = 3 + 3 + 3
+  vars = Array{String, 1}(undef, n)
+  # generate dummy array of n strings for generating
+  # singular polynomial ring
+  ctr = 1
+  for i in [11,12,13]
+    vars[ctr] = "y$(i)"
+    ctr = ctr + 1
+  end
+  for i in [21,22,23]
+    vars[ctr] = "y$(i)"
+    ctr = ctr + 1
+  end
+  for i in [31,32,33]
+    vars[ctr] = "y$(i)"
+    ctr = ctr + 1
+  end
+    if char == 0
+    R, X = Singular.PolynomialRing(Singular.QQ, vars, ordering = ord)
+  else
+    R, X = Singular.PolynomialRing(Singular.N_ZpField(char), vars, ordering = ord)
+  end
+  global X
+  # parses X[i] to xi
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  ps =
+"y31^2+y32^2+y33^2-1",
+"y21*y31+y22*y32+y23*y33",
+"y11*y31+y12*y32+y13*y33",
+"y21^2+y22^2+y23^2-1",
+"y11*y21+y12*y22+y13*y23",
+"-y13*y22*y31+y12*y23*y31+y13*y21*y32-y11*y23*y32-y12*y21*y33+y11*y22*y33-1",
+"y11^2+y12^2+y13^2-1",
+"y12^3*y13-y12*y13^3+y22^3*y23-y22*y23^3+y32^3*y33-y32*y33^3",
+"y11^3*y13-y11*y13^3+y21^3*y23-y21*y23^3+y31^3*y33-y31*y33^3",
+"y11^3*y12-y11*y12^3+y21^3*y22-y21*y22^3+y31^3*y32-y31*y32^3"
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
+  R, id
+end
+
 function lfour_non_convex(
     char::Int,
     ord::Symbol=:degrevlex
