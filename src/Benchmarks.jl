@@ -1115,6 +1115,77 @@ function lfour_non_convex(
   R, id
 end
 
+function lfive_non_convex(
+    char::Int,
+    ord::Symbol=:degrevlex
+    )
+  if (ord != :lex) && (ord != :degrevlex)
+    error("Order not known -- No ideal generated.")
+  end
+  n   = 5*5
+  vars = Array{String, 1}(undef, n)
+  # generate dummy array of n strings for generating
+  # singular polynomial ring
+  ctr = 1
+  for i in [11,12,13,14,15]
+    vars[ctr] = "y$(i)"
+    ctr = ctr + 1
+  end
+  for i in [21,22,23,24,25]
+    vars[ctr] = "y$(i)"
+    ctr = ctr + 1
+  end
+  for i in [31,32,33,34,35]
+    vars[ctr] = "y$(i)"
+    ctr = ctr + 1
+  end
+  for i in [41,42,43,44,45]
+    vars[ctr] = "y$(i)"
+    ctr = ctr + 1
+  end
+  for i in [51,52,53,54,55]
+    vars[ctr] = "y$(i)"
+    ctr = ctr + 1
+  end
+    if char == 0
+    R, X = Singular.PolynomialRing(Singular.QQ, vars, ordering = ord)
+  else
+    R, X = Singular.PolynomialRing(Singular.N_ZpField(char), vars, ordering = ord)
+  end
+  global X
+  # parses X[i] to xi
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  ps =
+  "y51^2+y52^2+y53^2+y54^2+y55^2-1",
+  "y41*y51+y42*y52+y43*y53+y44*y54+y45*y55",
+  "y31*y51+y32*y52+y33*y53+y34*y54+y35*y55",
+  "y21*y51+y22*y52+y23*y53+y24*y54+y25*y55",
+  "y11*y51+y12*y52+y13*y53+y14*y54+y15*y55",
+  "y41^2+y42^2+y43^2+y44^2+y45^2-1",
+  "y31*y41+y32*y42+y33*y43+y34*y44+y35*y45",
+  "y21*y41+y22*y42+y23*y43+y24*y44+y25*y45",
+  "y11*y41+y12*y42+y13*y43+y14*y44+y15*y45",
+  "y31^2+y32^2+y33^2+y34^2+y35^2-1",
+  "y21*y31+y22*y32+y23*y33+y24*y34+y25*y35",
+  "y11*y31+y12*y32+y13*y33+y14*y34+y15*y35",
+  "y21^2+y22^2+y23^2+y24^2+y25^2-1",
+  "y11*y21+y12*y22+y13*y23+y14*y24+y15*y25",
+  "y15*y24*y33*y42*y51-y14*y25*y33*y42*y51-y15*y23*y34*y42*y51+y13*y25*y34*y42*y51+y14*y23*y35*y42*y51-y13*y24*y35*y42*y51-y15*y24*y32*y43*y51+y14*y25*y32*y43*y51+y15*y22*y34*y43*y51-y12*y25*y34*y43*y51-y14*y22*y35*y43*y51+y12*y24*y35*y43*y51+y15*y23*y32*y44*y51-y13*y25*y32*y44*y51-y15*y22*y33*y44*y51+y12*y25*y33*y44*y51+y13*y22*y35*y44*y51-y12*y23*y35*y44*y51-y14*y23*y32*y45*y51+y13*y24*y32*y45*y51+y14*y22*y33*y45*y51-y12*y24*y33*y45*y51-y13*y22*y34*y45*y51+y12*y23*y34*y45*y51-y15*y24*y33*y41*y52+y14*y25*y33*y41*y52+y15*y23*y34*y41*y52-y13*y25*y34*y41*y52-y14*y23*y35*y41*y52+y13*y24*y35*y41*y52+y15*y24*y31*y43*y52-y14*y25*y31*y43*y52-y15*y21*y34*y43*y52+y11*y25*y34*y43*y52+y14*y21*y35*y43*y52-y11*y24*y35*y43*y52-y15*y23*y31*y44*y52+y13*y25*y31*y44*y52+y15*y21*y33*y44*y52-y11*y25*y33*y44*y52-y13*y21*y35*y44*y52+y11*y23*y35*y44*y52+y14*y23*y31*y45*y52-y13*y24*y31*y45*y52-y14*y21*y33*y45*y52+y11*y24*y33*y45*y52+y13*y21*y34*y45*y52-y11*y23*y34*y45*y52+y15*y24*y32*y41*y53-y14*y25*y32*y41*y53-y15*y22*y34*y41*y53+y12*y25*y34*y41*y53+y14*y22*y35*y41*y53-y12*y24*y35*y41*y53-y15*y24*y31*y42*y53+y14*y25*y31*y42*y53+y15*y21*y34*y42*y53-y11*y25*y34*y42*y53-y14*y21*y35*y42*y53+y11*y24*y35*y42*y53+y15*y22*y31*y44*y53-y12*y25*y31*y44*y53-y15*y21*y32*y44*y53+y11*y25*y32*y44*y53+y12*y21*y35*y44*y53-y11*y22*y35*y44*y53-y14*y22*y31*y45*y53+y12*y24*y31*y45*y53+y14*y21*y32*y45*y53-y11*y24*y32*y45*y53-y12*y21*y34*y45*y53+y11*y22*y34*y45*y53-y15*y23*y32*y41*y54+y13*y25*y32*y41*y54+y15*y22*y33*y41*y54-y12*y25*y33*y41*y54-y13*y22*y35*y41*y54+y12*y23*y35*y41*y54+y15*y23*y31*y42*y54-y13*y25*y31*y42*y54-y15*y21*y33*y42*y54+y11*y25*y33*y42*y54+y13*y21*y35*y42*y54-y11*y23*y35*y42*y54-y15*y22*y31*y43*y54+y12*y25*y31*y43*y54+y15*y21*y32*y43*y54-y11*y25*y32*y43*y54-y12*y21*y35*y43*y54+y11*y22*y35*y43*y54+y13*y22*y31*y45*y54-y12*y23*y31*y45*y54-y13*y21*y32*y45*y54+y11*y23*y32*y45*y54+y12*y21*y33*y45*y54-y11*y22*y33*y45*y54+y14*y23*y32*y41*y55-y13*y24*y32*y41*y55-y14*y22*y33*y41*y55+y12*y24*y33*y41*y55+y13*y22*y34*y41*y55-y12*y23*y34*y41*y55-y14*y23*y31*y42*y55+y13*y24*y31*y42*y55+y14*y21*y33*y42*y55-y11*y24*y33*y42*y55-y13*y21*y34*y42*y55+y11*y23*y34*y42*y55+y14*y22*y31*y43*y55-y12*y24*y31*y43*y55-y14*y21*y32*y43*y55+y11*y24*y32*y43*y55+y12*y21*y34*y43*y55-y11*y22*y34*y43*y55-y13*y22*y31*y44*y55+y12*y23*y31*y44*y55+y13*y21*y32*y44*y55-y11*y23*y32*y44*y55-y12*y21*y33*y44*y55+y11*y22*y33*y44*y55-1",
+  "y11^2+y12^2+y13^2+y14^2+y15^2-1",
+  "y14^3*y15-y14*y15^3+y24^3*y25-y24*y25^3+y34^3*y35-y34*y35^3+y44^3*y45-y44*y45^3+y54^3*y55-y54*y55^3",
+  "y13^3*y15-y13*y15^3+y23^3*y25-y23*y25^3+y33^3*y35-y33*y35^3+y43^3*y45-y43*y45^3+y53^3*y55-y53*y55^3",
+  "y12^3*y15-y12*y15^3+y22^3*y25-y22*y25^3+y32^3*y35-y32*y35^3+y42^3*y45-y42*y45^3+y52^3*y55-y52*y55^3",
+  "y11^3*y15-y11*y15^3+y21^3*y25-y21*y25^3+y31^3*y35-y31*y35^3+y41^3*y45-y41*y45^3+y51^3*y55-y51*y55^3",
+  "y13^3*y14-y13*y14^3+y23^3*y24-y23*y24^3+y33^3*y34-y33*y34^3+y43^3*y44-y43*y44^3+y53^3*y54-y53*y54^3",
+  "y12^3*y14-y12*y14^3+y22^3*y24-y22*y24^3+y32^3*y34-y32*y34^3+y42^3*y44-y42*y44^3+y52^3*y54-y52*y54^3",
+  "y11^3*y14-y11*y14^3+y21^3*y24-y21*y24^3+y31^3*y34-y31*y34^3+y41^3*y44-y41*y44^3+y51^3*y54-y51*y54^3",
+  "y12^3*y13-y12*y13^3+y22^3*y23-y22*y23^3+y32^3*y33-y32*y33^3+y42^3*y43-y42*y43^3+y52^3*y53-y52*y53^3",
+  "y11^3*y13-y11*y13^3+y21^3*y23-y21*y23^3+y31^3*y33-y31*y33^3+y41^3*y43-y41*y43^3+y51^3*y53-y51*y53^3",
+  "y11^3*y12-y11*y12^3+y21^3*y22-y21*y22^3+y31^3*y32-y31*y32^3+y41^3*y42-y41*y42^3+y51^3*y52-y51*y52^3"
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
+  R, id
+end
+
 function pearson_9(
     char::Int,
     ord::Symbol=:degrevlex
