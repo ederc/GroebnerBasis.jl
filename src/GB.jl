@@ -24,10 +24,6 @@ function __init__()
    else
       push!(Libdl.DL_LOAD_PATH, libdir)
    end
-
-   println("")
-   println("GB comes with absolutely no warranty whatsoever")
-   println("")
 end
 
 # we take a Singular ideal and extract the following data:
@@ -47,14 +43,18 @@ function convert_singular_ideal_to_array(
   end
   cfs   = Array{Int32,1}(undef, nterms)
   exps  = Array{Int32,1}(undef, nvars*nterms)
-  ctr = 1
+  cc = 1 # coefficient counter
+  ec = 0 # exponent vector counter
   for i = 1:Singular.ngens(id)
-    for (c,e) in Singular.coeffs_expos(id[i])
-      cfs[ctr]  = Base.Int(c)
+    for c in Singular.coeffs(id[i])
+      cfs[cc] = Base.Int(c)
+      cc += 1
+    end
+    for e in Singular.exponent_vectors(id[i])
       for j = 1:nvars
-        exps[nvars*(ctr-1)+j]  =  Base.Int(e[j])
+        exps[nvars*ec+j]  =  Base.Int(e[j])
       end
-      ctr +=  1
+      ec +=  1
     end
   end
   lens, cfs, exps
@@ -69,7 +69,7 @@ function convert_gb_array_to_singular_ideal(
     )
   ngens = gb[1] # number of generators of basis
 
-  nvars = Singular.ngens(R)
+  nvars = Singular.nvars(R)
   basis = Singular.Ideal(R, ) # empty ideal
   exp   = zeros(Cint, nvars+1) 
   
@@ -173,7 +173,7 @@ function f4(
   J   = Singular.Ideal(R, ptr)
   Singular.libSingular.idSkipZeroes(J.ptr)
   # get number of variables
-  nvars   = Singular.ngens(R)
+  nvars   = Singular.nvars(R)
   ngens   = Singular.ngens(J)
   # convert Singular ideal to flattened arrays of ints
   lens, cfs, exps   = convert_singular_ideal_to_array(J, nvars, ngens)
