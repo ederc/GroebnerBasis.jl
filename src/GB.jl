@@ -258,16 +258,6 @@ function f4p(
         push!(cfs, ret[2])
         push!(exps, ret[3])
     end
-    # call f4 in gb
-    #  println("Input data")
-    #  println("----------")
-    #  println(lens)
-    #  println(cfs)
-    #  println(exps)
-    #  println("----------")
-    #if hts > 30
-    #    hts = 24
-    #  end
     ord = 0
     if monorder == :degrevlex
         ord = 0
@@ -275,14 +265,6 @@ function f4p(
     if monorder == :lex
         ord = 1
     end
-    # calling f4_julia with the following arguments:
-    # lengths of all generators
-    # coefficients of all generators
-    # exponents of all generators
-    # number of variables
-    # number of generators
-    # hash table size log_2, i.e. given 12 => 2^12
-    # println(char, nvars, ngens, hts, nthrds, maxpairs, laopt)
     jl_basis  = []
     gb_basis  = []
     gb_basis_len  = Array{Int32,1}(undef,nthrds)
@@ -291,24 +273,17 @@ function f4p(
                     sizeof(Ptr{Cint})))
     end
     println("nthrds ", nthrds)
-    # for i in 1:nthrds
-    # @sync @distributed for i in 1:nthrds
-    Threads.@threads for i in 1:nthrds
         lib = Libdl.dlopen(libgb)
         sym = Libdl.dlsym(lib, :f4_julia)
-        # gb_basis[i]  = ccall((:malloc, "libc.so.6"), Ptr{Ptr{Cint}}, (Csize_t, ), sizeof(Ptr{Cint}))
+    Threads.@threads for i in 1:nthrds
         gb_basis_len[i]  = ccall(sym, Int,
             (Ptr{Ptr{Cint}}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int, Int, Int, Int, Int,
             Int, Int, Int, Int, Int, Int),
             gb_basis[i], lens[i], cfs[i], exps[i], char[i], ord, nvars, ngens,
             hts, 1, maxpairs,
             resetht, laopt, pbmfiles, infolevel)
-
-        # convert to julia array, also give memory management to julia
-        # jl_basis[i] = Base.unsafe_wrap(Array, unsafe_load(gb_basis[i]),
-        #             gb_basis_len; own=true)
-        Libdl.dlclose(lib)
     end
+        Libdl.dlclose(lib)
     res = []
     for i in 1:nthrds
         push!(jl_basis, Base.unsafe_wrap(Array, unsafe_load(gb_basis[i]),
