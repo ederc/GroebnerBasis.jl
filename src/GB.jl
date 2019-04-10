@@ -3,6 +3,7 @@ module GB
 # other files
 include("Benchmarks.jl")
 include("Example.jl")
+include("ZnZ.jl")
 
 # package code goes here
 using Libdl
@@ -17,6 +18,13 @@ const pkgdir  = realpath(joinpath(dirname(@__FILE__), ".."))
 const libdir   = joinpath(pkgdir, "local", "lib")
 const libgb   = joinpath(pkgdir, "local", "lib", "libgb")
 
+const _non_inv = Ref{Int32}()
+
+function _abort(x::Int32)
+  global _non_inv[] = x
+  error("Problem in GB: $x")
+end
+
 function __init__()
    if "HOSTNAME" in keys(ENV) && ENV["HOSTNAME"] == "juliabox"
        push!(Libdl.DL_LOAD_PATH, "/usr/local/lib")
@@ -26,6 +34,10 @@ function __init__()
    else
       push!(Libdl.DL_LOAD_PATH, libdir)
    end
+
+   ccall((:set_abort, libgb), Nothing,
+         (Ptr{Nothing},), @cfunction(_abort, Nothing, (Int32,)))
+
 end
 
 # we take a Singular ideal and extract the following data:
