@@ -1,12 +1,17 @@
-function split(a, n)
+# Stupid workaround
+function Base.Int(x::Singular.n_Zn)
+  return parse(Int, string(x))
+end
+
+function _split(a, n)
   fb = Hecke.FactorBase(Hecke.coprime_base([a, n]))
   f = Hecke.factor(fb, n)
   return [ (p, e) for (p, e) in f]
 end
 
-function idempotents(a, b)
+function _idempotents(a, b)
   g, e, f = gcdx(a, b)
-  return e, f
+  return e * a, f * b
 end
 
 function _stab(a, b, N)
@@ -36,31 +41,38 @@ end
 function gbmodn(I)
   R = I.base_ring
   n = characteristic(R)
-  @show typeof(n)
   global _non_inv
   local G
   try
     println("Trying to call GB.f4 with ", I)
     G = GB.f4(I)
+    println("Result is $G")
     return G
   catch e
     @show "I AM SPLITTING ..."
-    @assert isa(e, ErrorException)
+    if !isa(e, ErrorException)
+      rethrow(e)
+    end
     a = _non_inv[]
     @show "Splitting with $a"
     @assert !iszero(gcd(n, a))
-    spl = split(a, n)
+    spl = _split(a, n)
     if length(spl) == 1
       error("Not implemented yet")
     else
+      # This is the maximal splitting that we can get
+      # Alternatively, we could split only two at a time
       m = spl[1][1]^spl[2][2]
-      Im = _reduce_mod_n(deepcopy(I), m)
+      Im = _reduce_mod_n(I, m)
       Gm = gbmodn(Im)
+      _adjust_leading_coefficients(Gm)
       for i in 2:length(spl)
         k = spl[i][1]^spl[i][2]
-        Ik = _reduce_mod_n(deepcopy(I), k)#define I over Z/k
+        Ik = _reduce_mod_n(I, k)#define I over Z/k
         Gk = gbmodn(Ik)
-        G = recombine(Gm, Gk) # G is Gröbner basis over Z/m * k
+        _adjust_leading_coefficients(Gk)
+        println("RECOMBINING $(Int(characteristic(base_ring(Gm)))) ($(Singular.ngens(Gm)) elements) and $k ($(Singular.ngens(Gk)) elements)")
+        G = _recombine(Gm, Gk) # G is Gröbner basis over Z/m * k
         Gm = G
         # m <- m * k
       end
@@ -75,9 +87,9 @@ function _adjust_leading_coefficients(G)
   new_polys = elem_type(R)[]
   for i in 1:Singular.ngens(G)
     f = G[i]
-    a = Int(deepcopy(lc(f)))
+    a = Int(lc(f))
     u = _unit(a, n)
-    push!(new_polys, deepcopy(u * f))
+    push!(new_polys, u * f)
   end
   return Ideal(R, new_polys)
 end
@@ -97,16 +109,84 @@ function _reduce_mod_n(G, n)
       for j in 1:length(exp)
         mon *= X[j]^exp[j]
       end
-      z += Sbase(Int(deepcopy(coe))) * mon
+      z += Sbase(Int(coe)) * mon
     end
     push!(new_polys, z)
   end
   return Ideal(S, new_polys)
 end
 
-function _recombine(Gp, Gq)
-  p = Int(characteristic(base_ring(Gp)))
-  q = Int(characteristic(base_ring(Gq)))
-  # Just to test
-  return Gp
+function lift(S, f)
+  z = zero(S)
+  X = Singular.gens(S)
+  # There must be an easier way?!
+  for (coe, exp) in zip(coeffs(f), exponent_vectors(f))
+    mon = one(S)
+    for j in 1:length(exp)
+      mon *= X[j]^exp[j]
+    end
+    z += S(Int(coe)) * mon
+  end
+  return z
+end
+
+function _recombine(Ga, Gb)
+  a = Int(characteristic(base_ring(Ga)))
+  b = Int(characteristic(base_ring(Gb)))
+  ua, vb = _idempotents(a, b)
+  @assert ua + vb == 1
+  @assert mod(ua, a) == 0
+  @assert mod(vb, b) == 0
+  ua = mod(ua, a * b)
+  vb = mod(vb, a * b)
+  @show ua, vb
+
+  R = base_ring(Ga)
+  n = a * b
+  Sbase = Singular.N_ZnRing(a * b)
+  S, X = Singular.PolynomialRing(Sbase, string.(gens(R)), ordering = R.ord)
+  new_polys = elem_type(S)[]
+  Gagenslifted = [ lift(S, Ga[i]) for i in 1:Singular.ngens(Ga)]
+  Gbgenslifted = [ lift(S, Gb[j]) for j in 1:Singular.ngens(Gb)]
+  push!(Gagenslifted, S(a))
+  push!(Gbgenslifted, S(b))
+
+  for i in 1:length(Gagenslifted)
+    for j in 1:length(Gbgenslifted)
+      Gai = Gagenslifted[i]
+      Gbj = Gbgenslifted[j]
+      lmlcm = _lcm_mon(Singular.lm(Gai), Singular.lm(Gbj))
+      push!(new_polys, ua * _div_mon(lmlcm, Singular.lm(Gbj)) * Singular.lc(Gai) * Gbj +
+                       vb * _div_mon(lmlcm, Singular.lm(Gai)) * Singular.lc(Gbj) * Gai)
+    end
+  end
+  # The last element is zero
+  f = pop!(new_polys)
+  @assert iszero(f)
+  return Ideal(S, new_polys)
+end
+
+# Why do I have to do this?
+function _div_mon(f, g)
+  x = Singular.gens(parent(f))
+  ef = first(exponent_vectors(f))
+  eg = first(exponent_vectors(g))
+  z = one(parent(f))
+  for i in 1:length(ef)
+    @assert ef >= eg
+    z *= x[i]^(ef[i] - eg[i])
+  end
+  return z
+end
+
+# Cannot do lcm over Z/nZ using Singular?
+function _lcm_mon(f, g)
+  x = Singular.gens(parent(f))
+  ef = first(exponent_vectors(f))
+  eg = first(exponent_vectors(g))
+  z = one(parent(f))
+  for i in 1:length(ef)
+    z *= x[i]^max(ef[i], eg[i])
+  end
+  return z
 end

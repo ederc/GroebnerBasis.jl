@@ -3,13 +3,14 @@ module GB
 # other files
 include("Benchmarks.jl")
 include("Example.jl")
-include("ZnZ.jl")
 
 # package code goes here
 using Libdl
 using Revise
 using Singular
 using Hecke
+
+include("ZnZ.jl")
 
 export Singular
 export Hecke
