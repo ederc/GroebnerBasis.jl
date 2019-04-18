@@ -117,6 +117,26 @@ function _reduce_mod_n(G, n)
 end
 
 function lift(S, f)
+    cfs = collect(Singular.coeffs(f))
+    exps =
+convert(Array{Array{Int32,1},1},collect(Singular.exponent_vectors(f)))
+    p     = Singular.libSingular.p_Init(S.ptr)
+    lp  = p
+    for j = 2:Singular.length(f)
+        pterm = Singular.libSingular.p_Init(S.ptr)
+        Singular.libSingular.SetpNext(lp, pterm)
+        lp  = pterm
+    end
+    lp  = p
+    for j in 1:Singular.length(f)
+        Singular.libSingular.pSetCoeff0(lp, Clong(cfs[j]), S.ptr)
+        Singular.libSingular.p_SetExpV(lp, prepend!(exps[j],Int32(0)), S.ptr)
+        lp  = Singular.libSingular.pNext(lp)
+    end
+    return S(p)
+end
+
+function lift_old(S, f)
   z = zero(S)
   X = Singular.gens(S)
   # There must be an easier way?!
