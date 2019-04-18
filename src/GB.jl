@@ -10,6 +10,7 @@ using Revise
 using Singular
 using Hecke
 
+include("Benchmarks-ZnZ.jl")
 include("ZnZ.jl")
 
 export Singular
