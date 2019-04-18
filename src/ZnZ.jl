@@ -38,18 +38,21 @@ function _unit(a, N)
   end
 end
 
-function gbmodn(I)
-  R = I.base_ring
+function gbmodn(I::Singular.sideal{Singular.spoly{Singular.n_Zn}}; timings = Dict())
+  R = Singular.base_ring(I)::Singular.PolyRing{Singular.n_Zn}
   n = characteristic(R)
   global _non_inv
   local G
   try
-    println("Trying to call GB.f4 with ", I)
-    G = GB.f4(I)
-    println("Result is $G")
+    println("Trying to call GB.f4 with ", n)
+    t = @elapsed G = GB.f4(I)
+    if haskey(timings, :f4)
+      timings[:f4] += t
+    else
+      timings[:f4] = t
+    end
     return G
   catch e
-    @show "I AM SPLITTING ..."
     if !isa(e, ErrorException)
       rethrow(e)
     end
@@ -69,10 +72,15 @@ function gbmodn(I)
       for i in 2:length(spl)
         k = spl[i][1]^spl[i][2]
         Ik = _reduce_mod_n(I, k)#define I over Z/k
-        Gk = gbmodn(Ik)
+        Gk = gbmodn(Ik, timings = timings)
         _adjust_leading_coefficients(Gk)
         println("RECOMBINING $(Int(characteristic(base_ring(Gm)))) ($(Singular.ngens(Gm)) elements) and $k ($(Singular.ngens(Gk)) elements)")
-        G = _recombine(Gm, Gk) # G is Gröbner basis over Z/m * k
+        t = @elapsed G = _recombine(Gm, Gk, timings = timings) # G is Gröbner basis over Z/m * k
+        if haskey(timings, :recombine)
+          timings[:recombine] += t
+        else
+          timings[:recombine] = t
+        end
         Gm = G
         # m <- m * k
       end
@@ -150,39 +158,108 @@ function lift_old(S, f)
   return z
 end
 
-function _recombine(Ga, Gb)
-  a = Int(characteristic(base_ring(Ga)))
-  b = Int(characteristic(base_ring(Gb)))
+function _recombine(Ga, Gb; timings = Dict())
+  a = Int(characteristic(base_ring(Ga)::Singular.PolyRing{Singular.n_Zn}))
+  b = Int(characteristic(base_ring(Gb)::Singular.PolyRing{Singular.n_Zn}))
   ua, vb = _idempotents(a, b)
   @assert ua + vb == 1
   @assert mod(ua, a) == 0
   @assert mod(vb, b) == 0
   ua = mod(ua, a * b)
   vb = mod(vb, a * b)
-  @show ua, vb
 
-  R = base_ring(Ga)
+  R = base_ring(Ga)::Singular.PolyRing{Singular.n_Zn}
   n = a * b
   Sbase = Singular.N_ZnRing(a * b)
   S, X = Singular.PolynomialRing(Sbase, string.(gens(R)), ordering = R.ord)
   new_polys = elem_type(S)[]
-  Gagenslifted = [ lift(S, Ga[i]) for i in 1:Singular.ngens(Ga)]
-  Gbgenslifted = [ lift(S, Gb[j]) for j in 1:Singular.ngens(Gb)]
+  Gagenslifted = Vector{elem_type(S)}(undef, Singular.ngens(Ga))
+  t = @elapsed for i in 1:Singular.ngens(Ga)
+    Gagenslifted[i] = lift(S, Ga[i])
+  end
+  if haskey(timings, :lifting)
+    timings[:lifting] += t
+  else
+    timings[:lifting] = t
+  end
+  Gbgenslifted = Vector{elem_type(S)}(undef, Singular.ngens(Gb))
+  t = @elapsed for i in 1:Singular.ngens(Gb)
+    Gbgenslifted[i] = lift(S, Gb[i])
+  end
+  timings[:lifting] += t
+  #Gbgenslifted = [ lift(S, Gb[j]) for j in 1:Singular.ngens(Gb)]
   push!(Gagenslifted, S(a))
   push!(Gbgenslifted, S(b))
 
-  for i in 1:length(Gagenslifted)
+  lt = Vector{Vector{Int}}()
+
+  cmp = function(x, y)
+    for i in 1:length(x)
+      if x[i] > y[i]
+        return false
+      end
+    end
+    return true
+  end
+
+  polys_to_keep = Vector{Tuple{Int, Int}}()
+
+  _to_delete = Int[]
+
+  _tmp = Vector{Int}(undef, Singular.nvars(S))
+
+  @time for i in 1:length(Gagenslifted)
     for j in 1:length(Gbgenslifted)
+      empty!(_to_delete)
       Gai = Gagenslifted[i]
       Gbj = Gbgenslifted[j]
-      lmlcm = _lcm_mon(Singular.lm(Gai), Singular.lm(Gbj))
-      push!(new_polys, ua * _div_mon(lmlcm, Singular.lm(Gbj)) * Singular.lc(Gai) * Gbj +
-                       vb * _div_mon(lmlcm, Singular.lm(Gai)) * Singular.lc(Gbj) * Gai)
+      _exp = _lcm_mon_exp!(_tmp, Gai, Gbj)
+
+      redundant = false
+      
+      for e in lt
+        if cmp(e, _exp)
+          redundant = true
+          break
+        end
+      end
+
+      if redundant
+        continue
+      end
+
+
+      for i in 1:length(lt)
+        e = lt[i]
+        if cmp(_exp, e)
+          push!(_to_delete, i)
+        end
+      end
+
+      if length(_to_delete) > 0
+        deleteat!(lt, _to_delete)
+      end
+
+      push!(lt, copy(_exp))
+      push!(polys_to_keep, (i, j))
     end
   end
+
+  for (i, j) in polys_to_keep
+    Gai = Gagenslifted[i]
+    Gbj = Gbgenslifted[j]
+    lmlcm = _lcm_mon(Singular.lm(Gai), Singular.lm(Gbj))
+    h =  ua * _div_mon(lmlcm, Singular.lm(Gbj)) * Singular.lc(Gai)::Singular.n_Zn * Gbj + vb * _div_mon(lmlcm, Singular.lm(Gai)) * Singular.lc(Gbj)::Singular.n_Zn * Gai
+    if iszero(h)
+      continue
+    end
+    push!(new_polys, h)
+  end
+
   # The last element is zero
-  f = pop!(new_polys)
-  @assert iszero(f)
+  #f = pop!(new_polys)
+  #@assert iszero(f)
+  @show length(new_polys)
   return Ideal(S, new_polys)
 end
 
@@ -210,3 +287,14 @@ function _lcm_mon(f, g)
   end
   return z
 end
+
+# Computes the lcm of the leading monomials of f and g and stores it in res (just the exponent vector)
+function _lcm_mon_exp!(res, f, g)
+  ef = first(exponent_vectors(f))
+  eg = first(exponent_vectors(g))
+  for k in 1:length(ef)
+    res[k] = max(ef[k], eg[k])
+  end
+  return res
+end
+
