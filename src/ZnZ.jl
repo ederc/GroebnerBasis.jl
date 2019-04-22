@@ -38,14 +38,14 @@ function _unit(a, N)
   end
 end
 
-function gbmodn(I::Singular.sideal{Singular.spoly{Singular.n_Zn}}; timings = Dict())
+function gbmodn(I::Singular.sideal{Singular.spoly{Singular.n_Zn}}; laopt = 2, timings = Dict())
   R = Singular.base_ring(I)::Singular.PolyRing{Singular.n_Zn}
   n = characteristic(R)
   global _non_inv
   local G
   try
     println("Trying to call GB.f4 with ", n)
-    t = @elapsed G = GB.f4(I)
+    t = @elapsed G = GB.f4(I, laopt=laopt)
     if haskey(timings, :f4)
       timings[:f4] += t
     else
@@ -67,12 +67,12 @@ function gbmodn(I::Singular.sideal{Singular.spoly{Singular.n_Zn}}; timings = Dic
       # Alternatively, we could split only two at a time
       m = spl[1][1]^spl[2][2]
       Im = _reduce_mod_n(I, m)
-      Gm = gbmodn(Im)
+      Gm = gbmodn(Im, laopt = laopt)
       _adjust_leading_coefficients(Gm)
       for i in 2:length(spl)
         k = spl[i][1]^spl[i][2]
         Ik = _reduce_mod_n(I, k)#define I over Z/k
-        Gk = gbmodn(Ik, timings = timings)
+        Gk = gbmodn(Ik, laopt = laopt, timings = timings)
         _adjust_leading_coefficients(Gk)
         println("RECOMBINING $(Int(characteristic(base_ring(Gm)))) ($(Singular.ngens(Gm)) elements) and $k ($(Singular.ngens(Gk)) elements)")
         t = @elapsed G = _recombine(Gm, Gk, timings = timings) # G is Gröbner basis over Z/m * k
