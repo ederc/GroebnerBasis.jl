@@ -84,6 +84,7 @@ function gbmodn(I::Singular.sideal{Singular.spoly{Singular.n_Zn}}; laopt = 2, ti
         Gm = G
         # m <- m * k
       end
+      G.isGB  = true
       return G
     end
   end
