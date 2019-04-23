@@ -716,7 +716,8 @@ function f633nz(
   ps =
   "2*u6+2*u5+2*u4+2*u3+2*u2+1",
    "2*U6+2*U5+2*U4+2*U3+2*U2+1",
-   "1-4*u2*U3-4*u2*U4-4*u2*U5-4*u2*U6+4*u3*U2-4*u3*U4-4*u3*U5-4*u3*U6+4*u4*U2+4*u4*U3-4*u4*U5-4*u4*U6+4*u5*U2+4*u5*U3+4*u5*U4-4*u5*U6+4*u6*U2+4*u6*U3+4*u6*U4+4*u6*U5+2*u2+2*u3+2*u4+2*u5+2*u6,1-4*U2*u3-4*U2*u4-4*U2*u5-4*U2*u6+4*U3*u2-4*U3*u4-4*U3*u5-4*U3*u6+4*U4*u2+4*U4*u3-4*U4*u5-4*U4*u6+4*U5*u2+4*U5*u3+4*U5*u4-4*U5*u6+4*U6*u2+4*U6*u3+4*U6*u4+4*U6*u5+2*U2+2*U3+2*U4+2*U5+2*U6",
+   "1-4*u2*U3-4*u2*U4-4*u2*U5-4*u2*U6+4*u3*U2-4*u3*U4-4*u3*U5-4*u3*U6+4*u4*U2+4*u4*U3-4*u4*U5-4*u4*U6+4*u5*U2+4*u5*U3+4*u5*U4-4*u5*U6+4*u6*U2+4*u6*U3+4*u6*U4+4*u6*U5+2*u2+2*u3+2*u4+2*u5+2*u6",
+   "1-4*U2*u3-4*U2*u4-4*U2*u5-4*U2*u6+4*U3*u2-4*U3*u4-4*U3*u5-4*U3*u6+4*U4*u2+4*U4*u3-4*U4*u5-4*U4*u6+4*U5*u2+4*U5*u3+4*U5*u4-4*U5*u6+4*U6*u2+4*U6*u3+4*U6*u4+4*U6*u5+2*U2+2*U3+2*U4+2*U5+2*U6",
    "U2*u2-1",
    "U3*u3-1",
    "U4*u4-1",
@@ -759,7 +760,48 @@ function f744nz(
   "U4*u4-1",
   "U5*u5-1",
   "U6*u6-1",
-  "U7*u7-1";
+  "U7*u7-1"
+
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
+  R, id
+end
+
+function f855nz(
+    char::Int,
+    ord::Symbol=:degrevlex
+    )
+  if (ord != :lex) && (ord != :degrevlex)
+    error("Order not known -- No ideal generated.")
+  end
+  n = 14
+  vars = Array{String, 1}(undef, n)
+  # generate dummy array of n strings for generating
+  # singular polynomial ring
+  vars = ["U8","U7","U6","U5","U4","U3","U2","u8","u7","u6","u5","u4","u3","u2"]
+  if char == 0
+    R, X = Singular.PolynomialRing(Singular.QQ, vars, ordering = ord)
+  else
+    R, X = Singular.PolynomialRing(Singular.N_ZnRing(char), vars, ordering = ord)
+  end
+  global X
+  # parses X[i] to xi
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  ps =
+"2*u8+2*u7+2*u6+2*u5+2*u4+2*u3+2*u2+1",
+"2*U8+2*U7+2*U6+2*U5+2*U4+2*U3+2*U2+1",
+"U2*u2-1",
+"U3*u3-1",
+"U4*u4-1",
+"U5*u5-1",
+"U6*u6-1",
+"U7*u7-1",
+"U8*u8-1",
+"-4*U7*u8-4*U6*u8-4*U5*u8-4*U4*u8-4*U3*u8-4*U2*u8+4*U8*u7-4*U6*u7-4*U5*u7-4*U4*u7-4*U3*u7-4*U2*u7+4*U8*u6+4*U7*u6-4*U5*u6-4*U4*u6-4*U3*u6-4*U2*u6+4*U8*u5+4*U7*u5+4*U6*u5-4*U4*u5-4*U3*u5-4*U2*u5+4*U8*u4+4*U7*u4+4*U6*u4+4*U5*u4-4*U3*u4-4*U2*u4+4*U8*u3+4*U7*u3+4*U6*u3+4*U5*u3+4*U4*u3-4*U2*u3+4*U8*u2+4*U7*u2+4*U6*u2+4*U5*u2+4*U4*u2+4*U3*u2+2*U8+2*U7+2*U6+2*U5+2*U4+2*U3+2*U2+1",
+"4*U7*u8+4*U6*u8+4*U5*u8+4*U4*u8+4*U3*u8+4*U2*u8-4*U8*u7+4*U6*u7+4*U5*u7+4*U4*u7+4*U3*u7+4*U2*u7-4*U8*u6-4*U7*u6+4*U5*u6+4*U4*u6+4*U3*u6+4*U2*u6-4*U8*u5-4*U7*u5-4*U6*u5+4*U4*u5+4*U3*u5+4*U2*u5-4*U8*u4-4*U7*u4-4*U6*u4-4*U5*u4+4*U3*u4+4*U2*u4-4*U8*u3-4*U7*u3-4*U6*u3-4*U5*u3-4*U4*u3+4*U2*u3-4*U8*u2-4*U7*u2-4*U6*u2-4*U5*u2-4*U4*u2-4*U3*u2+2*u8+2*u7+2*u6+2*u5+2*u4+2*u3+2*u2+1",
+"16*U6*U4*u5+16*U6*U3*u5+16*U6*U2*u5+16*U6*U3*u4+16*U5*U3*u4+16*U6*U2*u4+16*U5*U2*u4+16*U6*U2*u3+16*U5*U2*u3+16*U4*U2*u3+8*U6*u5+8*U6*u4+8*U5*u4+8*U6*u3+8*U5*u3+8*U4*u3+8*U6*u2+8*U5*u2+8*U4*u2+8*U3*u2+26*U6+26*U5+26*U4+26*U3+26*U2+15",
+"16*U5*u6*u4+16*U5*u6*u3+16*U4*u6*u3+16*U4*u5*u3+16*U5*u6*u2+16*U4*u6*u2+16*U3*u6*u2+16*U4*u5*u2+16*U3*u5*u2+16*U3*u4*u2+8*U5*u6+8*U4*u6+8*U3*u6+8*U2*u6+8*U4*u5+8*U3*u5+8*U2*u5+8*U3*u4+8*U2*u4+8*U2*u3+26*u6+26*u5+26*u4+26*u3+26*u2+15",
+"-2*U7*U5*u8*u6-2*U7*U4*u8*u6-2*U7*U3*u8*u6-2*U7*U2*u8*u6-2*U7*U4*u8*u5-2*U6*U4*u8*u5-2*U7*U3*u8*u5-2*U6*U3*u8*u5-2*U7*U2*u8*u5-2*U6*U2*u8*u5+2*U8*U6*u7*u5-2*U6*U4*u7*u5-2*U6*U3*u7*u5-2*U6*U2*u7*u5-2*U7*U3*u8*u4-2*U6*U3*u8*u4-2*U5*U3*u8*u4-2*U7*U2*u8*u4-2*U6*U2*u8*u4-2*U5*U2*u8*u4+2*U8*U6*u7*u4+2*U8*U5*u7*u4-2*U6*U3*u7*u4-2*U5*U3*u7*u4-2*U6*U2*u7*u4-2*U5*U2*u7*u4+2*U8*U5*u6*u4+2*U7*U5*u6*u4-2*U5*U3*u6*u4-2*U5*U2*u6*u4-2*U7*U2*u8*u3-2*U6*U2*u8*u3-2*U5*U2*u8*u3-2*U4*U2*u8*u3+2*U8*U6*u7*u3+2*U8*U5*u7*u3+2*U8*U4*u7*u3-2*U6*U2*u7*u3-2*U5*U2*u7*u3-2*U4*U2*u7*u3+2*U8*U5*u6*u3+2*U7*U5*u6*u3+2*U8*U4*u6*u3+2*U7*U4*u6*u3-2*U5*U2*u6*u3-2*U4*U2*u6*u3+2*U8*U4*u5*u3+2*U7*U4*u5*u3+2*U6*U4*u5*u3-2*U4*U2*u5*u3+2*U8*U6*u7*u2+2*U8*U5*u7*u2+2*U8*U4*u7*u2+2*U8*U3*u7*u2+2*U8*U5*u6*u2+2*U7*U5*u6*u2+2*U8*U4*u6*u2+2*U7*U4*u6*u2+2*U8*U3*u6*u2+2*U7*U3*u6*u2+2*U8*U4*u5*u2+2*U7*U4*u5*u2+2*U6*U4*u5*u2+2*U8*U3*u5*u2+2*U7*U3*u5*u2+2*U6*U3*u5*u2+2*U8*U3*u4*u2+2*U7*U3*u4*u2+2*U6*U3*u4*u2+2*U5*U3*u4*u2+U8*U6*u7+U8*U5*u7+U8*U4*u7+U8*U3*u7+U8*U2*u7+U8*U5*u6+U7*U5*u6+U8*U4*u6+U7*U4*u6+U8*U3*u6+U7*U3*u6+U8*U2*u6+U7*U2*u6-U7*u8*u6+U8*U4*u5+U7*U4*u5+U6*U4*u5+U8*U3*u5+U7*U3*u5+U6*U3*u5+U8*U2*u5+U7*U2*u5+U6*U2*u5-U7*u8*u5-U6*u8*u5-U6*u7*u5+U8*U3*u4+U7*U3*u4+U6*U3*u4+U5*U3*u4+U8*U2*u4+U7*U2*u4+U6*U2*u4+U5*U2*u4-U7*u8*u4-U6*u8*u4-U5*u8*u4-U6*u7*u4-U5*u7*u4-U5*u6*u4+U8*U2*u3+U7*U2*u3+U6*U2*u3+U5*U2*u3+U4*U2*u3-U7*u8*u3-U6*u8*u3-U5*u8*u3-U4*u8*u3-U6*u7*u3-U5*u7*u3-U4*u7*u3-U5*u6*u3-U4*u6*u3-U4*u5*u3-U7*u8*u2-U6*u8*u2-U5*u8*u2-U4*u8*u2-U3*u8*u2-U6*u7*u2-U5*u7*u2-U4*u7*u2-U3*u7*u2-U5*u6*u2-U4*u6*u2-U3*u6*u2-U4*u5*u2-U3*u5*u2-U3*u4*u2",
+"2*U7*U5*u8*u6+2*U7*U4*u8*u6+2*U7*U3*u8*u6+2*U7*U2*u8*u6+2*U7*U4*u8*u5+2*U6*U4*u8*u5+2*U7*U3*u8*u5+2*U6*U3*u8*u5+2*U7*U2*u8*u5+2*U6*U2*u8*u5-2*U8*U6*u7*u5+2*U6*U4*u7*u5+2*U6*U3*u7*u5+2*U6*U2*u7*u5+2*U7*U3*u8*u4+2*U6*U3*u8*u4+2*U5*U3*u8*u4+2*U7*U2*u8*u4+2*U6*U2*u8*u4+2*U5*U2*u8*u4-2*U8*U6*u7*u4-2*U8*U5*u7*u4+2*U6*U3*u7*u4+2*U5*U3*u7*u4+2*U6*U2*u7*u4+2*U5*U2*u7*u4-2*U8*U5*u6*u4-2*U7*U5*u6*u4+2*U5*U3*u6*u4+2*U5*U2*u6*u4+2*U7*U2*u8*u3+2*U6*U2*u8*u3+2*U5*U2*u8*u3+2*U4*U2*u8*u3-2*U8*U6*u7*u3-2*U8*U5*u7*u3-2*U8*U4*u7*u3+2*U6*U2*u7*u3+2*U5*U2*u7*u3+2*U4*U2*u7*u3-2*U8*U5*u6*u3-2*U7*U5*u6*u3-2*U8*U4*u6*u3-2*U7*U4*u6*u3+2*U5*U2*u6*u3+2*U4*U2*u6*u3-2*U8*U4*u5*u3-2*U7*U4*u5*u3-2*U6*U4*u5*u3+2*U4*U2*u5*u3-2*U8*U6*u7*u2-2*U8*U5*u7*u2-2*U8*U4*u7*u2-2*U8*U3*u7*u2-2*U8*U5*u6*u2-2*U7*U5*u6*u2-2*U8*U4*u6*u2-2*U7*U4*u6*u2-2*U8*U3*u6*u2-2*U7*U3*u6*u2-2*U8*U4*u5*u2-2*U7*U4*u5*u2-2*U6*U4*u5*u2-2*U8*U3*u5*u2-2*U7*U3*u5*u2-2*U6*U3*u5*u2-2*U8*U3*u4*u2-2*U7*U3*u4*u2-2*U6*U3*u4*u2-2*U5*U3*u4*u2-U8*U6*u7-U8*U5*u7-U8*U4*u7-U8*U3*u7-U8*U2*u7-U8*U5*u6-U7*U5*u6-U8*U4*u6-U7*U4*u6-U8*U3*u6-U7*U3*u6-U8*U2*u6-U7*U2*u6+U7*u8*u6-U8*U4*u5-U7*U4*u5-U6*U4*u5-U8*U3*u5-U7*U3*u5-U6*U3*u5-U8*U2*u5-U7*U2*u5-U6*U2*u5+U7*u8*u5+U6*u8*u5+U6*u7*u5-U8*U3*u4-U7*U3*u4-U6*U3*u4-U5*U3*u4-U8*U2*u4-U7*U2*u4-U6*U2*u4-U5*U2*u4+U7*u8*u4+U6*u8*u4+U5*u8*u4+U6*u7*u4+U5*u7*u4+U5*u6*u4-U8*U2*u3-U7*U2*u3-U6*U2*u3-U5*U2*u3-U4*U2*u3+U7*u8*u3+U6*u8*u3+U5*u8*u3+U4*u8*u3+U6*u7*u3+U5*u7*u3+U4*u7*u3+U5*u6*u3+U4*u6*u3+U4*u5*u3+U7*u8*u2+U6*u8*u2+U5*u8*u2+U4*u8*u2+U3*u8*u2+U6*u7*u2+U5*u7*u2+U4*u7*u2+U3*u7*u2+U5*u6*u2+U4*u6*u2+U3*u6*u2+U4*u5*u2+U3*u5*u2+U3*u4*u2"
 
   id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
