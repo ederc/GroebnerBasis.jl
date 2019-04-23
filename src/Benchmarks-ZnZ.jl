@@ -563,6 +563,309 @@ function mayrnz_42(
   R, id
 end
 
+function reimernz_5(
+    char::Int,
+    ord::Symbol=:degrevlex
+    )
+  if (ord != :lex) && (ord != :degrevlex)
+    error("Order not known -- No ideal generated.")
+  end
+  n = 5
+  vars = Array{String, 1}(undef, n)
+  # generate dummy array of n strings for generating
+  # singular polynomial ring
+  vars = ["x","y","z","t","u"]
+  if char == 0
+    R, X = Singular.PolynomialRing(Singular.QQ, vars, ordering = ord)
+  else
+    R, X = Singular.PolynomialRing(Singular.N_ZnRing(char), vars, ordering = ord)
+  end
+  global X
+  # parses X[i] to xi
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  ps =
+  "2*x^2-2*y^2+2*z^2-2*t^2+2*u^2-1",
+  "2*x^3-2*y^3+2*z^3-2*t^3+2*u^3-1",
+  "2*x^4-2*y^4+2*z^4-2*t^4+2*u^4-1",
+  "2*x^5-2*y^5+2*z^5-2*t^5+2*u^5-1",
+  "2*x^6-2*y^6+2*z^6-2*t^6+2*u^6-1"
+
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
+  R, id
+end
+
+function reimernz_6(
+    char::Int,
+    ord::Symbol=:degrevlex
+    )
+  if (ord != :lex) && (ord != :degrevlex)
+    error("Order not known -- No ideal generated.")
+  end
+  n = 6
+  vars = Array{String, 1}(undef, n)
+  # generate dummy array of n strings for generating
+  # singular polynomial ring
+  vars = ["x1","x2","x3","x4","x5", "x6"]
+  if char == 0
+    R, X = Singular.PolynomialRing(Singular.QQ, vars, ordering = ord)
+  else
+    R, X = Singular.PolynomialRing(Singular.N_ZnRing(char), vars, ordering = ord)
+  end
+  global X
+  # parses X[i] to xi
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  ps =
+  "2*x1^2-2*x2^2+2*x3^2-2*x4^2+2*x5^2-2*x6^2-1",
+  "2*x1^3-2*x2^3+2*x3^3-2*x4^3+2*x5^3-2*x6^3-1",
+  "2*x1^4-2*x2^4+2*x3^4-2*x4^4+2*x5^4-2*x6^4-1",
+  "2*x1^5-2*x2^5+2*x3^5-2*x4^5+2*x5^5-2*x6^5-1",
+  "2*x1^6-2*x2^6+2*x3^6-2*x4^6+2*x5^6-2*x6^6-1",
+  "2*x1^7-2*x2^7+2*x3^7-2*x4^7+2*x5^7-2*x6^7-1"
+
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
+  R, id
+end
+
+function noonnz_7(
+    char::Int,
+    ord::Symbol=:degrevlex
+    )
+  if (ord != :lex) && (ord != :degrevlex)
+    error("Order not known -- No ideal generated.")
+  end
+  n = 7
+  vars = Array{String, 1}(undef, n)
+  # generate dummy array of n strings for generating
+  # singular polynomial ring
+  vars = ["x1","x2","x3","x4","x5", "x6", "x7"]
+  if char == 0
+    R, X = Singular.PolynomialRing(Singular.QQ, vars, ordering = ord)
+  else
+    R, X = Singular.PolynomialRing(Singular.N_ZnRing(char), vars, ordering = ord)
+  end
+  global X
+  # parses X[i] to xi
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  ps =
+  "10*x1*x2^2+10*x1*x3^2+10*x1*x4^2+10*x1*x5^2+10*x1*x6^2+10*x1*x7^2-11*x1+10",
+  "10*x1^2*x2+10*x2*x3^2+10*x2*x4^2+10*x2*x5^2+10*x2*x6^2+10*x2*x7^2-11*x2+10",
+  "10*x1^2*x3+10*x2^2*x3+10*x3*x4^2+10*x3*x5^2+10*x3*x6^2+10*x3*x7^2-11*x3+10",
+  "10*x1^2*x4+10*x2^2*x4+10*x3^2*x4+10*x4*x5^2+10*x4*x6^2+10*x4*x7^2-11*x4+10",
+  "10*x1^2*x5+10*x2^2*x5+10*x3^2*x5+10*x4^2*x5+10*x5*x6^2+10*x5*x7^2-11*x5+10",
+  "10*x1^2*x6+10*x2^2*x6+10*x3^2*x6+10*x4^2*x6+10*x5^2*x6+10*x6*x7^2-11*x6+10",
+  "10*x1^2*x7+10*x2^2*x7+10*x3^2*x7+10*x4^2*x7+10*x5^2*x7+10*x6^2*x7-11*x7+10"
+
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
+  R, id
+end
+
+function noonnz_8(
+    char::Int,
+    ord::Symbol=:degrevlex
+    )
+  if (ord != :lex) && (ord != :degrevlex)
+    error("Order not known -- No ideal generated.")
+  end
+  n = 8
+  vars = Array{String, 1}(undef, n)
+  # generate dummy array of n strings for generating
+  # singular polynomial ring
+  vars = ["x1","x2","x3","x4","x5", "x6", "x7","x8"]
+  if char == 0
+    R, X = Singular.PolynomialRing(Singular.QQ, vars, ordering = ord)
+  else
+    R, X = Singular.PolynomialRing(Singular.N_ZnRing(char), vars, ordering = ord)
+  end
+  global X
+  # parses X[i] to xi
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  ps =
+  "10*x1*x2^2+10*x1*x3^2+10*x1*x4^2+10*x1*x5^2+10*x1*x6^2+10*x1*x7^2+10*x1*x8^2-11*x1+10",
+  "10*x1^2*x2+10*x2*x3^2+10*x2*x4^2+10*x2*x5^2+10*x2*x6^2+10*x2*x7^2+10*x2*x8^2-11*x2+10",
+  "10*x1^2*x3+10*x2^2*x3+10*x3*x4^2+10*x3*x5^2+10*x3*x6^2+10*x3*x7^2+10*x3*x8^2-11*x3+10",
+  "10*x1^2*x4+10*x2^2*x4+10*x3^2*x4+10*x4*x5^2+10*x4*x6^2+10*x4*x7^2+10*x4*x8^2-11*x4+10",
+  "10*x1^2*x5+10*x2^2*x5+10*x3^2*x5+10*x4^2*x5+10*x5*x6^2+10*x5*x7^2+10*x5*x8^2-11*x5+10",
+  "10*x1^2*x6+10*x2^2*x6+10*x3^2*x6+10*x4^2*x6+10*x5^2*x6+10*x6*x7^2+10*x6*x8^2-11*x6+10",
+  "10*x1^2*x7+10*x2^2*x7+10*x3^2*x7+10*x4^2*x7+10*x5^2*x7+10*x6^2*x7+10*x7*x8^2-11*x7+10",
+  "10*x1^2*x8+10*x2^2*x8+10*x3^2*x8+10*x4^2*x8+10*x5^2*x8+10*x6^2*x8+10*x7^2*x8-11*x8+10"
+
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
+  R, id
+end
+
+function f633nz(
+    char::Int,
+    ord::Symbol=:degrevlex
+    )
+  if (ord != :lex) && (ord != :degrevlex)
+    error("Order not known -- No ideal generated.")
+  end
+  n = 10
+  vars = Array{String, 1}(undef, n)
+  # generate dummy array of n strings for generating
+  # singular polynomial ring
+  vars = ["U6","U5","U4","U3","U2","u6","u5","u4","u3","u2"]
+  if char == 0
+    R, X = Singular.PolynomialRing(Singular.QQ, vars, ordering = ord)
+  else
+    R, X = Singular.PolynomialRing(Singular.N_ZnRing(char), vars, ordering = ord)
+  end
+  global X
+  # parses X[i] to xi
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  ps =
+  "2*u6+2*u5+2*u4+2*u3+2*u2+1",
+   "2*U6+2*U5+2*U4+2*U3+2*U2+1",
+   "1-4*u2*U3-4*u2*U4-4*u2*U5-4*u2*U6+4*u3*U2-4*u3*U4-4*u3*U5-4*u3*U6+4*u4*U2+4*u4*U3-4*u4*U5-4*u4*U6+4*u5*U2+4*u5*U3+4*u5*U4-4*u5*U6+4*u6*U2+4*u6*U3+4*u6*U4+4*u6*U5+2*u2+2*u3+2*u4+2*u5+2*u6,1-4*U2*u3-4*U2*u4-4*U2*u5-4*U2*u6+4*U3*u2-4*U3*u4-4*U3*u5-4*U3*u6+4*U4*u2+4*U4*u3-4*U4*u5-4*U4*u6+4*U5*u2+4*U5*u3+4*U5*u4-4*U5*u6+4*U6*u2+4*U6*u3+4*U6*u4+4*U6*u5+2*U2+2*U3+2*U4+2*U5+2*U6",
+   "U2*u2-1",
+   "U3*u3-1",
+   "U4*u4-1",
+   "U5*u5-1",
+   "U6*u6-1"
+
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
+  R, id
+end
+
+function f744nz(
+    char::Int,
+    ord::Symbol=:degrevlex
+    )
+  if (ord != :lex) && (ord != :degrevlex)
+    error("Order not known -- No ideal generated.")
+  end
+  n = 12
+  vars = Array{String, 1}(undef, n)
+  # generate dummy array of n strings for generating
+  # singular polynomial ring
+  vars = ["U7","U6","U5","U4","U3","U2","u7","u6","u5","u4","u3","u2"]
+  if char == 0
+    R, X = Singular.PolynomialRing(Singular.QQ, vars, ordering = ord)
+  else
+    R, X = Singular.PolynomialRing(Singular.N_ZnRing(char), vars, ordering = ord)
+  end
+  global X
+  # parses X[i] to xi
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  ps =
+  "2*u7+2*u6+2*u5+2*u4+2*u3+2*u2+1",
+  "2*U7+2*U6+2*U5+2*U4+2*U3+2*U2+1",
+  "8*U6*u7+8*U5*u7+8*U4*u7+8*U3*u7+8*U2*u7+8*U6*u6+8*U5*u6+8*U4*u6+8*U3*u6+8*U2*u6+8*U5*u5+8*U4*u5+8*U3*u5+8*U2*u5+8*U4*u4+8*U3*u4+8*U2*u4+8*U3*u3+8*U2*u3+8*U2*u2-17",
+  "8*U7*u6+8*U6*u6+8*U7*u5+8*U6*u5+8*U5*u5+8*U7*u4+8*U6*u4+8*U5*u4+8*U4*u4+8*U7*u3+8*U6*u3+8*U5*u3+8*U4*u3+8*U3*u3+8*U7*u2+8*U6*u2+8*U5*u2+8*U4*u2+8*U3*u2+8*U2*u2-17",
+  "16*U5*U3*u4+16*U5*U2*u4+16*U5*U2*u3+16*U4*U2*u3+8*U5*u4+8*U5*u3+8*U4*u3+8*U5*u2+8*U4*u2+8*U3*u2+18*U5+18*U4+18*U3+18*U2+11",
+  "16*U4*u5*u3+16*U4*u5*u2+16*U3*u5*u2+16*U3*u4*u2+8*U4*u5+8*U3*u5+8*U2*u5+8*U3*u4+8*U2*u4+8*U2*u3+18*u5+18*u4+18*u3+18*u2+11",
+  "U2*u2-1",
+  "U3*u3-1",
+  "U4*u4-1",
+  "U5*u5-1",
+  "U6*u6-1",
+  "U7*u7-1";
+
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
+  R, id
+end
+
+function econz_10(
+    char::Int,
+    ord::Symbol=:degrevlex
+    )
+  if (ord != :lex) && (ord != :degrevlex)
+    error("Order not known -- No ideal generated.")
+  end
+  n = 10
+  vars = Array{String, 1}(undef, n)
+  # generate dummy array of n strings for generating
+  # singular polynomial ring
+  vars = ["x1","x2","x3","x4","x5","x6","x7","x8","x9","u10"]
+  if char == 0
+    R, X = Singular.PolynomialRing(Singular.QQ, vars, ordering = ord)
+  else
+    R, X = Singular.PolynomialRing(Singular.N_ZnRing(char), vars, ordering = ord)
+  end
+  global X
+  # parses X[i] to xi
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  ps =
+  "x1*x2+x2*x3+x3*x4+x4*x5+x5*x6+x6*x7+x7*x8+x8*x9+x1-u10",
+  "x1*x3+x2*x4+x3*x5+x4*x6+x5*x7+x6*x8+x7*x9+x2-2*u10",
+  "x1*x4+x2*x5+x3*x6+x4*x7+x5*x8+x6*x9+x3-3*u10",
+  "x1*x5+x2*x6+x3*x7+x4*x8+x5*x9+x4-4*u10",
+  "x1*x6+x2*x7+x3*x8+x4*x9+x5-5*u10",
+  "x1*x7+x2*x8+x3*x9+x6-6*u10",
+  "x1*x8+x2*x9+x7-7*u10",
+  "x1*x9+x8-8*u10",
+  "x9-9*u10",
+  "x1+x2+x3+x4+x5+x6+x7+x8+x9+1"
+
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
+  R, id
+end
+
+function econz_11(
+    char::Int,
+    ord::Symbol=:degrevlex
+    )
+  if (ord != :lex) && (ord != :degrevlex)
+    error("Order not known -- No ideal generated.")
+  end
+  n = 11
+  vars = Array{String, 1}(undef, n)
+  # generate dummy array of n strings for generating
+  # singular polynomial ring
+  vars = ["x1","x2","x3","x4","x5","x6","x7","x8","x9","x10","u11"]
+  if char == 0
+    R, X = Singular.PolynomialRing(Singular.QQ, vars, ordering = ord)
+  else
+    R, X = Singular.PolynomialRing(Singular.N_ZnRing(char), vars, ordering = ord)
+  end
+  global X
+  # parses X[i] to xi
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  ps =
+  "x1*x2+x2*x3+x3*x4+x4*x5+x5*x6+x6*x7+x7*x8+x8*x9+x9*x10+x1-u11",
+  "x1*x3+x2*x4+x3*x5+x4*x6+x5*x7+x6*x8+x7*x9+x8*x10+x2-2*u11",
+  "x1*x4+x2*x5+x3*x6+x4*x7+x5*x8+x6*x9+x7*x10+x3-3*u11",
+  "x1*x5+x2*x6+x3*x7+x4*x8+x5*x9+x6*x10+x4-4*u11",
+  "x1*x6+x2*x7+x3*x8+x4*x9+x5*x10+x5-5*u11",
+  "x1*x7+x2*x8+x3*x9+x4*x10+x6-6*u11",
+  "x1*x8+x2*x9+x3*x10+x7-7*u11",
+  "x1*x9+x2*x10+x8-8*u11",
+  "x1*x10+x9-9*u11",
+  "x10-10*u11",
+  "x1+x2+x3+x4+x5+x6+x7+x8+x9+x10+1"
+
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
+  R, id
+end
+
+function lichtblaunz(
+    char::Int,
+    ord::Symbol=:degrevlex
+    )
+  if (ord != :lex) && (ord != :degrevlex)
+    error("Order not known -- No ideal generated.")
+  end
+  n = 3
+  vars = Array{String, 1}(undef, n)
+  # generate dummy array of n strings for generating
+  # singular polynomial ring
+  vars = ["t","x","y"]
+  if char == 0
+    R, X = Singular.PolynomialRing(Singular.QQ, vars, ordering = ord)
+  else
+    R, X = Singular.PolynomialRing(Singular.N_ZnRing(char), vars, ordering = ord)
+  end
+  global X
+  # parses X[i] to xi
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  ps =
+  "x-110*t^2+495*t^3-1320*t^4+2772*t^5-5082*t^6+7590*t^7-8085*t^8+5555*t^9-2189*t^10+374*t^11",
+  "y-22*t+110*t^2-330*t^3+1848*t^5-3696*t^6+3300*t^7-1650*t^8+550*t^9-88*t^10-22*t^11"
+
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
+  R, id
+end
+
 function yangnz_1(
     char::Int,
     ord::Symbol=:degrevlex
