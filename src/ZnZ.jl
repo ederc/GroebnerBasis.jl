@@ -67,7 +67,7 @@ function gbmodn(I::Singular.sideal{Singular.spoly{Singular.n_Zn}}; laopt = 2, ti
       # Alternatively, we could split only two at a time
       m = spl[1][1]^spl[2][2]
       Im = _reduce_mod_n(I, m)
-      Gm = gbmodn(Im, laopt = laopt)
+      Gm = gbmodn(Im, laopt = laopt, timings = timings)
       _adjust_leading_coefficients(Gm)
       for i in 2:length(spl)
         k = spl[i][1]^spl[i][2]
