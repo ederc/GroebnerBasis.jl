@@ -1152,6 +1152,8 @@ end
 #
 ################################################################################
 
+const PolynomialRing = Singular.PolynomialRing
+
 function bayes148(R)
   Rx = Singular.@PolynomialRing R "x" 32
   gens = [-x23*x32+x24*x31, -x22*x32+x24*x30, -x22*x31+x23*x30, -x21*x32+x24*x29, -x21*x31+x23*x29, -x21*x30+x22*x29, -x12*x32+x16*x28,  -x19*x28+x20*x27,
@@ -1163,7 +1165,7 @@ function bayes148(R)
 end
 
 function butcher83(R)
-  Rx, (A, a32, B, b1, b2, b3, c2, c3) = PolynomialRing(R, ["P", "A", "a32", "B", "b1", "b2", "b3", "c2", "c3"]);
+  Rx, (A, a32, B, b1, b2, b3, c2, c3) = Singular.PolynomialRing(R, ["P", "A", "a32", "B", "b1", "b2", "b3", "c2", "c3"]);
   gens = [
      A-B+b1+b2+b3,2*A*B-2*B^2+2*b2*c2+2*b3*c3-B-1,
     -3*A*B^2+3*B^3+3*b2*c2^2+3*b3*c3^2+3*B^2-A+4*B,
