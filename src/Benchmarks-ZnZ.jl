@@ -1235,7 +1235,7 @@ function eco9(R)
   x7*x8-8,
   x0+x1+x2+x3+x4+x5+x6+x7+1
   ]
-  return Singular.Ideal(Rx, I)
+  return Singular.Ideal(Rx, gens)
 end
 
 function f633(R)

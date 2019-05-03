@@ -57,15 +57,16 @@ function gbmodn(I::Singular.sideal{Singular.spoly{Singular.n_Zn}}; laopt = 2, ti
       rethrow(e)
     end
     a = _non_inv[]
-    @show "Splitting with $a"
+    println("Splitting with $a")
     @assert !iszero(gcd(n, a))
     spl = _split(a, n)
     if length(spl) == 1
-      error("Not implemented yet")
+      println("Cannot split ... falling back to Singular.std for $n")
+      return Singular.std(I)
     else
       # This is the maximal splitting that we can get
       # Alternatively, we could split only two at a time
-      m = spl[1][1]^spl[2][2]
+      m = spl[1][1]^spl[1][2]
       Im = _reduce_mod_n(I, m)
       Gm = gbmodn(Im, laopt = laopt, timings = timings)
       _adjust_leading_coefficients(Gm)
@@ -127,10 +128,9 @@ end
 
 function lift(S, f)
     cfs = collect(Singular.coeffs(f))
-    exps =
-convert(Array{Array{Int32,1},1},collect(Singular.exponent_vectors(f)))
-    p     = Singular.libSingular.p_Init(S.ptr)
-    lp  = p
+    exps = convert(Array{Array{Int32,1},1},collect(Singular.exponent_vectors(f)))
+    p = Singular.libSingular.p_Init(S.ptr)
+    lp = p
     for j = 2:Singular.length(f)
         pterm = Singular.libSingular.p_Init(S.ptr)
         Singular.libSingular.SetpNext(lp, pterm)
@@ -192,9 +192,15 @@ function _recombine(Ga, Gb; timings = Dict())
   push!(Gagenslifted, S(a))
   push!(Gbgenslifted, S(b))
 
-  lt = Vector{Vector{Int}}()
+  lt = Vector{Tuple{Int, Vector{Int}}}()
 
-  cmp = function(x, y)
+  # Return true if lcx * x divides lcy * y
+  _divides = function(lcx, x, lcy, y)
+    # there is no divides(x, y) ... :(
+    if gcd(lcx, lcy, n) != gcd(lcx, n)
+      return false
+    end
+
     for i in 1:length(x)
       if x[i] > y[i]
         return false
@@ -215,11 +221,12 @@ function _recombine(Ga, Gb; timings = Dict())
       Gai = Gagenslifted[i]
       Gbj = Gbgenslifted[j]
       _exp = _lcm_mon_exp!(_tmp, Gai, Gbj)
+      lcrecomb = Int(lc(Gai))*Int(lc(Gbj))
 
       redundant = false
       
-      for e in lt
-        if cmp(e, _exp)
+      for (_lc, e) in lt
+        if _divides(_lc, e, lcrecomb, _exp)
           redundant = true
           break
         end
@@ -229,10 +236,9 @@ function _recombine(Ga, Gb; timings = Dict())
         continue
       end
 
-
       for i in 1:length(lt)
-        e = lt[i]
-        if cmp(_exp, e)
+        _lc, e = lt[i]
+        if _divides(lcrecomb, _exp, _lc, e)
           push!(_to_delete, i)
         end
       end
@@ -241,7 +247,7 @@ function _recombine(Ga, Gb; timings = Dict())
         deleteat!(lt, _to_delete)
       end
 
-      push!(lt, copy(_exp))
+      push!(lt, (lcrecomb, copy(_exp)))
       push!(polys_to_keep, (i, j))
     end
   end
@@ -299,3 +305,18 @@ function _lcm_mon_exp!(res, f, g)
   return res
 end
 
+function _are_gb_equal(G1, G2)
+  for i in 1:Singular.ngens(G1)
+    if Singular.reduce(G1[i], G2) != 0
+      return false
+    end
+  end
+  
+  for i in 1:Singular.ngens(G2)
+    if Singular.reduce(G2[i], G1) != 0
+      return false
+    end
+  end
+
+  return true
+end
