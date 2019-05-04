@@ -1205,6 +1205,39 @@ function cyc7(R)
   return Singular.Ideal(Rx, gens)
 end
 
+function cyc8(R)
+  Rx = Singular.@PolynomialRing R "x" 8
+  gens = [
+  x1+x2+x3+x4+x5+x6+x7+x8,
+  x1*x2+x2*x3+x3*x4+x4*x5+x5*x6+x6*x7+x1*x8+x7*x8,
+  x1*x2*x3+x2*x3*x4+x3*x4*x5+x4*x5*x6+x5*x6*x7+x1*x2*x8+x1*x7*x8+x6*x7*x8,
+  x1*x2*x3*x4+x2*x3*x4*x5+x3*x4*x5*x6+x4*x5*x6*x7+x1*x2*x3*x8+x1*x2*x7*x8+x1*x6*x7*x8+x5*x6*x7*x8,
+  x1*x2*x3*x4*x5+x2*x3*x4*x5*x6+x3*x4*x5*x6*x7+x1*x2*x3*x4*x8+x1*x2*x3*x7*x8+x1*x2*x6*x7*x8+x1*x5*x6*x7*x8+x4*x5*x6*x7*x8,
+  x1*x2*x3*x4*x5*x6+x2*x3*x4*x5*x6*x7+x1*x2*x3*x4*x5*x8+x1*x2*x3*x4*x7*x8+x1*x2*x3*x6*x7*x8+x1*x2*x5*x6*x7*x8+x1*x4*x5*x6*x7*x8+x3*x4*x5*x6*x7*x8,
+  x1*x2*x3*x4*x5*x6*x7+x1*x2*x3*x4*x5*x6*x8+x1*x2*x3*x4*x5*x7*x8+x1*x2*x3*x4*x6*x7*x8+x1*x2*x3*x5*x6*x7*x8+x1*x2*x4*x5*x6*x7*x8+x1*x3*x4*x5*x6*x7*x8+x2*x3*x4*x5*x6*x7*x8,
+  x1*x2*x3*x4*x5*x6*x7*x8-1
+  ]
+  return Singular.Ideal(Rx, gens)
+end
+
+function eco11(R)
+  Rx, (x0,x1,x2,x3,x4,x5,x6,x7,x8,x9, x10) = PolynomialRing(R, ["x$i" for i in 0:10]);
+  gens = [
+  x0*x1*x10+x1*x2*x10+x2*x3*x10+x3*x4*x10+x4*x5*x10+x5*x6*x10+x6*x7*x10+x7*x8*x10+x8*x9*x10+x0*x10-1,
+  x0*x2*x10+x1*x3*x10+x2*x4*x10+x3*x5*x10+x4*x6*x10+x5*x7*x10+x6*x8*x10+x7*x9*x10+x1*x10-2,
+  x0*x3*x10+x1*x4*x10+x2*x5*x10+x3*x6*x10+x4*x7*x10+x5*x8*x10+x6*x9*x10+x2*x10-3,
+  x0*x4*x10+x1*x5*x10+x2*x6*x10+x3*x7*x10+x4*x8*x10+x5*x9*x10+x3*x10-4,
+  x0*x5*x10+x1*x6*x10+x2*x7*x10+x3*x8*x10+x4*x9*x10+x4*x10-5,
+  x0*x6*x10+x1*x7*x10+x2*x8*x10+x3*x9*x10+x5*x10-6,
+  x0*x7*x10+x1*x8*x10+x2*x9*x10+x6*x10-7,
+  x0*x8*x10+x1*x9*x10+x7*x10-8,
+  x0*x9*x10+x8*x10-9,
+  x9*x10-10,
+  x0+x1+x2+x3+x4+x5+x6+x7+x8+x9+1
+  ]
+  return Singular.Ideal(Rx, gens)
+end
+
 function eco10(R)
   Rx, (x0,x1,x2,x3,x4,x5,x6,x7,x8,x9) = PolynomialRing(R, ["x$i" for i in 0:9]);
   gens =  [
@@ -1281,7 +1314,73 @@ function f744(R)
   return Singular.Ideal(Rx, gens)
 end
 
-function gametwo7(Q)
+function f855(R)
+  Rx, (U8,U7,U6,U5,U4,U3,U2,u8,u7,u6,u5,u4,u3,u2) = PolynomialRing(R, vcat(["U$i" for i in 8:-1:2], ["u$i" for i in 8:-1:2]));
+  gens = [
+    2*u8 + 2*u7 + 2*u6 + 2*u5 + 2*u4 + 2*u3 + 2*u2 + 1,
+    2*U8 + 2*U7 + 2*U6 + 2*U5 + 2*U4 + 2*U3 + 2*U2 + 1,
+    U2*u2 - 1,
+    U3*u3 - 1,
+    U4*u4 - 1,
+    U5*u5 - 1,
+    U6*u6 - 1,
+    U7*u7 - 1,
+    U8*u8 - 1,
+    -4*U7*u8 - 4*U6*u8 - 4*U5*u8 - 4*U4*u8 - 4*U3*u8 - 4*U2*u8 + 4*U8*u7 - 4*U6*u7 - 4*U5*u7 - 4*U4*u7 - 4*U3*u7 - 4*U2*u7 + 4*U8*u6 + 4*U7*u6 - 4*U5*u6 - 4*U4*u6 - 4*U3*u6 - 4*U2*u6 + 4*U8*u5 + 4*U7*u5 + 4*U6*u5 - 4*U4*u5 - 4*U3*u5 - 4*U2*u5 + 4*U8*u4 + 4*U7*u4 + 4*U6*u4 + 4*U5*u4 - 4*U3*u4 - 4*U2*u4 + 4*U8*u3 + 4*U7*u3 + 4*U6*u3 + 4*U5*u3 + 4*U4*u3 - 4*U2*u3 + 4*U8*u2 + 4*U7*u2 + 4*U6*u2 + 4*U5*u2 + 4*U4*u2 + 4*U3*u2 + 2*U8 + 2*U7 + 2*U6 + 2*U5 + 2*U4 + 2*U3 + 2*U2 + 1,
+    4*U7*u8 + 4*U6*u8 + 4*U5*u8 + 4*U4*u8 + 4*U3*u8 + 4*U2*u8 - 4*U8*u7 +
+      4*U6*u7 + 4*U5*u7 + 4*U4*u7 + 4*U3*u7 + 4*U2*u7 - 4*U8*u6 - 4*U7*u6 +
+      4*U5*u6 + 4*U4*u6 + 4*U3*u6 + 4*U2*u6 - 4*U8*u5 - 4*U7*u5 - 4*U6*u5 +
+      4*U4*u5 + 4*U3*u5 + 4*U2*u5 - 4*U8*u4 - 4*U7*u4 - 4*U6*u4 - 4*U5*u4 +
+      4*U3*u4 + 4*U2*u4 - 4*U8*u3 - 4*U7*u3 - 4*U6*u3 - 4*U5*u3 - 4*U4*u3 +
+      4*U2*u3 - 4*U8*u2 - 4*U7*u2 - 4*U6*u2 - 4*U5*u2 - 4*U4*u2 - 4*U3*u2 + 2*u8 + 2*u7 + 2*u6 + 2*u5 + 2*u4 + 2*u3 + 2*u2 + 1,
+    16*U6*U4*u5 + 16*U6*U3*u5 + 16*U6*U2*u5 + 16*U6*U3*u4 + 16*U5*U3*u4 +
+      16*U6*U2*u4 + 16*U5*U2*u4 + 16*U6*U2*u3 + 16*U5*U2*u3 + 16*U4*U2*u3 + 8*U6*u5 + 8*U6*u4 + 8*U5*u4 + 8*U6*u3 + 8*U5*u3 + 8*U4*u3 +
+      8*U6*u2 + 8*U5*u2 + 8*U4*u2 + 8*U3*u2 + 26*U6 + 26*U5 + 26*U4 + 26*U3 + 26*U2 + 15,
+    16*U5*u6*u4 + 16*U5*u6*u3 + 16*U4*u6*u3 + 16*U4*u5*u3 + 16*U5*u6*u2 +
+      16*U4*u6*u2 + 16*U3*u6*u2 + 16*U4*u5*u2 + 16*U3*u5*u2 + 16*U3*u4*u2 + 8*U5*u6 + 8*U4*u6 + 8*U3*u6 + 8*U2*u6 + 8*U4*u5 + 8*U3*u5 +
+      8*U2*u5 + 8*U3*u4 + 8*U2*u4 + 8*U2*u3 + 26*u6 + 26*u5 + 26*u4 +
+      26*u3 + 26*u2 + 15,
+    - 2*U7*U5*u8*u6 - 2*U7*U4*u8*u6 - 2*U7*U3*u8*u6 - 2*U7*U2*u8*u6 - 2*U7*U4*u8*u5 - 2*U6*U4*u8*u5 - 2*U7*U3*u8*u5 - 2*U6*U3*u8*u5 - 2*U7*U2*u8*u5 - 2*U6*U2*u8*u5 + 2*U8*U6*u7*u5 - 2*U6*U4*u7*u5 - 2*U6*U3*u7*u5 - 2*U6*U2*u7*u5 - 2*U7*U3*u8*u4 - 2*U6*U3*u8*u4 - 2*U5*U3*u8*u4 - 2*U7*U2*u8*u4 - 2*U6*U2*u8*u4 - 2*U5*U2*u8*u4 +
+      2*U8*U6*u7*u4 + 2*U8*U5*u7*u4 - 2*U6*U3*u7*u4 - 2*U5*U3*u7*u4 - 2*U6*U2*u7*u4 - 2*U5*U2*u7*u4 + 2*U8*U5*u6*u4 + 2*U7*U5*u6*u4 - 2*U5*U3*u6*u4 - 2*U5*U2*u6*u4 - 2*U7*U2*u8*u3 - 2*U6*U2*u8*u3 - 2*U5*U2*u8*u3 - 2*U4*U2*u8*u3 + 2*U8*U6*u7*u3 + 2*U8*U5*u7*u3 +
+      2*U8*U4*u7*u3 - 2*U6*U2*u7*u3 - 2*U5*U2*u7*u3 - 2*U4*U2*u7*u3 +
+      2*U8*U5*u6*u3 + 2*U7*U5*u6*u3 + 2*U8*U4*u6*u3 + 2*U7*U4*u6*u3 - 2*U5*U2*u6*u3 - 2*U4*U2*u6*u3 + 2*U8*U4*u5*u3 + 2*U7*U4*u5*u3 +
+      2*U6*U4*u5*u3 - 2*U4*U2*u5*u3 + 2*U8*U6*u7*u2 + 2*U8*U5*u7*u2 +
+      2*U8*U4*u7*u2 + 2*U8*U3*u7*u2 + 2*U8*U5*u6*u2 + 2*U7*U5*u6*u2 +
+      2*U8*U4*u6*u2 + 2*U7*U4*u6*u2 + 2*U8*U3*u6*u2 + 2*U7*U3*u6*u2 +
+      2*U8*U4*u5*u2 + 2*U7*U4*u5*u2 + 2*U6*U4*u5*u2 + 2*U8*U3*u5*u2 +
+      2*U7*U3*u5*u2 + 2*U6*U3*u5*u2 + 2*U8*U3*u4*u2 + 2*U7*U3*u4*u2 +
+      2*U6*U3*u4*u2 + 2*U5*U3*u4*u2 + U8*U6*u7 + U8*U5*u7 + U8*U4*u7 +
+      U8*U3*u7 + U8*U2*u7 + U8*U5*u6 + U7*U5*u6 + U8*U4*u6 + U7*U4*u6 +
+      U8*U3*u6 + U7*U3*u6 + U8*U2*u6 + U7*U2*u6  - U7*u8*u6 + U8*U4*u5 +
+      U7*U4*u5 + U6*U4*u5 + U8*U3*u5 + U7*U3*u5 + U6*U3*u5 + U8*U2*u5 +
+      U7*U2*u5 + U6*U2*u5  - U7*u8*u5  - U6*u8*u5  - U6*u7*u5 + U8*U3*u4 +
+      U7*U3*u4 + U6*U3*u4 + U5*U3*u4 + U8*U2*u4 + U7*U2*u4 + U6*U2*u4 +
+      U5*U2*u4  - U7*u8*u4  - U6*u8*u4  - U5*u8*u4  - U6*u7*u4  - U5*u7*u4 - U5*u6*u4 + U8*U2*u3 + U7*U2*u3 + U6*U2*u3 + U5*U2*u3 + U4*U2*u3  -
+      U7*u8*u3  - U6*u8*u3  - U5*u8*u3  - U4*u8*u3  - U6*u7*u3  - U5*u7*u3 - U4*u7*u3  - U5*u6*u3  - U4*u6*u3  - U4*u5*u3  - U7*u8*u2  -
+      U6*u8*u2  - U5*u8*u2  - U4*u8*u2  - U3*u8*u2  - U6*u7*u2  - U5*u7*u2 - U4*u7*u2  - U3*u7*u2  - U5*u6*u2  - U4*u6*u2  - U3*u6*u2  -
+      U4*u5*u2  - U3*u5*u2  - U3*u4*u2,
+    2*U7*U5*u8*u6 + 2*U7*U4*u8*u6 + 2*U7*U3*u8*u6 + 2*U7*U2*u8*u6 +
+      2*U7*U4*u8*u5 + 2*U6*U4*u8*u5 + 2*U7*U3*u8*u5 + 2*U6*U3*u8*u5 +
+      2*U7*U2*u8*u5 + 2*U6*U2*u8*u5 - 2*U8*U6*u7*u5 + 2*U6*U4*u7*u5 +
+      2*U6*U3*u7*u5 + 2*U6*U2*u7*u5 + 2*U7*U3*u8*u4 + 2*U6*U3*u8*u4 +
+      2*U5*U3*u8*u4 + 2*U7*U2*u8*u4 + 2*U6*U2*u8*u4 + 2*U5*U2*u8*u4 - 2*U8*U6*u7*u4 - 2*U8*U5*u7*u4 + 2*U6*U3*u7*u4 + 2*U5*U3*u7*u4 +
+      2*U6*U2*u7*u4 + 2*U5*U2*u7*u4 - 2*U8*U5*u6*u4 - 2*U7*U5*u6*u4 +
+      2*U5*U3*u6*u4 + 2*U5*U2*u6*u4 + 2*U7*U2*u8*u3 + 2*U6*U2*u8*u3 + 
+      2*U5*U2*u8*u3 + 2*U4*U2*u8*u3 - 2*U8*U6*u7*u3 - 2*U8*U5*u7*u3 - 2*U8*U4*u7*u3 + 2*U6*U2*u7*u3 + 2*U5*U2*u7*u3 + 2*U4*U2*u7*u3 - 2*U8*U5*u6*u3 - 2*U7*U5*u6*u3 - 2*U8*U4*u6*u3 - 2*U7*U4*u6*u3 +
+      2*U5*U2*u6*u3 + 2*U4*U2*u6*u3 - 2*U8*U4*u5*u3 - 2*U7*U4*u5*u3 - 2*U6*U4*u5*u3 + 2*U4*U2*u5*u3 - 2*U8*U6*u7*u2 - 2*U8*U5*u7*u2 - 2*U8*U4*u7*u2 - 2*U8*U3*u7*u2 - 2*U8*U5*u6*u2 - 2*U7*U5*u6*u2 - 2*U8*U4*u6*u2 - 2*U7*U4*u6*u2 - 2*U8*U3*u6*u2 - 2*U7*U3*u6*u2 - 2*U8*U4*u5*u2 - 2*U7*U4*u5*u2 - 2*U6*U4*u5*u2 - 2*U8*U3*u5*u2 - 2*U7*U3*u5*u2 - 2*U6*U3*u5*u2 - 2*U8*U3*u4*u2 - 2*U7*U3*u4*u2 - 2*U6*U3*u4*u2 - 2*U5*U3*u4*u2  - U8*U6*u7  - U8*U5*u7  - U8*U4*u7 -
+      U8*U3*u7  - U8*U2*u7  - U8*U5*u6  - U7*U5*u6  - U8*U4*u6  - U7*U4*u6 - U8*U3*u6  - U7*U3*u6  - U8*U2*u6  - U7*U2*u6 + U7*u8*u6  -
+      U8*U4*u5  - U7*U4*u5  - U6*U4*u5  - U8*U3*u5  - U7*U3*u5  - U6*U3*u5 - U8*U2*u5  - U7*U2*u5  - U6*U2*u5 + U7*u8*u5 + U6*u8*u5 + U6*u7*u5 - U8*U3*u4  - U7*U3*u4  - U6*U3*u4  - U5*U3*u4  - U8*U2*u4  -
+      U7*U2*u4  - U6*U2*u4  - U5*U2*u4 + U7*u8*u4 + U6*u8*u4 + U5*u8*u4 +
+      U6*u7*u4 + U5*u7*u4 + U5*u6*u4  - U8*U2*u3  - U7*U2*u3  - U6*U2*u3 - U5*U2*u3  - U4*U2*u3 + U7*u8*u3 + U6*u8*u3 + U5*u8*u3 + U4*u8*u3 +
+      U6*u7*u3 + U5*u7*u3 + U4*u7*u3 + U5*u6*u3 + U4*u6*u3 + U4*u5*u3 +
+      U7*u8*u2 + U6*u8*u2 + U5*u8*u2 + U4*u8*u2 + U3*u8*u2 + U6*u7*u2 +
+      U5*u7*u2 + U4*u7*u2 + U3*u7*u2 + U5*u6*u2 + U4*u6*u2 + U3*u6*u2 +
+      U4*u5*u2 + U3*u5*u2 + U3*u4*u2
+  ]
+  return Singular.Ideal(Rx, gens)
+end
+
+function gametwo7(R)
   Rx = Singular.@PolynomialRing R "x" 7
   gens = [
   3821*p2*p3*p4*p5*p6*p7-7730*p2*p3*p4*p5*p6-164*p2*p3*p4*p5*p7-2536*p2*p3*p4*p6*p7-4321*p2*p3*p5*p6*p7-2161*p2*p4*p5*p6*p7-2188*p3*p4*p5*p6*p7-486*p2*p3*p4*p5+3491*p2*p3*p4*p6+4247*p2*p3*p5*p6+3528*p2*p4*p5*p6+2616*p3*p4*p5*p6-101*p2*p3*p4*p7+1765*p2*p3*p5*p7+258*p2*p4*p5*p7-378*p3*p4*p5*p7+1246*p2*p3*p6*p7+2320*p2*p4*p6*p7+1776*p3*p4*p6*p7+1715*p2*p5*p6*p7+728*p3*p5*p6*p7+842*p4*p5*p6*p7+69*p2*p3*p4-1660*p2*p3*p5+1863*p2*p4*p5+1520*p3*p4*p5-245*p2*p3*p6-804*p2*p4*p6-2552*p3*p4*p6-3152*p2*p5*p6+40*p3*p5*p6-1213*p4*p5*p6+270*p2*p3*p7-851*p2*p4*p7+327*p3*p4*p7-1151*p2*p5*p7+1035*p3*p5*p7-161*p4*p5*p7-230*p2*p6*p7-294*p3*p6*p7-973*p4*p6*p7-264*p5*p6*p7+874*p2*p3-2212*p2*p4+168*p3*p4+511*p2*p5-918*p3*p5-2017*p4*p5-76*p2*p6+465*p3*p6+1629*p4*p6+856*p5*p6-54*p2*p7-1355*p3*p7+227*p4*p7+77*p5*p7-220*p6*p7-696*p2+458*p3+486*p4+661*p5-650*p6+671*p7-439,
@@ -1347,6 +1446,39 @@ function kat8(R)
   return Singular.Ideal(Rx, gens)
 end
 
+function kat9(R)
+  Rx = Singular.@PolynomialRing R "x" 9
+  gens = [
+  x1+2*x2+2*x3+2*x4+2*x5+2*x6+2*x7+2*x8+2*x9-1,
+  x1^2+2*x2^2+2*x3^2+2*x4^2+2*x5^2+2*x6^2+2*x7^2+2*x8^2+2*x9^2-x1,
+  2*x1*x2+2*x2*x3+2*x3*x4+2*x4*x5+2*x5*x6+2*x6*x7+2*x7*x8+2*x8*x9-x2,
+  x2^2+2*x1*x3+2*x2*x4+2*x3*x5+2*x4*x6+2*x5*x7+2*x6*x8+2*x7*x9-x3,
+  2*x2*x3+2*x1*x4+2*x2*x5+2*x3*x6+2*x4*x7+2*x5*x8+2*x6*x9-x4,
+  x3^2+2*x2*x4+2*x1*x5+2*x2*x6+2*x3*x7+2*x4*x8+2*x5*x9-x5,
+  2*x3*x4+2*x2*x5+2*x1*x6+2*x2*x7+2*x3*x8+2*x4*x9-x6,
+  x4^2+2*x3*x5+2*x2*x6+2*x1*x7+2*x2*x8+2*x3*x9-x7,
+  2*x4*x5+2*x3*x6+2*x2*x7+2*x1*x8+2*x2*x9-x8
+  ]
+  return Singular.Ideal(Rx, gens)
+end
+
+function kat10(R)
+  Rx = Singular.@PolynomialRing R "x" 10
+  gens = [
+  x1+2*x2+2*x3+2*x4+2*x5+2*x6+2*x7+2*x8+2*x9+2*x10-1,
+  x1^2+2*x2^2+2*x3^2+2*x4^2+2*x5^2+2*x6^2+2*x7^2+2*x8^2+2*x9^2+2*x10^2-x1,
+  2*x1*x2+2*x2*x3+2*x3*x4+2*x4*x5+2*x5*x6+2*x6*x7+2*x7*x8+2*x8*x9+2*x9*x10-x2,
+  x2^2+2*x1*x3+2*x2*x4+2*x3*x5+2*x4*x6+2*x5*x7+2*x6*x8+2*x7*x9+2*x8*x10-x3,
+  2*x2*x3+2*x1*x4+2*x2*x5+2*x3*x6+2*x4*x7+2*x5*x8+2*x6*x9+2*x7*x10-x4,
+  x3^2+2*x2*x4+2*x1*x5+2*x2*x6+2*x3*x7+2*x4*x8+2*x5*x9+2*x6*x10-x5,
+  2*x3*x4+2*x2*x5+2*x1*x6+2*x2*x7+2*x3*x8+2*x4*x9+2*x5*x10-x6,
+  x4^2+2*x3*x5+2*x2*x6+2*x1*x7+2*x2*x8+2*x3*x9+2*x4*x10-x7,
+  2*x4*x5+2*x3*x6+2*x2*x7+2*x1*x8+2*x2*x9+2*x3*x10-x8,
+  x5^2+2*x4*x6+2*x3*x7+2*x2*x8+2*x1*x9+2*x2*x10-x9
+  ]
+  return Singular.Ideal(Rx, gens)
+end
+
 function lichtblaul2(R)
   Rx, (x,y,z,w) = PolynomialRing(R, ["x", "y", "z", "w"]);
   gens = [
@@ -1359,7 +1491,7 @@ function lichtblaul2(R)
 end
 
 function lichtblau(R)
-  Rx, (t,x,y) = PolynomialRing(Q, ["t", "x", "y"])
+  Rx, (t,x,y) = PolynomialRing(R, ["t", "x", "y"])
   gens = [
   374*t^11-2189*t^10+5555*t^9-8085*t^8+7590*t^7-5082*t^6+2772*t^5-1320*t^4+495*t^3-110*t^2+x,
   -22*t^11-88*t^10+550*t^9-1650*t^8+3300*t^7-3696*t^6+1848*t^5-330*t^3+110*t^2-22*t+y
@@ -1432,6 +1564,35 @@ function noon7h(R)
   return Singular.Ideal(Rx, I)
 end
 
+function noon7(R)
+  Rx = Singular.@PolynomialRing R "x" 7 
+  gens = [
+  10*x1*x2^2+10*x1*x3^2+10*x1*x4^2+10*x1*x5^2+10*x1*x6^2+10*x1*x7^2-11*x1+10,
+  10*x1^2*x2+10*x2*x3^2+10*x2*x4^2+10*x2*x5^2+10*x2*x6^2+10*x2*x7^2-11*x2+10,
+  10*x1^2*x3+10*x2^2*x3+10*x3*x4^2+10*x3*x5^2+10*x3*x6^2+10*x3*x7^2-11*x3+10,
+  10*x1^2*x4+10*x2^2*x4+10*x3^2*x4+10*x4*x5^2+10*x4*x6^2+10*x4*x7^2-11*x4+10,
+  10*x1^2*x5+10*x2^2*x5+10*x3^2*x5+10*x4^2*x5+10*x5*x6^2+10*x5*x7^2-11*x5+10,
+  10*x1^2*x6+10*x2^2*x6+10*x3^2*x6+10*x4^2*x6+10*x5^2*x6+10*x6*x7^2-11*x6+10,
+  10*x1^2*x7+10*x2^2*x7+10*x3^2*x7+10*x4^2*x7+10*x5^2*x7+10*x6^2*x7-11*x7+10
+  ]
+  return Singular.Ideal(Rx, gens)
+end
+
+function noon8(R)
+  Rx = Singular.@PolynomialRing R "x" 8 
+  gens = [
+  10*x1*x2^2+10*x1*x3^2+10*x1*x4^2+10*x1*x5^2+10*x1*x6^2+10*x1*x7^2+10*x1*x8^2-11*x1+10,
+  10*x1^2*x2+10*x2*x3^2+10*x2*x4^2+10*x2*x5^2+10*x2*x6^2+10*x2*x7^2+10*x2*x8^2-11*x2+10,
+  10*x1^2*x3+10*x2^2*x3+10*x3*x4^2+10*x3*x5^2+10*x3*x6^2+10*x3*x7^2+10*x3*x8^2-11*x3+10,
+  10*x1^2*x4+10*x2^2*x4+10*x3^2*x4+10*x4*x5^2+10*x4*x6^2+10*x4*x7^2+10*x4*x8^2-11*x4+10,
+  10*x1^2*x5+10*x2^2*x5+10*x3^2*x5+10*x4^2*x5+10*x5*x6^2+10*x5*x7^2+10*x5*x8^2-11*x5+10,
+  10*x1^2*x6+10*x2^2*x6+10*x3^2*x6+10*x4^2*x6+10*x5^2*x6+10*x6*x7^2+10*x6*x8^2-11*x6+10,
+  10*x1^2*x7+10*x2^2*x7+10*x3^2*x7+10*x4^2*x7+10*x5^2*x7+10*x6^2*x7+10*x7*x8^2-11*x7+10,
+  10*x1^2*x8+10*x2^2*x8+10*x3^2*x8+10*x4^2*x8+10*x5^2*x8+10*x6^2*x8+10*x7^2*x8-11*x8+10
+  ]
+  return Singular.Ideal(Rx, gens)
+end
+
 function reimer5(R)
   Rx, (x,y,z,t,u) = PolynomialRing(R, ["x", "y", "z", "t", "u"]);
   gens = [
@@ -1458,7 +1619,7 @@ function reimer6(R)
 end
 
 function ub(R)
-  Rx, (x,y,z,t,h) = PolynomialRing(Q, ["x", "y", "z", "t", "h"])
+  Rx, (x,y,z,t,h) = PolynomialRing(R, ["x", "y", "z", "t", "h"])
   gens = [
   x^2+x*y+y^2-2*x*z-4*y*z+3*z^2-3*x*t+2*y*t+t^2-3*x*h-2*y*h+3*z*h-2*t*h-2*h^2,
   2*x^2-x*y+y^2-x*z-y*z-6*z^2-x*t+y*t-5*z*t-3*t^2-5*x*h+y*h+5*z*h+2*t*h+5*h^2,
@@ -1509,6 +1670,26 @@ function yang1(R)
   ]
   return Singular.Ideal(Rx, gens)
 end
+
+paper_bench = [ cyc6,
+                cyc7,
+                cyc8,
+                kat8,
+                kat9,
+                kat10,
+                eco10,
+                eco11,
+                f744,
+                f855,
+                noon7,
+                noon8,
+                reimer5,
+                reimer6,
+                lichtblau,
+                mayr42,
+                yang1,
+                jason210
+              ]
 
 bench = [bayes148, butcher83, cyc6, cyc7, eco10, eco9, f633, f744, gametwo7,
          jason210, kat6, kat7, kat8, lichtblaul2, lichtblau, mayr42, noon7h,
