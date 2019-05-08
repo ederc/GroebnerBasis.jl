@@ -236,15 +236,16 @@ function _recombine(Ga, Gb; timings = Dict())
         continue
       end
 
-      for i in 1:length(lt)
-        _lc, e = lt[i]
+      for k in 1:length(lt)
+        _lc, e = lt[k]
         if _divides(lcrecomb, _exp, _lc, e)
-          push!(_to_delete, i)
+          push!(_to_delete, k)
         end
       end
 
       if length(_to_delete) > 0
         deleteat!(lt, _to_delete)
+        deleteat!(polys_to_keep, _to_delete)
       end
 
       push!(lt, (lcrecomb, copy(_exp)))
