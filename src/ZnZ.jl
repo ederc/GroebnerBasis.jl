@@ -253,21 +253,22 @@ function _recombine(Ga, Gb; timings = Dict())
     end
   end
 
+  resize!(new_polys, length(polys_to_keep))
+  k = 1
   for (i, j) in polys_to_keep
     Gai = Gagenslifted[i]
     Gbj = Gbgenslifted[j]
     lmlcm = _lcm_mon(Singular.lm(Gai), Singular.lm(Gbj))
     h =  ua * _div_mon(lmlcm, Singular.lm(Gbj)) * Singular.lc(Gai)::Singular.n_Zn * Gbj + vb * _div_mon(lmlcm, Singular.lm(Gai)) * Singular.lc(Gbj)::Singular.n_Zn * Gai
-    if iszero(h)
-      continue
-    end
-    push!(new_polys, h)
+#push!(new_polys, h)
+    new_polys[k] = h
+    k += 1
   end
 
   # The last element is zero
-  #f = pop!(new_polys)
+  f = pop!(new_polys)
   #@assert iszero(f)
-  @show length(new_polys)
+ @show length(new_polys)
   return Ideal(S, new_polys)
 end
 
@@ -277,10 +278,9 @@ function _div_mon(f, g)
   ef = lead_exponent(f)
   eg = lead_exponent(g)
   z = one(parent(f))
-  for i in 1:length(ef)
-    @assert ef >= eg
-    z *= x[i]^(ef[i] - eg[i])
-  end
+  @assert ef >= eg
+  efg = ef-eg
+  z = prod(x.^efg)
   return z
 end
 
@@ -290,9 +290,8 @@ function _lcm_mon(f, g)
   ef = lead_exponent(f)
   eg = lead_exponent(g)
   z = one(parent(f))
-  for i in 1:length(ef)
-    z *= x[i]^max(ef[i], eg[i])
-  end
+  m = max.(ef,eg)
+  z = prod(x.^m)
   return z
 end
 
@@ -300,9 +299,7 @@ end
 function _lcm_mon_exp!(res, f, g)
   ef = lead_exponent(f)
   eg = lead_exponent(g)
-  for k in 1:length(ef)
-    res[k] = max(ef[k], eg[k])
-  end
+  res = max.(ef,eg)
   return res
 end
 
