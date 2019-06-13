@@ -274,8 +274,8 @@ end
 # Why do I have to do this?
 function _div_mon(f, g)
   x = Singular.gens(parent(f))
-  ef = first(exponent_vectors(f))
-  eg = first(exponent_vectors(g))
+  ef = lead_exponent(f)
+  eg = lead_exponent(g)
   z = one(parent(f))
   for i in 1:length(ef)
     @assert ef >= eg
@@ -287,8 +287,8 @@ end
 # Cannot do lcm over Z/nZ using Singular?
 function _lcm_mon(f, g)
   x = Singular.gens(parent(f))
-  ef = first(exponent_vectors(f))
-  eg = first(exponent_vectors(g))
+  ef = lead_exponent(f)
+  eg = lead_exponent(g)
   z = one(parent(f))
   for i in 1:length(ef)
     z *= x[i]^max(ef[i], eg[i])
@@ -298,8 +298,8 @@ end
 
 # Computes the lcm of the leading monomials of f and g and stores it in res (just the exponent vector)
 function _lcm_mon_exp!(res, f, g)
-  ef = first(exponent_vectors(f))
-  eg = first(exponent_vectors(g))
+  ef = lead_exponent(f)
+  eg = lead_exponent(g)
   for k in 1:length(ef)
     res[k] = max(ef[k], eg[k])
   end
