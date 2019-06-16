@@ -179,8 +179,7 @@ function _recombine(Ga, Gb; timings = Dict())
   push!(Gagenslifted, S(a))
   push!(Gbgenslifted, S(b))
 
-#lt = Vector{Tuple{Int, Vector{Int}}}()
-  ltp = Vector{Tuple{Tuple{Int, Int}, Int, Vector{Int}}}()
+  lt = Vector{Tuple{Int, Vector{Int}}}()
 
   # Return true if lcx * x divides lcy * y
   _divides = function(lcx, x, lcy, y)
@@ -197,12 +196,15 @@ function _recombine(Ga, Gb; timings = Dict())
     return true
   end
 
+  polys_to_keep = Vector{Tuple{Int, Int}}()
+
+  _to_delete = Int[]
+
   _tmp = Vector{Int}(undef, Singular.nvars(S))
 
   @time for i in 1:length(Gagenslifted)
-    j = 1
-    @label label1
-    while j < length(Gbgenslifted)
+    for j in 1:length(Gbgenslifted)
+      empty!(_to_delete)
       Gai = Gagenslifted[i]
       Gbj = Gbgenslifted[j]
       _exp = _lcm_mon_exp!(_tmp, Gai, Gbj)
@@ -210,36 +212,42 @@ function _recombine(Ga, Gb; timings = Dict())
 
       redundant = false
       
-      for (p, _lc, e) in ltp
+      for (_lc, e) in lt
         if _divides(_lc, e, lcrecomb, _exp)
           redundant = true
-          j += 1
-          @goto label1
+          break
         end
       end
 
-      k = 1
-      while k <= length(ltp)
-        p, _lc, e = ltp[k]
-        if _divides(lcrecomb, _exp, _lc, e)
-          deleteat!(ltp, k)
-          k -= 1
-        end
-        k += 1
+      if redundant
+        continue
       end
-      push!(ltp, ((i,j), lcrecomb, copy(_exp)))
-      j += 1
+
+      for k in 1:length(lt)
+        _lc, e = lt[k]
+        if _divides(lcrecomb, _exp, _lc, e)
+          push!(_to_delete, k)
+        end
+      end
+
+      if length(_to_delete) > 0
+        deleteat!(lt, _to_delete)
+        deleteat!(polys_to_keep, _to_delete)
+      end
+
+      push!(lt, (lcrecomb, copy(_exp)))
+      push!(polys_to_keep, (i, j))
     end
   end
 
+  resize!(new_polys, length(polys_to_keep))
   k = 1
-  x = Singular.gens(S)
-  resize!(new_polys, length(ltp))
-  for ((i, j), _lc, e) in ltp
+  for (i, j) in polys_to_keep
     Gai = Gagenslifted[i]
     Gbj = Gbgenslifted[j]
-    lmlcm = prod(x.^e)
+    lmlcm = _lcm_mon(Singular.lm(Gai), Singular.lm(Gbj))
     h =  ua * _div_mon(lmlcm, Singular.lm(Gbj)) * Singular.lc(Gai)::Singular.n_Zn * Gbj + vb * _div_mon(lmlcm, Singular.lm(Gai)) * Singular.lc(Gbj)::Singular.n_Zn * Gai
+#push!(new_polys, h)
     new_polys[k] = h
     k += 1
   end
