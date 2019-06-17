@@ -149,7 +149,11 @@ end
 # Return true if lcx * x divides lcy * y
 _divides = function(lcx, x, lcy, y, n)
   # there is no divides(x, y) ... :(
-  if gcd(lcx, lcy, n) != gcd(lcx, n)
+  # OLD: lcrecomb = mod(lcrecomb, n)
+  # lcrecomb is the product of the two leading coefficients,
+  # thus lcrecomb is smaller than a*b = n, so usual mod should
+  # be enough for checking divisibility
+  if mod(lcy,lcx) != 0
     return false
   end
 
@@ -213,6 +217,9 @@ function _recombine(Ga, Gb; timings = Dict())
       Gbj = Gbgenslifted[j]
       _exp = _lcm_mon_exp!(_tmp, Gai, Gbj)
       lcrecomb = Int(lc(Gai))*Int(lc(Gbj))
+      if lcrecomb > n
+        println("greater n")
+      end
 
       for (_lc, e) in lt
         if _divides(_lc, e, lcrecomb, _exp, n)
