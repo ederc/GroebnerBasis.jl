@@ -205,11 +205,11 @@ function _recombine(Ga, Gb; timings = Dict())
   i = 1
   @label label2
   @time while i <= length(Gagenslifted)
+    Gai = Gagenslifted[i]
     j = 1
     @label label1
     while j  <= length(Gbgenslifted)
       empty!(_to_delete)
-      Gai = Gagenslifted[i]
       Gbj = Gbgenslifted[j]
       _exp = _lcm_mon_exp!(_tmp, Gai, Gbj)
       lcrecomb = Int(lc(Gai))*Int(lc(Gbj))
