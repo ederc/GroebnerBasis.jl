@@ -146,6 +146,21 @@ function lift_old(S, f)
   return z
 end
 
+# Return true if lcx * x divides lcy * y
+_divides = function(lcx, x, lcy, y, n)
+  # there is no divides(x, y) ... :(
+  if gcd(lcx, lcy, n) != gcd(lcx, n)
+    return false
+  end
+
+  for i in 1:length(x)
+    if x[i] > y[i]
+      return false
+    end
+  end
+  return true
+end
+
 function _recombine(Ga, Gb; timings = Dict())
   a = Int(characteristic(base_ring(Ga)::Singular.PolyRing{Singular.n_Zn}))
   b = Int(characteristic(base_ring(Gb)::Singular.PolyRing{Singular.n_Zn}))
@@ -181,21 +196,6 @@ function _recombine(Ga, Gb; timings = Dict())
 
   lt = Vector{Tuple{Int, Vector{Int}}}()
 
-  # Return true if lcx * x divides lcy * y
-  _divides = function(lcx, x, lcy, y)
-    # there is no divides(x, y) ... :(
-    if gcd(lcx, lcy, n) != gcd(lcx, n)
-      return false
-    end
-
-    for i in 1:length(x)
-      if x[i] > y[i]
-        return false
-      end
-    end
-    return true
-  end
-
   polys_to_keep = Vector{Tuple{Int, Int}}()
 
   _to_delete = Int[]
@@ -215,8 +215,8 @@ function _recombine(Ga, Gb; timings = Dict())
       lcrecomb = Int(lc(Gai))*Int(lc(Gbj))
 
       for (_lc, e) in lt
-        if _divides(_lc, e, lcrecomb, _exp)
-          if _divides(_lc, e, Int(Singular.lc(Gai)), Singular.lead_exponent(Gai))
+        if _divides(_lc, e, lcrecomb, _exp, n)
+          if _divides(_lc, e, Int(Singular.lc(Gai)), Singular.lead_exponent(Gai), n)
             i += 1
             @goto label2
           end
@@ -227,7 +227,7 @@ function _recombine(Ga, Gb; timings = Dict())
 
       for k in 1:length(lt)
         _lc, e = lt[k]
-        if _divides(lcrecomb, _exp, _lc, e)
+        if _divides(lcrecomb, _exp, _lc, e, n)
           push!(_to_delete, k)
         end
       end
