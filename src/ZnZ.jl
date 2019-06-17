@@ -202,25 +202,27 @@ function _recombine(Ga, Gb; timings = Dict())
 
   _tmp = Vector{Int}(undef, Singular.nvars(S))
 
-  @time for i in 1:length(Gagenslifted)
-    for j in 1:length(Gbgenslifted)
+  i = 1
+  @label label2
+  @time while i <= length(Gagenslifted)
+    j = 1
+    @label label1
+    while j  <= length(Gbgenslifted)
       empty!(_to_delete)
       Gai = Gagenslifted[i]
       Gbj = Gbgenslifted[j]
       _exp = _lcm_mon_exp!(_tmp, Gai, Gbj)
       lcrecomb = Int(lc(Gai))*Int(lc(Gbj))
 
-      redundant = false
-      
       for (_lc, e) in lt
         if _divides(_lc, e, lcrecomb, _exp)
-          redundant = true
-          break
+          if _divides(_lc, e, Int(Singular.lc(Gai)), Singular.lead_exponent(Gai))
+            i += 1
+            @goto label2
+          end
+          j += 1
+          @goto label1
         end
-      end
-
-      if redundant
-        continue
       end
 
       for k in 1:length(lt)
@@ -237,7 +239,9 @@ function _recombine(Ga, Gb; timings = Dict())
 
       push!(lt, (lcrecomb, copy(_exp)))
       push!(polys_to_keep, (i, j))
+      j += 1
     end
+    i += 1
   end
 
   resize!(new_polys, length(polys_to_keep))
