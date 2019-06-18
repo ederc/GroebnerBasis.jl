@@ -165,6 +165,39 @@ _divides = function(lcx, x, lcy, y, n)
   return true
 end
 
+# Return true if lcx * x divides lcy * y
+_divides_2 = function(lcx, sx, x, lcy, sy, y, n)
+  # there is no divides(x, y) ... :(
+  # OLD: lcrecomb = mod(lcrecomb, n)
+  # lcrecomb is the product of the two leading coefficients,
+  # thus lcrecomb is smaller than a*b = n, so usual mod should
+  # be enough for checking divisibility
+  if mod(lcy,lcx) != 0
+    return false
+  end
+
+  if sx & ~sy != 0
+    return false
+  end
+  for i in 1:length(x)
+    if x[i] > y[i]
+      return false
+    end
+  end
+  return true
+end
+
+function short_exp_vector(ev::Vector{Int}, nvars::Int)
+  _se = Int32(0)
+  bound = min(32, nvars)
+  for i in 1:bound
+    if (ev[i] > 0)
+      _se = _se | 1 << i
+    end
+  end
+  return _se
+end
+
 function _recombine(Ga, Gb; timings = Dict())
   a = Int(characteristic(base_ring(Ga)::Singular.PolyRing{Singular.n_Zn}))
   b = Int(characteristic(base_ring(Gb)::Singular.PolyRing{Singular.n_Zn}))
@@ -179,6 +212,7 @@ function _recombine(Ga, Gb; timings = Dict())
   n = a * b
   Sbase = Singular.N_ZnRing(a * b)
   S, X = Singular.PolynomialRing(Sbase, string.(gens(R)), ordering = R.ord)
+  nv  = Singular.nvars(S)
   new_polys = elem_type(S)[]
   Gagenslifted = Vector{elem_type(S)}(undef, Singular.ngens(Ga))
   t = @elapsed for i in 1:Singular.ngens(Ga)
@@ -198,7 +232,7 @@ function _recombine(Ga, Gb; timings = Dict())
   push!(Gagenslifted, S(a))
   push!(Gbgenslifted, S(b))
 
-  ltp = Vector{Tuple{Tuple{Int, Int},Int, Vector{Int}}}()
+  ltp = Vector{Tuple{Tuple{Int, Int},Int, Int32, Vector{Int}}}()
 
   _tmp = Vector{Int}(undef, Singular.nvars(S))
 
@@ -211,14 +245,21 @@ function _recombine(Ga, Gb; timings = Dict())
     while j  <= length(Gbgenslifted)
       Gbj = Gbgenslifted[j]
       _exp = _lcm_mon_exp!(_tmp, Gai, Gbj)
+      _sen  = short_exp_vector(_exp, nv)
       lcrecomb = Int(lc(Gai))*Int(lc(Gbj))
 
-      for (p, _lc, e) in ltp
-        if _divides(_lc, e, lcrecomb, _exp, n)
-          if _divides(_lc, e, Int(Singular.lc(Gai)), Singular.lead_exponent(Gai), n)
+      for (p, _lc, _se, e) in ltp
+        if _divides_2(_lc, _se, e, lcrecomb, _sen, _exp, n)
+          if _divides_2(_lc, _se, e, Int(Singular.lc(Gai)),
+                  short_exp_vector(Singular.lead_exponent(Gai), nv),
+                  Singular.lead_exponent(Gai), n)
             i += 1
             @goto label2
           end
+          # if _divides(_lc, _se, e, Int(Singular.lc(Gai)), Singular.lead_exponent(Gai), n)
+          #   i += 1
+          #   @goto label2
+          # end
           j += 1
           @goto label1
         end
@@ -226,15 +267,15 @@ function _recombine(Ga, Gb; timings = Dict())
 
       k = 1
       while k <= length(ltp)
-        p, _lc, e = ltp[k]
-        if _divides(lcrecomb, _exp, _lc, e, n)
+        p, _lc, _se, e = ltp[k]
+        if _divides_2(lcrecomb, _sen, _exp, _lc, _se, e, n)
           deleteat!(ltp, k)
           continue
         end
         k += 1
       end
 
-      push!(ltp, ((i,j),lcrecomb, copy(_exp)))
+      push!(ltp, ((i,j), lcrecomb, _sen, copy(_exp)))
       j += 1
     end
     i += 1
@@ -243,7 +284,7 @@ function _recombine(Ga, Gb; timings = Dict())
   resize!(new_polys, length(ltp))
   k = 1
   X = Singular.gens(S)
-  for ((i, j),_lc,e) in ltp
+  for ((i, j),_lc,_se,e) in ltp
     Gai = Gagenslifted[i]
     Gbj = Gbgenslifted[j]
     lmlcm = prod(X.^e)
