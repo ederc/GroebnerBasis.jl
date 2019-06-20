@@ -252,7 +252,7 @@ function _recombine(Ga, Gb; timings = Dict())
 
   ltp = Vector{Tuple{Tuple{Int, Int},Int, Int32, Vector{Int}}}()
 
-  _tmp = Vector{Int}(undef, Singular.nvars(S))
+  _tmp = Vector{Int}(undef, nv)
 
   # bit array to track which of the Gbjs are not already multiples of elements
   # in ltp. if so, we do not need to take care of them. we have to store this
