@@ -166,23 +166,26 @@ _divides = function(lcx, x, lcy, y, n)
 end
 
 # Return true if lcx * x divides lcy * y
-_divides_2 = function(lcx, sx, x, lcy, sy, y, n)
+function _divides_2(lcx, sx, x, lcy, sy, y, nv)
   # there is no divides(x, y) ... :(
   # OLD: lcrecomb = mod(lcrecomb, n)
   # lcrecomb is the product of the two leading coefficients,
   # thus lcrecomb is smaller than a*b = n, so usual mod should
   # be enough for checking divisibility
+
   if mod(lcy,lcx) != 0
     return false
   end
-
   if sx & ~sy != 0
     return false
   end
-  for i in 1:length(x)
-    if x[i] > y[i]
+  for i in 1:2:nv-1
+    if x[i] > y[i] || x[i+1] > y[i+1]
       return false
     end
+  end
+  if x[nv] > y[nv]
+    return false
   end
   return true
 end
@@ -190,11 +193,26 @@ end
 function short_exp_vector(ev::Vector{Int}, nvars::Int)
   _se = Int32(0)
   bound = min(32, nvars)
-  for i in 1:bound
-    if (ev[i] > 0)
-      _se = _se | 1 << i
+    k = 1
+    if bound <= 16
+      for i in 1:bound
+        if (ev[i] > 0)
+          _se = _se | 1 << k
+        end
+        k += 1
+        if (ev[i] > 1)
+          _se = _se | 1 << k
+        end
+        k += 1
+      end
+    else
+      for i in 1:bound
+        if (ev[i] > 0)
+          _se = _se | 1 << k
+        end
+        k += 1
+      end
     end
-  end
   return _se
 end
 
@@ -236,30 +254,50 @@ function _recombine(Ga, Gb; timings = Dict())
 
   _tmp = Vector{Int}(undef, Singular.nvars(S))
 
+  # bit array to track which of the Gbjs are not already multiples of elements
+  # in ltp. if so, we do not need to take care of them. we have to store this
+  # information separately since the Gbjs are the inner loop, for the Gais in the
+  # outer loop we can directly continue with the next Gai in Gagenslifted without
+  # touching the corresponding Gai again. 
+  goodj = trues(length(Gbgenslifted))
+
   i = 1
   @label label2
-  @time while i <= length(Gagenslifted)
+  while i <= length(Gagenslifted)
     Gai = Gagenslifted[i]
+    # get divisibility data from Gai 
+    _ei   = Singular.lead_exponent(Gai)
+    _sei  = short_exp_vector(_ei, nv)
+    _lci  = Int(Singular.lc(Gai))
     j = 1
     @label label1
     while j  <= length(Gbgenslifted)
+      if goodj[j] == false
+        j += 1
+        continue
+      end
       Gbj = Gbgenslifted[j]
-      _exp = _lcm_mon_exp!(_tmp, Gai, Gbj)
+      # get divisibility data from Gai 
+      _ej   = Singular.lead_exponent(Gbj)
+      _sej  = short_exp_vector(_ej, nv)
+      _lcj  = Int(Singular.lc(Gbj))
+
+      # get lcm exponent
+      _exp = max.(_ei, _ej)
       _sen  = short_exp_vector(_exp, nv)
-      lcrecomb = Int(lc(Gai))*Int(lc(Gbj))
+      
+      # get combined lc
+      lcrecomb = _lci * _lcj
 
       for (p, _lc, _se, e) in ltp
-        if _divides_2(_lc, _se, e, lcrecomb, _sen, _exp, n)
-          if _divides_2(_lc, _se, e, Int(Singular.lc(Gai)),
-                  short_exp_vector(Singular.lead_exponent(Gai), nv),
-                  Singular.lead_exponent(Gai), n)
+        if _divides_2(_lc, _se, e, lcrecomb, _sen, _exp, nv)
+          if _divides_2(_lc, _se, e, _lci, _sei, _ei, nv)
             i += 1
             @goto label2
           end
-          # if _divides(_lc, _se, e, Int(Singular.lc(Gai)), Singular.lead_exponent(Gai), n)
-          #   i += 1
-          #   @goto label2
-          # end
+          if _divides_2(_lc, _se, e, _lcj, _sej, _ej, nv)
+            goodj[j]  = false
+          end
           j += 1
           @goto label1
         end
@@ -268,7 +306,7 @@ function _recombine(Ga, Gb; timings = Dict())
       k = 1
       while k <= length(ltp)
         p, _lc, _se, e = ltp[k]
-        if _divides_2(lcrecomb, _sen, _exp, _lc, _se, e, n)
+        if _divides_2(lcrecomb, _sen, _exp, _lc, _se, e, nv)
           deleteat!(ltp, k)
           continue
         end
@@ -284,20 +322,24 @@ function _recombine(Ga, Gb; timings = Dict())
   resize!(new_polys, length(ltp))
   k = 1
   X = Singular.gens(S)
-  for ((i, j),_lc,_se,e) in ltp
+  t = @elapsed for ((i, j), _lc, _se, e) in ltp
     Gai = Gagenslifted[i]
     Gbj = Gbgenslifted[j]
     lmlcm = prod(X.^e)
     h =  ua * _div_mon(lmlcm, Singular.lm(Gbj)) * Singular.lc(Gai)::Singular.n_Zn * Gbj + vb * _div_mon(lmlcm, Singular.lm(Gai)) * Singular.lc(Gbj)::Singular.n_Zn * Gai
-#push!(new_polys, h)
     new_polys[k] = h
     k += 1
+  end
+  if haskey(timings, :new_polys)
+    timings[:new_polys] += t
+  else
+    timings[:new_polys] = t
   end
 
   # The last element is zero
   f = pop!(new_polys)
   #@assert iszero(f)
- @show length(new_polys)
+  @show length(new_polys)
   return Ideal(S, new_polys)
 end
 
