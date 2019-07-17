@@ -202,6 +202,42 @@ function cyclic_8(
   R, id
 end
 
+function cyclich_8(
+    char::Int,
+    ord::Symbol=:degrevlex
+    )
+  if (ord != :lex) && (ord != :degrevlex)
+    error("Order not known -- No ideal generated.")
+  end
+  n = 9
+  vars = Array{String, 1}(undef, n)
+  # generate dummy array of n strings for generating
+  # singular polynomial ring
+  for i = 1:n
+    vars[i] = "x$(i)"
+  end
+  if char == 0
+    R, X = Singular.PolynomialRing(Singular.QQ, vars, ordering = ord)
+  else
+    R, X = Singular.PolynomialRing(Singular.N_ZpField(char), vars, ordering = ord)
+  end
+  global X
+  # parses X[i] to xi
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  ps =
+    "x1+x2+x3+x4+x5+x6+x7+x8",
+    "x1*x2+x2*x3+x3*x4+x4*x5+x5*x6+x6*x7+x1*x8+x7*x8",
+    "x1*x2*x3+x2*x3*x4+x3*x4*x5+x4*x5*x6+x5*x6*x7+x1*x2*x8+x1*x7*x8+x6*x7*x8",
+    "x1*x2*x3*x4+x2*x3*x4*x5+x3*x4*x5*x6+x4*x5*x6*x7+x1*x2*x3*x8+x1*x2*x7*x8+x1*x6*x7*x8+x5*x6*x7*x8",
+    "x1*x2*x3*x4*x5+x2*x3*x4*x5*x6+x3*x4*x5*x6*x7+x1*x2*x3*x4*x8+x1*x2*x3*x7*x8+x1*x2*x6*x7*x8+x1*x5*x6*x7*x8+x4*x5*x6*x7*x8",
+    "x1*x2*x3*x4*x5*x6+x2*x3*x4*x5*x6*x7+x1*x2*x3*x4*x5*x8+x1*x2*x3*x4*x7*x8+x1*x2*x3*x6*x7*x8+x1*x2*x5*x6*x7*x8+x1*x4*x5*x6*x7*x8+x3*x4*x5*x6*x7*x8",
+    "x1*x2*x3*x4*x5*x6*x7+x1*x2*x3*x4*x5*x6*x8+x1*x2*x3*x4*x5*x7*x8+x1*x2*x3*x4*x6*x7*x8+x1*x2*x3*x5*x6*x7*x8+x1*x2*x4*x5*x6*x7*x8+x1*x3*x4*x5*x6*x7*x8+x2*x3*x4*x5*x6*x7*x8",
+    "x1*x2*x3*x4*x5*x6*x7*x8-x9^8"
+
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
+  R, id
+end
+
 function cyclic_9(
     char::Int,
     ord::Symbol=:degrevlex
@@ -234,6 +270,43 @@ function cyclic_9(
     "x1*x2*x3*x4*x5*x6*x7+x2*x3*x4*x5*x6*x7*x8+x1*x2*x3*x4*x5*x6*x9+x1*x2*x3*x4*x5*x8*x9+x1*x2*x3*x4*x7*x8*x9+x1*x2*x3*x6*x7*x8*x9+x1*x2*x5*x6*x7*x8*x9+x1*x4*x5*x6*x7*x8*x9+x3*x4*x5*x6*x7*x8*x9",
     "x1*x2*x3*x4*x5*x6*x7*x8+x1*x2*x3*x4*x5*x6*x7*x9+x1*x2*x3*x4*x5*x6*x8*x9+x1*x2*x3*x4*x5*x7*x8*x9+x1*x2*x3*x4*x6*x7*x8*x9+x1*x2*x3*x5*x6*x7*x8*x9+x1*x2*x4*x5*x6*x7*x8*x9+x1*x3*x4*x5*x6*x7*x8*x9+x2*x3*x4*x5*x6*x7*x8*x9",
     "x1*x2*x3*x4*x5*x6*x7*x8*x9-1"
+
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
+  R, id
+end
+
+function cyclich_9(
+    char::Int,
+    ord::Symbol=:degrevlex
+    )
+  if (ord != :lex) && (ord != :degrevlex)
+    error("Order not known -- No ideal generated.")
+  end
+  n = 10
+  vars = Array{String, 1}(undef, n)
+  # generate dummy array of n strings for generating
+  # singular polynomial ring
+  for i = 1:n
+    vars[i] = "x$(i)"
+  end
+  if char == 0
+    R, X = Singular.PolynomialRing(Singular.QQ, vars, ordering = ord)
+  else
+    R, X = Singular.PolynomialRing(Singular.N_ZpField(char), vars, ordering = ord)
+  end
+  global X
+  # parses X[i] to xi
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  ps =
+    "x1+x2+x3+x4+x5+x6+x7+x8+x9",
+    "x1*x2+x2*x3+x3*x4+x4*x5+x5*x6+x6*x7+x7*x8+x1*x9+x8*x9",
+    "x1*x2*x3+x2*x3*x4+x3*x4*x5+x4*x5*x6+x5*x6*x7+x6*x7*x8+x1*x2*x9+x1*x8*x9+x7*x8*x9",
+    "x1*x2*x3*x4+x2*x3*x4*x5+x3*x4*x5*x6+x4*x5*x6*x7+x5*x6*x7*x8+x1*x2*x3*x9+x1*x2*x8*x9+x1*x7*x8*x9+x6*x7*x8*x9",
+    "x1*x2*x3*x4*x5+x2*x3*x4*x5*x6+x3*x4*x5*x6*x7+x4*x5*x6*x7*x8+x1*x2*x3*x4*x9+x1*x2*x3*x8*x9+x1*x2*x7*x8*x9+x1*x6*x7*x8*x9+x5*x6*x7*x8*x9",
+    "x1*x2*x3*x4*x5*x6+x2*x3*x4*x5*x6*x7+x3*x4*x5*x6*x7*x8+x1*x2*x3*x4*x5*x9+x1*x2*x3*x4*x8*x9+x1*x2*x3*x7*x8*x9+x1*x2*x6*x7*x8*x9+x1*x5*x6*x7*x8*x9+x4*x5*x6*x7*x8*x9",
+    "x1*x2*x3*x4*x5*x6*x7+x2*x3*x4*x5*x6*x7*x8+x1*x2*x3*x4*x5*x6*x9+x1*x2*x3*x4*x5*x8*x9+x1*x2*x3*x4*x7*x8*x9+x1*x2*x3*x6*x7*x8*x9+x1*x2*x5*x6*x7*x8*x9+x1*x4*x5*x6*x7*x8*x9+x3*x4*x5*x6*x7*x8*x9",
+    "x1*x2*x3*x4*x5*x6*x7*x8+x1*x2*x3*x4*x5*x6*x7*x9+x1*x2*x3*x4*x5*x6*x8*x9+x1*x2*x3*x4*x5*x7*x8*x9+x1*x2*x3*x4*x6*x7*x8*x9+x1*x2*x3*x5*x6*x7*x8*x9+x1*x2*x4*x5*x6*x7*x8*x9+x1*x3*x4*x5*x6*x7*x8*x9+x2*x3*x4*x5*x6*x7*x8*x9",
+    "x1*x2*x3*x4*x5*x6*x7*x8*x9-x10^9"
 
   id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
   R, id
