@@ -993,7 +993,7 @@ function barakat(
   # singular polynomial ring
   for i = 1:7
     for j = 1:7
-      vars[i+7*(j-1)] = "g$(i)$(j)"
+      vars[j+7*(i-1)] = "g$(i)$(j)"
     end
   end
   println(vars)
