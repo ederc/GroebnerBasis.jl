@@ -32,7 +32,7 @@ end
 # an int array lengths storing the lengths of each generator
 # an int array cfs storing the coefficients of each generator
 # an int array exps storing the exponent vectors of each generator
-function convert_singular_ideal_to_array(
+function convert_ff_singular_ideal_to_array(
         id::Singular.sideal,
         nvars::Int,
         ngens::Int
@@ -50,6 +50,38 @@ function convert_singular_ideal_to_array(
     for i = 1:Singular.ngens(id)
         for c in Singular.coeffs(id[i])
             cfs[cc] = Base.Int(c)
+            cc += 1
+        end
+        for e in Singular.exponent_vectors(id[i])
+            for j = 1:nvars
+                exps[nvars*ec+j]  =  Base.Int(e[j])
+            end
+            ec +=  1
+        end
+    end
+    lens, cfs, exps
+end
+
+function convert_q_singular_ideal_to_array(
+        id::Singular.sideal,
+        nvars::Int,
+        ngens::Int
+        )
+    nterms  = 0
+    lens = Array{Int32,1}(undef, ngens)
+    for i = 1:ngens
+        lens[i] =   Singular.length(id[i])
+        nterms  +=  lens[i]
+    end
+    cfs   = Array{BigInt,1}(undef, 2*nterms)
+    exps  = Array{Int32,1}(undef, nvars*nterms)
+    cc = 1 # coefficient counter
+    ec = 0 # exponent vector counter
+    for i = 1:Singular.ngens(id)
+        for c in Singular.coeffs(id[i])
+            cfs[cc] = numerator(c)
+            cc += 1
+            cfs[cc] = denominator(c)
             cc += 1
         end
         for e in Singular.exponent_vectors(id[i])
@@ -152,6 +184,48 @@ input and returns a Singular ideal.
     - `degrevlex`: the degree-reverse-lexicographical (DRL) order (default),
     - `lex`: the lexicographical order (LEX).
 """
+function mf4(
+        I::Singular.sideal;           # input generators
+        hts::Int=17,                  # hash table size, default 2^17
+        nthrds::Int=1,                # number of threads
+        maxpairs::Int=0,              # number of pairs maximally chosen
+                                    # in symbolic preprocessing
+        resetht::Int=0,               # resetting global hash table
+        laopt::Int=2,                 # linear algebra option
+        pbmfiles::Int=0,              # generation of pbm files
+        infolevel::Int=0,             # info level for print outs
+        monorder::Symbol=:dregrevlex  # monomial order
+        )
+    R     = I.base_ring
+    char  = Singular.characteristic(R)
+    if 0 != char
+        if Hecke.isprime(char)
+            println("Characteristic is ", char, " != 0.",
+                    " Trying finite field computation")
+            return f4(I, hts=hts, nthrds=nthrds, maxpairs=maxpairs,
+                resetht=resetht, laopt=laopt, pbmfiles=pbmfiles,
+                infolevel=infolevel, monorder=monorder)
+        else
+            error("Only finite fields and rationals are supported ",
+                    "at the moment.")
+        end
+    end
+    # skip zero generators in ideal
+    ptr = Singular.libSingular.id_Copy(I.ptr, R.ptr)
+    J   = Singular.Ideal(R, ptr)
+    Singular.libSingular.idSkipZeroes(J.ptr)
+    # get number of variables
+    nvars   = Singular.nvars(R)
+    ngens   = Singular.ngens(J)
+    # convert Singular ideal to flattened arrays of ints
+    lens, cfs, exps   = convert_q_singular_ideal_to_array(J, nvars, ngens)
+
+    println("lens")
+    println(lens)
+    println("cfs")
+    println(cfs)
+end
+
 function f4(
         I::Singular.sideal;           # input generators
         hts::Int=17,                  # hash table size, default 2^17
@@ -178,7 +252,7 @@ function f4(
     nvars   = Singular.nvars(R)
     ngens   = Singular.ngens(J)
     # convert Singular ideal to flattened arrays of ints
-    lens, cfs, exps   = convert_singular_ideal_to_array(J, nvars, ngens)
+    lens, cfs, exps   = convert_ff_singular_ideal_to_array(J, nvars, ngens)
     # call f4 in gb
     #  println("Input data")
     #  println("----------")
@@ -253,7 +327,7 @@ function f4p(
         push!(R, I[i].base_ring)
         push!(char, Singular.characteristic(R[i]))
         # convert Singular ideal to flattened arrays of ints
-        ret = convert_singular_ideal_to_array(I[i], nvars, ngens)
+        ret = convert_ff_singular_ideal_to_array(I[i], nvars, ngens)
         push!(lens, ret[1])
         push!(cfs, ret[2])
         push!(exps, ret[3])
