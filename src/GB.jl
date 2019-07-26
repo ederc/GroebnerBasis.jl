@@ -185,6 +185,48 @@ input and returns a Singular ideal.
     - `degrevlex`: the degree-reverse-lexicographical (DRL) order (default),
     - `lex`: the lexicographical order (LEX).
 """
+function mf4(
+        I::Singular.sideal;           # input generators
+        hts::Int=17,                  # hash table size, default 2^17
+        nthrds::Int=1,                # number of threads
+        maxpairs::Int=0,              # number of pairs maximally chosen
+                                    # in symbolic preprocessing
+        resetht::Int=0,               # resetting global hash table
+        laopt::Int=2,                 # linear algebra option
+        pbmfiles::Int=0,              # generation of pbm files
+        infolevel::Int=0,             # info level for print outs
+        monorder::Symbol=:dregrevlex  # monomial order
+        )
+    R     = I.base_ring
+    char  = Singular.characteristic(R)
+    if 0 != char
+        if Hecke.isprime(char)
+            println("Characteristic is ", char, " != 0.",
+                    " Trying finite field computation")
+            return f4(I, hts=hts, nthrds=nthrds, maxpairs=maxpairs,
+                resetht=resetht, laopt=laopt, pbmfiles=pbmfiles,
+                infolevel=infolevel, monorder=monorder)
+        else
+            error("Only finite fields and rationals are supported ",
+                    "at the moment.")
+        end
+    end
+    # skip zero generators in ideal
+    ptr = Singular.libSingular.id_Copy(I.ptr, R.ptr)
+    J   = Singular.Ideal(R, ptr)
+    Singular.libSingular.idSkipZeroes(J.ptr)
+    # get number of variables
+    nvars   = Singular.nvars(R)
+    ngens   = Singular.ngens(J)
+    # convert Singular ideal to flattened arrays of ints
+    lens, cfs, exps   = convert_q_singular_ideal_to_array(J, nvars, ngens)
+
+    println("lens")
+    println(lens)
+    println("cfs")
+    println(cfs)
+end
+
 function f4(
         I::Singular.sideal;           # input generators
         hts::Int=17,                  # hash table size, default 2^17
@@ -337,12 +379,17 @@ function mf4(
     nvars   = Singular.nvars(R)
     ngens   = Singular.ngens(J)
     # convert Singular ideal to flattened arrays of ints
-    lens, cfs, exps   = convert_q_singular_ideal_to_array(J, nvars, ngens)
-
-    println("lens")
-    println(lens)
-    println("cfs")
-    println(cfs)
+    lens, cfs, exps   = convert_ff_singular_ideal_to_array(J, nvars, ngens)
+    # call f4 in gb
+    #  println("Input data")
+    #  println("----------")
+    #  println(lens)
+    #  println(cfs)
+    #  println(exps)
+    #  println("----------")
+    #if hts > 30
+    #    hts = 24
+    #  end
     ord = 0
     if monorder == :degrevlex
         ord = 0
