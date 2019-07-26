@@ -185,48 +185,6 @@ input and returns a Singular ideal.
     - `degrevlex`: the degree-reverse-lexicographical (DRL) order (default),
     - `lex`: the lexicographical order (LEX).
 """
-function mf4(
-        I::Singular.sideal;           # input generators
-        hts::Int=17,                  # hash table size, default 2^17
-        nthrds::Int=1,                # number of threads
-        maxpairs::Int=0,              # number of pairs maximally chosen
-                                    # in symbolic preprocessing
-        resetht::Int=0,               # resetting global hash table
-        laopt::Int=2,                 # linear algebra option
-        pbmfiles::Int=0,              # generation of pbm files
-        infolevel::Int=0,             # info level for print outs
-        monorder::Symbol=:dregrevlex  # monomial order
-        )
-    R     = I.base_ring
-    char  = Singular.characteristic(R)
-    if 0 != char
-        if Hecke.isprime(char)
-            println("Characteristic is ", char, " != 0.",
-                    " Trying finite field computation")
-            return f4(I, hts=hts, nthrds=nthrds, maxpairs=maxpairs,
-                resetht=resetht, laopt=laopt, pbmfiles=pbmfiles,
-                infolevel=infolevel, monorder=monorder)
-        else
-            error("Only finite fields and rationals are supported ",
-                    "at the moment.")
-        end
-    end
-    # skip zero generators in ideal
-    ptr = Singular.libSingular.id_Copy(I.ptr, R.ptr)
-    J   = Singular.Ideal(R, ptr)
-    Singular.libSingular.idSkipZeroes(J.ptr)
-    # get number of variables
-    nvars   = Singular.nvars(R)
-    ngens   = Singular.ngens(J)
-    # convert Singular ideal to flattened arrays of ints
-    lens, cfs, exps   = convert_q_singular_ideal_to_array(J, nvars, ngens)
-
-    println("lens")
-    println(lens)
-    println("cfs")
-    println(cfs)
-end
-
 function f4(
         I::Singular.sideal;           # input generators
         hts::Int=17,                  # hash table size, default 2^17
@@ -258,12 +216,12 @@ function f4(
     char  = Singular.characteristic(R)
     if 0 == char
         # computation over the rationals
-        return f4qq(J, char, nvars, ngens, hts=hts, nthrds=nthrds,
+        return f4_qq(J, char, nvars, ngens, hts=hts, nthrds=nthrds,
             maxpairs=maxpairs, resetht=resetht, laopt=laopt,
             pbmfiles=pbmfiles, ord=ord, infolevel=infolevel)
     elseif Hecke.isprime(char)
         # finite field computation
-        return f4ff(J, char, nvars, ngens, hts=hts, nthrds=nthrds,
+        return f4_ff(J, char, nvars, ngens, hts=hts, nthrds=nthrds,
             maxpairs=maxpairs, resetht=resetht, laopt=laopt,
             pbmfiles=pbmfiles, ord=ord, infolevel=infolevel)
     else
@@ -271,7 +229,7 @@ function f4(
     end
 end
 
-function f4qq(
+function f4_qq(
         J::Singular.sideal,
         char::Int,
         nvars::Int,
@@ -308,7 +266,7 @@ function f4qq(
     return basis
 end
 
-function f4ff(
+function f4_ff(
         J::Singular.sideal,
         char::Int,
         nvars::Int,
