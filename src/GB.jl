@@ -32,7 +32,7 @@ end
 # an int array lengths storing the lengths of each generator
 # an int array cfs storing the coefficients of each generator
 # an int array exps storing the exponent vectors of each generator
-function convert_singular_ideal_to_array(
+function convert_ff_singular_ideal_to_array(
         id::Singular.sideal,
         nvars::Int,
         ngens::Int
@@ -62,10 +62,43 @@ function convert_singular_ideal_to_array(
     lens, cfs, exps
 end
 
+function convert_qq_singular_ideal_to_array(
+        id::Singular.sideal,
+        nvars::Int,
+        ngens::Int
+        )
+    nterms  = 0
+    lens = Array{Int32,1}(undef, ngens)
+    for i = 1:ngens
+        lens[i] =   Singular.length(id[i])
+        nterms  +=  lens[i]
+    end
+    cfs   = Array{BigInt,1}(undef, 2*nterms)
+    exps  = Array{Int32,1}(undef, nvars*nterms)
+    cc = 1 # coefficient counter
+    ec = 0 # exponent vector counter
+    for i = 1:Singular.ngens(id)
+        for c in Singular.coeffs(id[i])
+            cfs[cc] = Singular.libSingular.n_GetMPZ(numerator(c).ptr, Singular.ZZ.ptr)
+            cc += 1
+            cfs[cc] = Singular.libSingular.n_GetMPZ(denominator(c).ptr, Singular.ZZ.ptr)
+            # cfs[cc] = Singular.convert(BigInt, denominator(c))
+            cc += 1
+        end
+        for e in Singular.exponent_vectors(id[i])
+            for j = 1:nvars
+                exps[nvars*ec+j]  =  Base.Int(e[j])
+            end
+            ec +=  1
+        end
+    end
+    lens, cfs, exps
+end
+
 # we know that the terms are already sorted and they are all different
 # coming from GB's F4 computation, so we do not need p_Add_q for the
 # terms, but we can directly set the next pointers of the polynomials
-function convert_gb_array_to_singular_ideal(
+function convert_ff_gb_array_to_singular_ideal(
         gb::Array{Int32,1},
         R::Singular.PolyRing
         )
@@ -165,10 +198,136 @@ function f4(
         monorder::Symbol=:dregrevlex  # monomial order
         )
     R     = I.base_ring
+    # skip zero generators in ideal
+    ptr = Singular.libSingular.id_Copy(I.ptr, R.ptr)
+    J   = Singular.Ideal(R, ptr)
+    Singular.libSingular.idSkipZeroes(J.ptr)
+    # get number of variables
+    nvars   = Singular.nvars(R)
+    ngens   = Singular.ngens(J)
+
+    ord = 0
+    if monorder == :degrevlex
+        ord = 0
+    end
+    if monorder == :lex
+        ord = 1
+    end
     char  = Singular.characteristic(R)
     if 0 == char
-        error("At the moment GB only supports finite characteristic.
-        Prime must be < 2^32.")
+        # computation over the rationals
+        return f4qq(J, char, nvars, ngens, hts=hts, nthrds=nthrds,
+            maxpairs=maxpairs, resetht=resetht, laopt=laopt,
+            pbmfiles=pbmfiles, ord=ord, infolevel=infolevel)
+    elseif Hecke.isprime(char)
+        # finite field computation
+        return f4ff(J, char, nvars, ngens, hts=hts, nthrds=nthrds,
+            maxpairs=maxpairs, resetht=resetht, laopt=laopt,
+            pbmfiles=pbmfiles, ord=ord, infolevel=infolevel)
+    else
+        error("At the moment GB only supports finite fields and the rationals.")
+    end
+end
+
+function f4qq(
+        J::Singular.sideal,
+        char::Int,
+        nvars::Int,
+        ngens::Int;
+        hts::Int=17,                  # hash table size, default 2^17
+        nthrds::Int=1,                # number of threads
+        maxpairs::Int=0,              # number of pairs maximally chosen
+                                      # in symbolic preprocessing
+        resetht::Int=0,               # resetting global hash table
+        laopt::Int=2,                 # linear algebra option
+        pbmfiles::Int=0,              # generation of pbm files
+        infolevel::Int=0,             # info level for print outs
+        ord::Int=0                    # monomial order
+        )
+    R = J.base_ring
+    # convert Singular ideal to flattened arrays of ints
+    lens, cfs, exps   = convert_qq_singular_ideal_to_array(J, nvars, ngens)
+    lib = Libdl.dlopen(libgb)
+    sym = Libdl.dlsym(lib, :f4_julia)
+    gb_basis  = ccall((:malloc, "libc.so.6"), Ptr{Ptr{Cint}}, (Csize_t, ), sizeof(Ptr{Cint}))
+    gb_basis_len  = ccall(sym, Int,
+        (Ptr{Ptr{Cint}}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int32, Int32, Int32,
+         Int32, Int32, Int32, Int32, Int32, Int32, Int32, Int32),
+        gb_basis, lens, cfs, exps, char, ord, nvars, ngens, hts, nthrds, maxpairs,
+        resetht, laopt, pbmfiles, infolevel)
+    Libdl.dlclose(lib)
+
+    # convert to julia array, also give memory management to julia
+    jl_basis  = Base.unsafe_wrap(Array, unsafe_load(gb_basis), gb_basis_len; own=true)
+    ccall((:free, "libc.so.6"), Nothing , (Ptr{Ptr{Cint}}, ), gb_basis)
+    basis       = convert_ff_gb_array_to_singular_ideal(jl_basis, R)
+    basis.isGB  = true;
+
+    return basis
+end
+
+function f4ff(
+        J::Singular.sideal,
+        char::Int,
+        nvars::Int,
+        ngens::Int;
+        hts::Int=17,                  # hash table size, default 2^17
+        nthrds::Int=1,                # number of threads
+        maxpairs::Int=0,              # number of pairs maximally chosen
+                                      # in symbolic preprocessing
+        resetht::Int=0,               # resetting global hash table
+        laopt::Int=2,                 # linear algebra option
+        pbmfiles::Int=0,              # generation of pbm files
+        infolevel::Int=0,             # info level for print outs
+        ord::Int=0                    # monomial order
+        )
+    R = J.base_ring
+    # convert Singular ideal to flattened arrays of ints
+    lens, cfs, exps   = convert_ff_singular_ideal_to_array(J, nvars, ngens)
+    lib = Libdl.dlopen(libgb)
+    sym = Libdl.dlsym(lib, :f4_julia)
+    gb_basis  = ccall((:malloc, "libc.so.6"), Ptr{Ptr{Cint}}, (Csize_t, ), sizeof(Ptr{Cint}))
+    gb_basis_len  = ccall(sym, Int,
+        (Ptr{Ptr{Cint}}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int32, Int32, Int32,
+         Int32, Int32, Int32, Int32, Int32, Int32, Int32, Int32),
+        gb_basis, lens, cfs, exps, char, ord, nvars, ngens, hts, nthrds, maxpairs,
+        resetht, laopt, pbmfiles, infolevel)
+    Libdl.dlclose(lib)
+
+    # convert to julia array, also give memory management to julia
+    jl_basis  = Base.unsafe_wrap(Array, unsafe_load(gb_basis), gb_basis_len; own=true)
+    ccall((:free, "libc.so.6"), Nothing , (Ptr{Ptr{Cint}}, ), gb_basis)
+    basis       = convert_ff_gb_array_to_singular_ideal(jl_basis, R)
+    basis.isGB  = true;
+
+    return basis
+end
+
+function mf4(
+        I::Singular.sideal;           # input generators
+        hts::Int=17,                  # hash table size, default 2^17
+        nthrds::Int=1,                # number of threads
+        maxpairs::Int=0,              # number of pairs maximally chosen
+                                    # in symbolic preprocessing
+        resetht::Int=0,               # resetting global hash table
+        laopt::Int=2,                 # linear algebra option
+        pbmfiles::Int=0,              # generation of pbm files
+        infolevel::Int=0,             # info level for print outs
+        monorder::Symbol=:dregrevlex  # monomial order
+        )
+    R     = I.base_ring
+    char  = Singular.characteristic(R)
+    if 0 != char
+        if Hecke.isprime(char)
+            println("Characteristic is ", char, " != 0.",
+                    " Trying finite field computation")
+            return f4(I, hts=hts, nthrds=nthrds, maxpairs=maxpairs,
+                resetht=resetht, laopt=laopt, pbmfiles=pbmfiles,
+                infolevel=infolevel, monorder=monorder)
+        else
+            error("Only finite fields and rationals are supported ",
+                    "at the moment.")
+        end
     end
     # skip zero generators in ideal
     ptr = Singular.libSingular.id_Copy(I.ptr, R.ptr)
@@ -178,17 +337,12 @@ function f4(
     nvars   = Singular.nvars(R)
     ngens   = Singular.ngens(J)
     # convert Singular ideal to flattened arrays of ints
-    lens, cfs, exps   = convert_singular_ideal_to_array(J, nvars, ngens)
-    # call f4 in gb
-    #  println("Input data")
-    #  println("----------")
-    #  println(lens)
-    #  println(cfs)
-    #  println(exps)
-    #  println("----------")
-    #if hts > 30
-    #    hts = 24
-    #  end
+    lens, cfs, exps   = convert_q_singular_ideal_to_array(J, nvars, ngens)
+
+    println("lens")
+    println(lens)
+    println("cfs")
+    println(cfs)
     ord = 0
     if monorder == :degrevlex
         ord = 0
@@ -205,7 +359,7 @@ function f4(
     # hash table size log_2, i.e. given 12 => 2^12
     # println(char, nvars, ngens, hts, nthrds, maxpairs, laopt)
     lib = Libdl.dlopen(libgb)
-    sym = Libdl.dlsym(lib, :f4_julia)
+    sym = Libdl.dlsym(lib, :mod_f4_julia)
     gb_basis  = ccall((:malloc, "libc.so.6"), Ptr{Ptr{Cint}}, (Csize_t, ), sizeof(Ptr{Cint}))
     gb_basis_len  = ccall(sym, Int,
         (Ptr{Ptr{Cint}}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int, Int, Int, Int, Int,
@@ -217,13 +371,13 @@ function f4(
     # convert to julia array, also give memory management to julia
     jl_basis  = Base.unsafe_wrap(Array, unsafe_load(gb_basis), gb_basis_len; own=true)
     ccall((:free, "libc.so.6"), Nothing , (Ptr{Ptr{Cint}}, ), gb_basis)
-    basis       = convert_gb_array_to_singular_ideal(jl_basis, R)
+    basis       = convert_ff_gb_array_to_singular_ideal(jl_basis, R)
     basis.isGB  = true;
 
     return basis
 end
 
-function f4p(
+function f4q(
         I::Array{Singular.sideal,1};           # input generators
         hts::Int=17,                  # hash table size, default 2^17
         nthrds::Int=1,                # number of threads
@@ -253,7 +407,7 @@ function f4p(
         push!(R, I[i].base_ring)
         push!(char, Singular.characteristic(R[i]))
         # convert Singular ideal to flattened arrays of ints
-        ret = convert_singular_ideal_to_array(I[i], nvars, ngens)
+        ret = convert_ff_singular_ideal_to_array(I[i], nvars, ngens)
         push!(lens, ret[1])
         push!(cfs, ret[2])
         push!(exps, ret[3])
@@ -340,7 +494,7 @@ function modf4(
         p     = pl[i]
         Il[i] = map_ideal(I,pl[i])
     end
-    res  = GB.f4p(Il, hts=hts, nthrds=nthrds,
+    res  = GB.f4q(Il, hts=hts, nthrds=nthrds,
             maxpairs=maxpairs, resetht=resetht, laopt=laopt,
             pbmfiles=pbmfiles, infolevel=infolevel, monorder=monorder)
     return res
