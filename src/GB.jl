@@ -82,7 +82,6 @@ function convert_qq_singular_ideal_to_array(
             cfs[cc] = Singular.libSingular.n_GetMPZ(numerator(c).ptr, Singular.ZZ.ptr)
             cc += 1
             cfs[cc] = Singular.libSingular.n_GetMPZ(denominator(c).ptr, Singular.ZZ.ptr)
-            # cfs[cc] = Singular.convert(BigInt, denominator(c))
             cc += 1
         end
         for e in Singular.exponent_vectors(id[i])
@@ -92,6 +91,7 @@ function convert_qq_singular_ideal_to_array(
             ec +=  1
         end
     end
+    println(typeof(cfs))
     lens, cfs, exps
 end
 
@@ -228,9 +228,9 @@ function f4(
     gb_cf   = ccall((:malloc, "libc.so.6"), Ptr{Ptr{Cvoid}}, (Csize_t, ), sizeof(Ptr{Cvoid}))
     nterms  = ccall(sym, Int,
         (Ptr{Cint}, Ptr{Ptr{Cint}}, Ptr{Ptr{Cint}}, Ptr{Ptr{Cvoid}},
-          Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Int, Int, Int, Int, Int,
+          Ptr{Cint}, Ptr{Cint}, Ptr{Cvoid}, Int, Int, Int, Int, Int,
           Int, Int, Int, Int, Int, Int),
-        gb_ld, gb_len, gb_exp, gb_cf, lens, cfs, exps, char, ord, nvars,
+        gb_ld, gb_len, gb_exp, gb_cf, lens, exps, cfs, char, ord, nvars,
         ngens, hts, nthrds, maxpairs, resetht, laopt, pbmfiles, infolevel)
     Libdl.dlclose(lib)
 
