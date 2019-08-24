@@ -64,6 +64,39 @@ function cyclic_4(
   R, id
 end
 
+function gmp_qq_example(
+    char::Int,
+    ord::Symbol=:degrevlex
+    )
+  if (ord != :lex) && (ord != :degrevlex)
+    error("Order not known -- No ideal generated.")
+  end
+  n = 5
+  vars = Array{String, 1}(undef, n)
+  # generate dummy array of n strings for generating
+  # singular polynomial ring
+  for i = 1:n
+    vars[i] = "x$(i)"
+  end
+  if char == 0
+    R, X = Singular.PolynomialRing(Singular.QQ, vars, ordering = ord)
+  else
+    R, X = Singular.PolynomialRing(Singular.N_ZpField(char), vars, ordering = ord)
+  end
+  global X
+  # parses X[i] to xi
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  ps =
+    "-3*x1+x2+x3+x4+x5",
+    "-1*x1*x2+x2*x3+x3*x4+x1*x5+x4*x5",
+    "x1*x2*x3+x2*x3*x4+x1*x2*x5+x1*x4*x5+x3*x4*x5",
+    "Singular.QQ(3//4)*x1*x2*x3*x4+2*x1*x2*x3*x5+x1*x2*x4*x5+x1*x3*x4*x5+x2*x3*x4*x5",
+    "14*x1*x2*x3*x4*x5-2"
+
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
+  R, id
+end
+
 function cyclic_5(
     char::Int,
     ord::Symbol=:degrevlex
