@@ -91,7 +91,6 @@ function convert_qq_singular_ideal_to_array(
             ec +=  1
         end
     end
-    println(typeof(cfs))
     lens, cfs, exps
 end
 
@@ -129,6 +128,54 @@ function convert_ff_gb_array_to_singular_ideal(
         for j = 2:blen[i]
           pterm = Singular.libSingular.p_Init(R.ptr)
           Singular.libSingular.pSetCoeff0(pterm, Clong(bcf[len+j-1]), R.ptr)
+          for k = 1:nvars
+              exp[k+1]  = bexp[(len+j-1-1) * nvars + k]
+          end
+          Singular.libSingular.p_SetExpV(pterm, exp, R.ptr)
+          Singular.libSingular.SetpNext(lp, pterm)
+          lp  = pterm
+        end
+        push!(list, R(p))
+        len += blen[i]
+    end
+    return Singular.Ideal(R, list)
+end
+
+function convert_qq_gb_array_to_singular_ideal(
+        bld::Int32,
+        blen::Array{Int32,1},
+        bexp::Array{Int32,1},
+        bcf::Ptr{BigInt},
+        R::Singular.PolyRing
+        )
+    ngens = bld
+
+    nvars = Singular.nvars(R)
+    basis = Singular.Ideal(R, ) # empty ideal
+    # first entry in exponent vector is module component => nvars+1
+    exp   = zeros(Cint, nvars+1)
+
+    list  = elem_type(R)[]
+    # we generate the singular polynomials low level in order
+    # to avoid overhead due to many exponent operations etc.
+    j   = ngens + 1 + 1
+    len = 1
+    for i = 1:ngens
+        # do the first term
+        p = Singular.libSingular.p_Init(R.ptr)
+        Singular.libSingular.p_SetCoeff0(p,
+                Singular.libSingular.n_InitMPZ(unsafe_load(bcf, len),
+                    Singular.QQ.ptr), R.ptr)
+        for k = 1:nvars
+            exp[k+1]  = bexp[(len-1) * nvars + k]
+        end
+        Singular.libSingular.p_SetExpV(p, exp, R.ptr)
+        lp  = p
+        for j = 2:blen[i]
+          pterm = Singular.libSingular.p_Init(R.ptr)
+        Singular.libSingular.p_SetCoeff0(pterm,
+                Singular.libSingular.n_InitMPZ(unsafe_load(bcf, len+j-1),
+                    Singular.QQ.ptr), R.ptr)
           for k = 1:nvars
               exp[k+1]  = bexp[(len+j-1-1) * nvars + k]
           end
@@ -242,8 +289,8 @@ function f4(
     jl_len  = Base.unsafe_wrap(Array, unsafe_load(gb_len), jl_ld; own=true)
     jl_exp  = Base.unsafe_wrap(Array, unsafe_load(gb_exp), nterms*nvars; own=true)
     if 0 == char
-      gb_cf_conv  = Ptr{Ptr{BigInt}}(gb_cf)
-      jl_cf       = Base.unsafe_wrap(Array, unsafe_load(gb_cf_conv), 2*nterms; own=true)
+        gb_cf_conv  = unsafe_load(gb_cf)
+        jl_cf       = reinterpret(Ptr{BigInt}, gb_cf_conv)
     elseif Hecke.isprime(char)
       gb_cf_conv  = Ptr{Ptr{Int32}}(gb_cf)
       jl_cf       = Base.unsafe_wrap(Array, unsafe_load(gb_cf_conv), nterms; own=true)
@@ -255,7 +302,8 @@ function f4(
 
     # construct Singular ideal
     if 0 == char
-        #basis = convert_qq_gb_array_to_singular_ideal(jl_basis, R)
+        basis = convert_qq_gb_array_to_singular_ideal(
+          jl_ld, jl_len, jl_exp, jl_cf, R)
     elseif Hecke.isprime(char)
         basis = convert_ff_gb_array_to_singular_ideal(
           jl_ld, jl_len, jl_exp, jl_cf, R)
