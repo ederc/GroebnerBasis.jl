@@ -286,19 +286,15 @@ function f4(
     end
     # convert to julia array, also give memory management to julia
     jl_ld   = unsafe_load(gb_ld)
-    jl_len  = Base.unsafe_wrap(Array, unsafe_load(gb_len), jl_ld; own=true)
-    jl_exp  = Base.unsafe_wrap(Array, unsafe_load(gb_exp), nterms*nvars; own=true)
+    jl_len  = Base.unsafe_wrap(Array, unsafe_load(gb_len), jl_ld)
+    jl_exp  = Base.unsafe_wrap(Array, unsafe_load(gb_exp), nterms*nvars)
     if 0 == char
         gb_cf_conv  = unsafe_load(gb_cf)
         jl_cf       = reinterpret(Ptr{BigInt}, gb_cf_conv)
     elseif Hecke.isprime(char)
       gb_cf_conv  = Ptr{Ptr{Int32}}(gb_cf)
-      jl_cf       = Base.unsafe_wrap(Array, unsafe_load(gb_cf_conv), nterms; own=true)
+      jl_cf       = Base.unsafe_wrap(Array, unsafe_load(gb_cf_conv), nterms)
     end
-    ccall((:free, "libc.so.6"), Nothing , (Ptr{Cint}, ), gb_ld)
-    ccall((:free, "libc.so.6"), Nothing , (Ptr{Ptr{Cint}}, ), gb_len)
-    ccall((:free, "libc.so.6"), Nothing , (Ptr{Ptr{Cint}}, ), gb_exp)
-    ccall((:free, "libc.so.6"), Nothing , (Ptr{Ptr{Cvoid}}, ), gb_cf)
 
     # construct Singular ideal
     if 0 == char
@@ -308,10 +304,18 @@ function f4(
         basis = convert_ff_gb_array_to_singular_ideal(
           jl_ld, jl_len, jl_exp, jl_cf, R)
     end
+    lib = Libdl.dlopen(libgb)
+    sym = Libdl.dlsym(lib, :free_julia_data)
+    ccall(sym, Nothing , (Ptr{Ptr{Cint}}, Ptr{Ptr{Cint}}, Ptr{Ptr{Cvoid}},
+                Int, Int), gb_len, gb_exp, gb_cf, jl_ld, char)
+    # free data
+    ccall((:free, "libc.so.6"), Nothing , (Ptr{Cint}, ), gb_ld)
+
     # for letting the garbage collector free memory
-    jl_len  = Nothing
-    jl_exp  = Nothing
-    jl_cf   = Nothing
+    jl_len      = Nothing
+    jl_exp      = Nothing
+    gb_cf_conv  = Nothing
+    jl_cf       = Nothing
 
     basis.isGB  = true;
 
