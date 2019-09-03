@@ -8,7 +8,8 @@ and maintained by Christian Eder. GB.jl is part of the Oscar project.
 
 The features of GB so far include:
 
-  - An implementation of Faug&egrave;re's F4 Algorithm for ideals over finite fields of characteristic up to 2^31-1,
+  - An implementation of Faug&egrave;re's F4 Algorithm for ideals over
+    finite fields ofcharacteristic up to 2^31-1 and over the rationals,
   - specialized linear algebra for 16-bit and 32-bit representations,
   - LEX and DRL monomial order,
   - input and output Singular-compatible,
