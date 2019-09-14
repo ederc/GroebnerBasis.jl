@@ -17,6 +17,8 @@ const pkgdir  = realpath(joinpath(dirname(@__FILE__), ".."))
 const libdir   = joinpath(pkgdir, "local", "lib")
 const libgb   = joinpath(pkgdir, "local", "lib", "libgb")
 
+const __isthreaded  = 1
+
 function __init__()
    if "HOSTNAME" in keys(ENV) && ENV["HOSTNAME"] == "juliabox"
        push!(Libdl.DL_LOAD_PATH, "/usr/local/lib")
@@ -26,6 +28,11 @@ function __init__()
    else
       push!(Libdl.DL_LOAD_PATH, libdir)
    end
+
+   if __isthreaded == 1
+    ccall((:__gmp_set_memory_functions, :libgmp), Nothing,
+            (Int, Int, Int), 0, 0, 0)
+    end
 end
 
 # we take a Singular ideal and extract the following data:
