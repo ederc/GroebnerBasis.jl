@@ -152,7 +152,7 @@ function convert_qq_gb_array_to_singular_ideal(
         bld::Int32,
         blen::Array{Int32,1},
         bexp::Array{Int32,1},
-        bcf::Ptr{BigInt},
+        bcf::Ptr{T} where {T <: Signed},
         R::Singular.PolyRing
         )
     ngens = bld
@@ -171,7 +171,7 @@ function convert_qq_gb_array_to_singular_ideal(
         # do the first term
         p = Singular.libSingular.p_Init(R.ptr)
         Singular.libSingular.p_SetCoeff0(p,
-                Singular.libSingular.n_InitMPZ(unsafe_load(bcf, len),
+                Singular.libSingular.n_InitMPZ(BigInt(unsafe_load(bcf, len)),
                     Singular.QQ.ptr), R.ptr)
         for k = 1:nvars
             exp[k+1]  = bexp[(len-1) * nvars + k]
@@ -181,7 +181,7 @@ function convert_qq_gb_array_to_singular_ideal(
         for j = 2:blen[i]
           pterm = Singular.libSingular.p_Init(R.ptr)
         Singular.libSingular.p_SetCoeff0(pterm,
-                Singular.libSingular.n_InitMPZ(unsafe_load(bcf, len+j-1),
+                Singular.libSingular.n_InitMPZ(BigInt(unsafe_load(bcf, len+j-1)),
                     Singular.QQ.ptr), R.ptr)
           for k = 1:nvars
               exp[k+1]  = bexp[(len+j-1-1) * nvars + k]
@@ -195,13 +195,19 @@ function convert_qq_gb_array_to_singular_ideal(
     end
     return Singular.Ideal(R, list)
 end
+function test()
+    lib = Libdl.dlopen(libgb)
+    sym = Libdl.dlsym(lib, :min_example)
+    ccall(sym, Nothing, ())
+end
 """
     f4(I[, hts::Int=17, nthrds::Int=1, maxpairs::Int=0, resetht::Int=0,
             laopt::Int=1, infolevel::Int=0, monorder::Symbol=:degrevlex])
 
 Compute a Groebner basis of the given ideal I w.r.t. to the given monomial
 order using Faugere's F4 algorithm. The function takes a Singular ideal as
-input and returns a Singular ideal.
+input and returns a Singular ideal. At the moment only finite fields up to
+31-bit and the rationals are supported as ground fields.
 
 # Arguments
 * `I::Singular.sideal`: ideal to compute a Groebner basis for.
