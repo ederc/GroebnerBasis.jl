@@ -1,7 +1,11 @@
 using GB
-using Base.Test
 
-# write your own tests here
-# @test 1 == 2
-include("../test/io_tests.jl")
-test_io()
+if VERSION < v"0.7.0-DEV.2004"
+   using Base.Test
+else
+   using Test
+end
+
+include("GB-test.jl")
+
+test_all()
