@@ -1,5 +1,6 @@
 name = "GB"
 uuid = "e39c9192-ea4d-5e15-9584-a488c6d614bd"
+version = "0.7"
 
 [deps]
 Hecke = "3e1990a7-5d81-5526-99ce-9ba3ff248f21"
@@ -9,4 +10,4 @@ Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
 Singular = "bcd08a7b-43d2-5ff7-b6d4-c458787f915c"
 
 [compat]
-julia = "≥ 0.7.0"
+julia = "≥ 1.0.0"
