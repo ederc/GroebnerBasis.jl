@@ -1908,6 +1908,41 @@ function eco_11(
   R, id
 end
 
+function butcher_83(
+    char::Int,
+    ord::Symbol=:degrevlex
+    )
+  if (ord != :lex) && (ord != :degrevlex)
+    error("Order not known -- No ideal generated.")
+  end
+  n = 8
+  vars = Array{String, 1}(undef, n)
+  # generate dummy array of n strings for generating
+  # singular polynomial ring
+  vars = ["A", "a32", "B", "b1", "b2", "b3", "c2", "c3"]
+  if char == 0
+    R, X = Singular.PolynomialRing(Singular.QQ, vars, ordering = ord)
+  else
+    R, X = Singular.PolynomialRing(Singular.N_ZpField(char), vars, ordering = ord)
+  end
+  global X
+  # parses X[i] to xi
+  println(R)
+  [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
+  ps =
+     "A-B+b1+b2+b3",
+     "2*A*B-2*B^2+2*b2*c2+2*b3*c3-B-1",
+    "-3*A*B^2+3*B^3+3*b2*c2^2+3*b3*c3^2+3*B^2-A+4*B",
+    "-6*A*B^2+6*B^3+6*a32*b3*c2-3*A*B+6*B^2-A+4*B",
+    "4*A*B^3-4*B^4+4*b3*c3^3-6*B^3+4*A*B-10*B^2+332*b2*c2-B-1",
+    "8*A*B^3-8*B^4+8*a32*b3*c2*c3+4*A*B^2-12*B^3+4*A*B-14*B^2-3*B-1",
+    "12*A*B^3-12*B^4+12*a32*b3*c2^2+12*A*B^2-18*B^3+8*A*B-14*B^2-B-1",
+    "-24*A*B^3+24*B^4-24*A*B^2+36*B^3-8*A*B+26*B^2+7*B+1"
+
+  id = Singular.Ideal(R, [eval(Meta.parse("$p")) for p in ps])
+  R, id
+end
+
 function lichtblau(
     char::Int,
     ord::Symbol=:degrevlex
