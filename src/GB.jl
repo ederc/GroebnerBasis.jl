@@ -15,9 +15,10 @@ using Dates
 export Singular
 export Hecke
 
-const pkgdir  = realpath(joinpath(dirname(@__FILE__), ".."))
-const libdir   = joinpath(pkgdir, "local", "lib")
-const libgb   = joinpath(pkgdir, "local", "lib", "libgb")
+const pkgdir = realpath(joinpath(dirname(@__DIR__)))
+const libdir = joinpath(pkgdir, "deps", "usr", "lib")
+const bindir = joinpath(pkgdir, "deps", "usr", "bin")
+const libgb  = joinpath(pkgdir, "deps", "usr", "lib", "libgb")
 
 const __isthreaded  = 1
 
