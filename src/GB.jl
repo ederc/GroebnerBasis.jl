@@ -6,7 +6,6 @@ include("Example.jl")
 
 # package code goes here
 using Libdl
-using Revise
 using Singular
 using Hecke
 using LibGit2
