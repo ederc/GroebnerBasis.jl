@@ -283,10 +283,11 @@ function f4(
     end
     lib = Libdl.dlopen(libgb)
     sym = Libdl.dlsym(lib, :f4_julia)
-    gb_ld   = ccall((:malloc, "libc.so.6"), Ptr{Cint}, (Csize_t, ), sizeof(Cint))
-    gb_len  = ccall((:malloc, "libc.so.6"), Ptr{Ptr{Cint}}, (Csize_t, ), sizeof(Ptr{Cint}))
-    gb_exp  = ccall((:malloc, "libc.so.6"), Ptr{Ptr{Cint}}, (Csize_t, ), sizeof(Ptr{Cint}))
-    gb_cf   = ccall((:malloc, "libc.so.6"), Ptr{Ptr{Cvoid}}, (Csize_t, ), sizeof(Ptr{Cvoid}))
+
+    gb_ld   = ccall(:malloc, Ptr{Cint}, (Csize_t, ), sizeof(Cint))
+    gb_len  = ccall(:malloc, Ptr{Ptr{Cint}}, (Csize_t, ), sizeof(Ptr{Cint}))
+    gb_exp  = ccall(:malloc, Ptr{Ptr{Cint}}, (Csize_t, ), sizeof(Ptr{Cint}))
+    gb_cf   = ccall(:malloc, Ptr{Ptr{Cvoid}}, (Csize_t, ), sizeof(Ptr{Cvoid}))
     nterms  = ccall(sym, Int,
         (Ptr{Cint}, Ptr{Ptr{Cint}}, Ptr{Ptr{Cint}}, Ptr{Ptr{Cvoid}},
           Ptr{Cint}, Ptr{Cint}, Ptr{Cvoid}, Int, Int, Int, Int, Int,
@@ -323,7 +324,7 @@ function f4(
     ccall(sym, Nothing , (Ptr{Ptr{Cint}}, Ptr{Ptr{Cint}}, Ptr{Ptr{Cvoid}},
                 Int, Int), gb_len, gb_exp, gb_cf, jl_ld, char)
     # free data
-    ccall((:free, "libc.so.6"), Nothing , (Ptr{Cint}, ), gb_ld)
+    ccall(:free, Nothing , (Ptr{Cint}, ), gb_ld)
 
     # for letting the garbage collector free memory
     jl_len      = Nothing
