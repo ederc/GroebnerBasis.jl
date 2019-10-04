@@ -1,4 +1,7 @@
 # GB
+
+[![Build Status](https://travis-ci.org/ederc/GB.jl.svg?branch=master)](https://travis-ci.org/ederc/GB.jl)
+
 This is a julia library which provides an interface between **Singular**
 (https://github.com/Singular/Sources) and **gb** (https://github.com/ederc/gb).
 
