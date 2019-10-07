@@ -1,7 +1,10 @@
-import Singular
-import Libdl
+using Libdl
+using BinaryProvider
 
 oldwdir = pwd()
+
+# Parse some basic command-line arguments
+const verbose = "--verbose" in ARGS
 
 issource_build = "GB_SOURCE_BUILD" in keys(ENV) && ENV["GB_SOURCE_BUILD"] == "1"
 
@@ -19,8 +22,7 @@ if !issource_build
 
   for url in dependencies
       build_file = joinpath(@__DIR__, basename(url))
-      if !isfile(build_file)
-          download(url, build_file)
+      if !isfile(build_file) download(url, build_file)
       end
   end
 
