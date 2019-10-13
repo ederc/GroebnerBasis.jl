@@ -19,7 +19,8 @@ if !issource_build
         "https://github.com/ederc/GBBuilder/releases/download/v0.13-dev2/build_libgb.v0.13.0-dev2.jl"
     ]
 
-    const prefix = Prefix(get([a for a in ARGS if a != "--verbose"], 1, joinpath(@__DIR__, "usr")))
+    const prefix = Prefix(get([a for a in ARGS if a != "--verbose"], 1,
+          joinpath(@__DIR__, "usr")))
 
     products = []
 
@@ -42,7 +43,7 @@ if !issource_build
         fpath = joinpath(prefixpath, "lib", filename)
         txt = read(fpath, String)
         open(fpath, "w") do f
-        write(f, replace(txt, "/workspace/destdir" => prefixpath))
+#write(f, replace(txt, "/workspace/destdir" => prefixpath))
         end
     end
 
@@ -82,7 +83,8 @@ else
         mkdir(joinpath(vdir, "lib"))
     end
 
-    LDFLAGS = "-Wl,-rpath,$vdir/lib -Wl,-rpath,\$\$ORIGIN/../share/julia/site/v$(VERSION.major).$(VERSION.minor)/GB/local/lib"
+    LDFLAGS = "-Wl,-rpath,$vdir/lib
+    -Wl,-rpath,\$\$ORIGIN/../share/julia/site/v$(VERSION.major).$(VERSION.minor)/GB/local/lib"
     DLCFLAGS = "-fPIC -fno-common"
 
     cd(wdir)
