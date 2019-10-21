@@ -230,6 +230,10 @@ input and returns a Singular ideal. At the moment only finite fields up to
     - `42`: probabilistic sparse-dense computation,
     - `43`: exact sparse then probabilistic dense computation,
     - `44`: probabilistic sparse computation.
+* `reducegb::Int=0`:  reduce final basis; default is 0. Note that for
+                      computations over Q we do not normalize the polynomials,
+                      the basis is only minimal and tailreduced. Normalize by
+                      hand if necessary.
 * `pbmfiles::Int=0`: option for generating pbm files of matrices:
     - `0`: off (default),
     - `1`:  on.
@@ -248,9 +252,10 @@ function f4(
         hts::Int=17,                  # hash table size, default 2^17
         nthrds::Int=1,                # number of threads
         maxpairs::Int=0,              # number of pairs maximally chosen
-                                    # in symbolic preprocessing
+                                      # in symbolic preprocessing
         resetht::Int=0,               # resetting global hash table
         laopt::Int=2,                 # linear algebra option
+        reducegb::Int=0,              # reduce final basis
         pbmfiles::Int=0,              # generation of pbm files
         infolevel::Int=0,             # info level for print outs
         monorder::Symbol=:dregrevlex  # monomial order
@@ -291,9 +296,9 @@ function f4(
     nterms  = ccall(sym, Int,
         (Ptr{Cint}, Ptr{Ptr{Cint}}, Ptr{Ptr{Cint}}, Ptr{Ptr{Cvoid}},
           Ptr{Cint}, Ptr{Cint}, Ptr{Cvoid}, Int, Int, Int, Int, Int,
-          Int, Int, Int, Int, Int, Int),
+          Int, Int, Int, Int, Int, Int, Int),
         gb_ld, gb_len, gb_exp, gb_cf, lens, exps, cfs, char, ord, nvars,
-        ngens, hts, nthrds, maxpairs, resetht, laopt, pbmfiles, infolevel)
+        ngens, hts, nthrds, maxpairs, resetht, laopt, reducegb, pbmfiles, infolevel)
     Libdl.dlclose(lib)
 
     if nterms == 0

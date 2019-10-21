@@ -16,7 +16,7 @@ if !issource_build
     dependencies = [
         # This has to be in sync with the corresponding commit in the source build below (for flint, arb, antic)
         "https://github.com/JuliaPackaging/Yggdrasil/releases/download/GMP-v6.1.2-1/build_GMP.v6.1.2.jl",
-        "https://github.com/ederc/GBBuilder/releases/download/v0.13-dev2/build_libgb.v0.13.0-dev2.jl"
+        "https://github.com/ederc/GBBuilder/releases/download/v0.16-dev0/build_libgb.v0.16.0-dev0.jl"
     ]
 
     const prefix = Prefix(get([a for a in ARGS if a != "--verbose"], 1,
@@ -62,7 +62,7 @@ else
     pkgdir = dirname(dirname(@__FILE__))
     sdir = joinpath(pkgdir, "src")
     wdir = joinpath(pkgdir, "deps")
-    vdir = joinpath(pkgdir, "local")
+    vdir = joinpath(pkgdir, "usr")
 
     if Sys.isapple() && !("CC" in keys(ENV))
     ENV["CC"] = "clang"
@@ -84,7 +84,7 @@ else
     end
 
     LDFLAGS = "-Wl,-rpath,$vdir/lib
-    -Wl,-rpath,\$\$ORIGIN/../share/julia/site/v$(VERSION.major).$(VERSION.minor)/GB/local/lib"
+    -Wl,-rpath,\$\$ORIGIN/../share/julia/site/v$(VERSION.major).$(VERSION.minor)/GB/usr/lib"
     DLCFLAGS = "-fPIC -fno-common"
 
     cd(wdir)
