@@ -62,7 +62,7 @@ else
     pkgdir = dirname(dirname(@__FILE__))
     sdir = joinpath(pkgdir, "src")
     wdir = joinpath(pkgdir, "deps")
-    vdir = joinpath(pkgdir, "usr")
+    vdir = joinpath(wdir, "usr")
 
     if Sys.isapple() && !("CC" in keys(ENV))
     ENV["CC"] = "clang"
