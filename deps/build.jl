@@ -49,8 +49,8 @@ if !issource_build
 
 else
     println("Doing a source build for C dependencies...")
-    if "NEMO_BUILD_THREADS" in keys(ENV)
-        build_threads = ENV["NEMO_BUILD_THREADS"]
+    if "GB_BUILD_THREADS" in keys(ENV)
+        build_threads = ENV["GB_BUILD_THREADS"]
         println("Using $build_threads threads for building as specified by NEMO_BUILD_THREADS.")
     else
         build_threads = Sys.CPU_THREADS
