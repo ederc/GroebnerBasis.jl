@@ -7,12 +7,12 @@ include("Example.jl")
 # package code goes here
 using Libdl
 using Singular
-using Hecke
+using Nemo
 using LibGit2
 using Dates
 
 export Singular
-export Hecke
+export Nemo
 
 const pkgdir  = realpath(joinpath(dirname(@__FILE__), ".."))
 const libdir   = joinpath(pkgdir, "deps", "usr", "lib")
@@ -281,7 +281,7 @@ function f4(
     # convert Singular ideal to flattened arrays of ints
     if 0 == char
       lens, cfs, exps   = convert_qq_singular_ideal_to_array(J, nvars, ngens)
-    elseif Hecke.isprime(char)
+    elseif Nemo.isprime(FlintZZ(char))
       lens, cfs, exps   = convert_ff_singular_ideal_to_array(J, nvars, ngens)
     else
         error("At the moment GB only supports finite fields and the rationals.")
@@ -311,7 +311,7 @@ function f4(
     if 0 == char
         gb_cf_conv  = unsafe_load(gb_cf)
         jl_cf       = reinterpret(Ptr{BigInt}, gb_cf_conv)
-    elseif Hecke.isprime(char)
+    elseif Nemo.isprime(FlintZZ(char))
       gb_cf_conv  = Ptr{Ptr{Int32}}(gb_cf)
       jl_cf       = Base.unsafe_wrap(Array, unsafe_load(gb_cf_conv), nterms)
     end
@@ -320,7 +320,7 @@ function f4(
     if 0 == char
         basis = convert_qq_gb_array_to_singular_ideal(
           jl_ld, jl_len, jl_exp, jl_cf, R)
-    elseif Hecke.isprime(char)
+    elseif Nemo.isprime(FlintZZ(char))
         basis = convert_ff_gb_array_to_singular_ideal(
           jl_ld, jl_len, jl_exp, jl_cf, R)
     end
@@ -506,55 +506,55 @@ function f4q(
     return res
 end
 
-function map_ideal(
-        I::Singular.sideal,
-        p
-        )
-    pp      = Hecke.next_prime(p)
-    R       = base_ring(I)
-    vars    = string.(Singular.gens(R))
-    Fp      = Singular.N_ZpField(pp)
-    # skip zero generators in ideal
-    ptr     = Singular.libSingular.id_Copy(I.ptr, R.ptr)
-    J       = Singular.Ideal(R, ptr)
-    Singular.libSingular.idSkipZeroes(J.ptr)
-    Rp, Xp  = Singular.PolynomialRing(Fp, vars, cached=false)
-    global Xp
-    [ eval(Meta.parse("$s = Xp[$i]")) for (i, s) in enumerate(vars) ]
-    id  = [string(J[k]) for k in 1:Singular.ngens(J)]
-    Ip  = Singular.Ideal(Rp, [eval(Meta.parse("$poly")) for poly in id])
-    Ip
-end
-
-function modf4(
-        I::Singular.sideal;           # input generators
-        hts::Int=17,                  # hash table size, default 2^17
-        nthrds::Int=1,                # number of threads
-        maxpairs::Int=0,              # number of pairs maximally chosen
-                                      # in symbolic preprocessing
-        resetht::Int=0,               # resetting global hash table
-        laopt::Int=2,                 # linear algebra option
-        pbmfiles::Int=0,              # generation of pbm files
-        infolevel::Int=0,             # info level for print outs
-        monorder::Symbol=:dregrevlex  # monomial order
-        )
-    ZX, X = FlintZZ['X']
-    # prime characteristic
-    p     = 2^29
-    pp    = fmpz(1)
-
-    pl  = Array{Int,1}(undef,nthrds)
-    Il  = Array{Singular.sideal,1}(undef,nthrds)
-    for i in 1:nthrds
-        pl[i] = next_prime(p)
-        p     = pl[i]
-        Il[i] = map_ideal(I,pl[i])
-    end
-    res  = GB.f4q(Il, hts=hts, nthrds=nthrds,
-            maxpairs=maxpairs, resetht=resetht, laopt=laopt,
-            pbmfiles=pbmfiles, infolevel=infolevel, monorder=monorder)
-    return res
-end
+# function map_ideal(
+#         I::Singular.sideal,
+#         p
+#         )
+#     pp      = Hecke.next_prime(p)
+#     R       = base_ring(I)
+#     vars    = string.(Singular.gens(R))
+#     Fp      = Singular.N_ZpField(pp)
+#     # skip zero generators in ideal
+#     ptr     = Singular.libSingular.id_Copy(I.ptr, R.ptr)
+#     J       = Singular.Ideal(R, ptr)
+#     Singular.libSingular.idSkipZeroes(J.ptr)
+#     Rp, Xp  = Singular.PolynomialRing(Fp, vars, cached=false)
+#     global Xp
+#     [ eval(Meta.parse("$s = Xp[$i]")) for (i, s) in enumerate(vars) ]
+#     id  = [string(J[k]) for k in 1:Singular.ngens(J)]
+#     Ip  = Singular.Ideal(Rp, [eval(Meta.parse("$poly")) for poly in id])
+#     Ip
+# end
+#
+# function modf4(
+#         I::Singular.sideal;           # input generators
+#         hts::Int=17,                  # hash table size, default 2^17
+#         nthrds::Int=1,                # number of threads
+#         maxpairs::Int=0,              # number of pairs maximally chosen
+#                                       # in symbolic preprocessing
+#         resetht::Int=0,               # resetting global hash table
+#         laopt::Int=2,                 # linear algebra option
+#         pbmfiles::Int=0,              # generation of pbm files
+#         infolevel::Int=0,             # info level for print outs
+#         monorder::Symbol=:dregrevlex  # monomial order
+#         )
+#     ZX, X = FlintZZ['X']
+#     # prime characteristic
+#     p     = 2^29
+#     pp    = fmpz(1)
+#
+#     pl  = Array{Int,1}(undef,nthrds)
+#     Il  = Array{Singular.sideal,1}(undef,nthrds)
+#     for i in 1:nthrds
+#         pl[i] = next_prime(p)
+#         p     = pl[i]
+#         Il[i] = map_ideal(I,pl[i])
+#     end
+#     res  = GB.f4q(Il, hts=hts, nthrds=nthrds,
+#             maxpairs=maxpairs, resetht=resetht, laopt=laopt,
+#             pbmfiles=pbmfiles, infolevel=infolevel, monorder=monorder)
+#     return res
+# end
 
 function versioninfo()
     print("GB v0.7\n")
