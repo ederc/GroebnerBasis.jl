@@ -39,26 +39,27 @@ function conics(
     error("Order not known -- No ideal generated.")
   end
   n = 5
-  vars = Array{String, 1}(undef,4*n)
+  vars = Array{String, 1}(undef,4*n+1)
   # generate dummy array of n strings for generating
   # singular polynomial ring
+  vars[1] = "l"
   k = 1
-  for i = 1:n
+  for i = 2:n+1
     vars[i] = "lambda$(k)"
     k += 1
   end
   k = 2
-  for i = n+1:2*n
+  for i = n+2:2*n+1
     vars[i] = "u$(k)"
     k += 1
   end
   k = 1
-  for i = 2*n+1:3*n
+  for i = 2*n+2:3*n+1
     vars[i] = "x$(k)"
     k += 1
   end
   k = 1
-  for i = 3*n+1:4*n
+  for i = 3*n+2:4*n+1
     vars[i] = "y$(k)"
     k += 1
   end
@@ -71,6 +72,7 @@ function conics(
   # parses X[i] to xi
   [ eval(Meta.parse("$s = X[$i]")) for (i, s) in enumerate(vars) ]
   ps =
+"l^5*lambda1*lambda2*lambda3*lambda4*lambda5-1",
 "47964*x1^2+64238*x1*y1-63189*y1^2+45025*x1-38813*y1+52506",
 "-37537*x2^2+30736*x2*y2+21665*y2^2-59676*x2-27375*y2-15181",
 "-6998*x3^2+37912*x3*y3+32141*y3^ 2-21927*x3-29647*y3+42158",
