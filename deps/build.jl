@@ -16,7 +16,7 @@ if !issource_build
     dependencies = [
         # This has to be in sync with the corresponding commit in the source build below (for flint, arb, antic)
         "https://github.com/JuliaPackaging/Yggdrasil/releases/download/GMP-v6.1.2-1/build_GMP.v6.1.2.jl",
-        "https://github.com/ederc/GBBuilder/releases/download/v0.17-dev0/build_libgb.v0.17.0-dev0.jl"
+        "https://github.com/ederc/GBBuilder/releases/download/v0.17-dev1/build_libgb.v0.17.0-dev1.jl"
     ]
 
     const prefix = Prefix(get([a for a in ARGS if a != "--verbose"], 1,
