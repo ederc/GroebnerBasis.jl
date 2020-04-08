@@ -17,3 +17,5 @@ of the package. E.g. in your julia session call
 using GB
 GB.run_cyclic_8()
 ```
+
+This work is partly supported by the DFG Sonderforschungsbereich TRR 195.
