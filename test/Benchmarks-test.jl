@@ -18,7 +18,7 @@ function test_benchmark_cyclic_4()
     f4  = x1*x2*x3*x4-1
     id = Singular.Ideal(R, f1, f2, f3, f4)
 
-    G = GB.f4(id)
+    G = GroebnerBasis.f4(id)
 
     @test Singular.ngens(G) == 7
 
@@ -53,7 +53,7 @@ function test_benchmark_katsura_5()
     f5  = 2*x2*x3+2*x1*x4+2*x2*x5-x4
     id = Singular.Ideal(R, f1, f2, f3, f4, f5)
 
-    G = GB.f4(id)
+    G = GroebnerBasis.f4(id)
 
     @test Singular.ngens(G) == 13
 

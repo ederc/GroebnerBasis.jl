@@ -84,7 +84,7 @@ else
     end
 
     LDFLAGS = "-Wl,-rpath,$vdir/lib
-    -Wl,-rpath,\$\$ORIGIN/../share/julia/site/v$(VERSION.major).$(VERSION.minor)/GB/usr/lib"
+    -Wl,-rpath,\$\$ORIGIN/../share/julia/site/v$(VERSION.major).$(VERSION.minor)/GroebnerBasis/usr/lib"
     DLCFLAGS = "-fPIC -fno-common"
 
     cd(wdir)

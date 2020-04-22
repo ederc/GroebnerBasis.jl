@@ -1,4 +1,4 @@
-module GB
+module GroebnerBasis
 
 # other files
 include("Benchmarks.jl")
@@ -103,8 +103,8 @@ function convert_qq_singular_ideal_to_array(
 end
 
 # we know that the terms are already sorted and they are all different
-# coming from GB's F4 computation, so we do not need p_Add_q for the
-# terms, but we can directly set the next pointers of the polynomials
+# coming from GroebnerBasis' F4 computation, so we do not need p_Add_q for
+# the terms, but we can directly set the next pointers of the polynomials
 function convert_ff_gb_array_to_singular_ideal(
         bld::Int32,
         blen::Array{Int32,1},
@@ -284,7 +284,7 @@ function f4(
     elseif Nemo.isprime(FlintZZ(char))
       lens, cfs, exps   = convert_ff_singular_ideal_to_array(J, nvars, ngens)
     else
-        error("At the moment GB only supports finite fields and the rationals.")
+        error("At the moment GroebnerBasis only supports finite fields and the rationals.")
     end
     lib = Libdl.dlopen(libgb)
     sym = Libdl.dlsym(lib, :f4_julia)
@@ -550,17 +550,17 @@ end
 #         p     = pl[i]
 #         Il[i] = map_ideal(I,pl[i])
 #     end
-#     res  = GB.f4q(Il, hts=hts, nthrds=nthrds,
+#     res  = GroebnerBasis.f4q(Il, hts=hts, nthrds=nthrds,
 #             maxpairs=maxpairs, resetht=resetht, laopt=laopt,
 #             pbmfiles=pbmfiles, infolevel=infolevel, monorder=monorder)
 #     return res
 # end
 
 function versioninfo()
-    print("GB v0.7\n")
+    print("GroebnerBasis v0.1.0\n")
     gbrepo = dirname(dirname(@__FILE__))
 
-    print("GB: ")
+    print("GroebnerBasis: ")
     prepo = LibGit2.GitRepo(gbrepo)
     print("commit: ")
     print(string(LibGit2.head_oid(prepo)))

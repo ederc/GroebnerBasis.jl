@@ -1,6 +1,6 @@
-The GB.jl package is licensed under the GNU Public License, Version 2.0+:
+The GroebnerBbasis.jl package is licensed under the GNU Public License, Version 2.0+:
 
-> Copyright (c) 2017: Christian Eder.
+> Copyright (c) 2020: Christian Eder.
 > This program is free software; you can redistribute it and/or modify
 > it under the terms of the GNU General Public License as published by
 > the Free Software Foundation; either version 2 of the License, or

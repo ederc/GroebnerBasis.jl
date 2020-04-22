@@ -30,7 +30,7 @@ notifications:
   - email: false
 script:
   - while sleep 30; do echo "still alive"; done &
-  - julia -e 'using Pkg; Pkg.build("GB"); Pkg.test("GB");'
+  - julia -e 'using Pkg; Pkg.build("GroebnerBasis"); Pkg.test("GroebnerBasis");'
 
 # env:
 #    global:

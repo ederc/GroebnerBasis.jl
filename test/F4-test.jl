@@ -18,7 +18,7 @@ function test_f4_convert_ff_singular_ideal_to_array()
     f4  = x1*x2*x3*x4-1
     id  = Singular.Ideal(R, f1, f2, f3, f4)
 
-    lens, cfs, exps = GB.convert_ff_singular_ideal_to_array(
+    lens, cfs, exps = GroebnerBasis.convert_ff_singular_ideal_to_array(
             id, 4, 4)
 
     tlens = Int32[4, 4, 4, 2]
@@ -55,7 +55,7 @@ function test_f4_convert_qq_singular_ideal_to_array()
     f5  = 2*x2*x3+2*x1*x4+2*x2*x5-x4
     id  = Singular.Ideal(R, f1, f2, f3, f4, f5)
 
-    lens, cfs, exps = GB.convert_qq_singular_ideal_to_array(
+    lens, cfs, exps = GroebnerBasis.convert_qq_singular_ideal_to_array(
             id, 5, 5)
 
     # println("cfs ", cfs)
@@ -103,7 +103,7 @@ function test_f4_convert_ff_gb_array_to_singular_ideal()
     1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1,
     1, 1, 1, 1, 1, 1, 0, 0, 0, 0]
 
-    H = GB.convert_ff_gb_array_to_singular_ideal(
+    H = GroebnerBasis.convert_ff_gb_array_to_singular_ideal(
             Int32(n), lens, exps, cfs, R)
 
     @test Singular.equal(G, H)
@@ -142,7 +142,7 @@ function test_f4_convert_qq_gb_array_to_singular_ideal()
     0, 1, 0, 0, 0, 1, 0]
 
     cfsp = pointer(cfs)
-    H = GB.convert_qq_gb_array_to_singular_ideal(
+    H = GroebnerBasis.convert_qq_gb_array_to_singular_ideal(
             Int32(n), lens, exps, cfsp, R)
 
     @test Singular.equal(G, H)
@@ -174,7 +174,7 @@ function test_f4_16_bit()
 
     id = Singular.Ideal(R, gens)
 
-    G = GB.f4(id)
+    G = GroebnerBasis.f4(id)
 
     @test Singular.ngens(G) == 13
 
@@ -225,7 +225,7 @@ function test_f4_32_bit()
 
     id = Singular.Ideal(R, gens)
 
-    G = GB.f4(id)
+    G = GroebnerBasis.f4(id)
 
     @test Singular.ngens(G) == 13
 
@@ -276,7 +276,7 @@ function test_f4_qq()
 
     id = Singular.Ideal(R, gens)
 
-    G = GB.f4(id)
+    G = GroebnerBasis.f4(id)
 
     @test Singular.ngens(G) == 13
 
