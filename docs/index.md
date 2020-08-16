@@ -30,8 +30,7 @@ GroebnerBasis.jl **depends on Singular.jl** (see [https://wbhart.github.io/Singu
 At the Julia prompt simply type
 
 ```
-julia> Pkg.clone("https://github.com/ederc/GroebnerBasis.jl")
-julia> Pkg.build("GroebnerBasis")
+julia> Pkg.add("GroebnerBasis")
 ```
 
 ## Quick start
