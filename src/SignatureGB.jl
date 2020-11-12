@@ -17,6 +17,8 @@ function f5(
     nvars   = Singular.nvars(R)
     ngens   = Singular.ngens(J)
 
+    len = len_t(nvars)
+    print(len)
     ord = 0
     if monorder == :degrevlex
         ord = 0
