@@ -32,6 +32,31 @@ function convert_ff_singular_ideal_to_array(
     lens, cfs, exps
 end
 
+function convert_ff_singular_ideal_to_signature_basis(
+        id::Singular.sideal,
+        stat::stat_t,
+        basis::basis_t
+        )
+    for i=1:stat.numberGenerators
+        basis.numberTerms[i]  = Singular.length(id[i])
+        basis.coefficients[i] = Array{cf_t}(undef, basis.numberTerms[i])
+        basis.monomials[i]    = Array{Array{exp_t}}(undef, basis.numberTerms[i])
+        cc  = 1
+        ec  = 1
+        for c in Singular.coeffs(id[i])
+            basis.coefficients[i][cc] = cf_t(Int(c))
+            cc += 1
+        end
+        for e in Singular.exponent_vectors(id[i])
+            basis.monomials[i][ec]    = Array{exp_t}(undef, stat.numberGenerators)
+            for j = 1:stat.numberVariables
+                basis.monomials[i][ec][j] = exp_t(e[j])
+            end
+            ec +=  1
+        end
+    end
+end
+
 function convert_qq_singular_ideal_to_array(
         id::Singular.sideal,
         nvars::Int,
@@ -81,7 +106,7 @@ function convert_ff_gb_array_to_singular_ideal(
     # first entry in exponent vector is module component => nvars+1
     exp   = zeros(Cint, nvars+1)
 
-    list  = elem_type(R)[]
+    list  = Singular.elem_type(R)[]
     # we generate the singular polynomials low level in order
     # to avoid overhead due to many exponent operations etc.
     j   = ngens + 1 + 1
@@ -125,7 +150,7 @@ function convert_qq_gb_array_to_singular_ideal(
     # first entry in exponent vector is module component => nvars+1
     exp   = zeros(Cint, nvars+1)
 
-    list  = elem_type(R)[]
+    list  = Singular.elem_type(R)[]
     # we generate the singular polynomials low level in order
     # to avoid overhead due to many exponent operations etc.
     j   = ngens + 1 + 1
