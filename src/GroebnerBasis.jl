@@ -4,15 +4,15 @@ module GroebnerBasis
 
 # package code goes here
 using Libdl
-using Singular
-using Nemo
 using LibGit2
 using Dates
-
 using gb_jll
 
-#export Singular
-#export Nemo
+import Singular
+import Nemo
+
+export Singular
+export Nemo
 
 export f4, f5
 

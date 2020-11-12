@@ -1,6 +1,7 @@
 """
     f4(I[, hts::Int=17, nthrds::Int=1, maxpairs::Int=0, resetht::Int=0,
-            laopt::Int=1, infolevel::Int=0, monorder::Symbol=:degrevlex])
+            laopt::Int=1, reducegb::Int=0, pbmfiles::Int=0,
+            infolevel::Int=0, monorder::Symbol=:degrevlex])
 
 Compute a Groebner basis of the given ideal I w.r.t. to the given monomial
 order using Faugere's F4 algorithm. The function takes a Singular ideal as
@@ -78,7 +79,7 @@ function f4(
     # convert Singular ideal to flattened arrays of ints
     if 0 == char
       lens, cfs, exps   = convert_qq_singular_ideal_to_array(J, nvars, ngens)
-    elseif Nemo.isprime(FlintZZ(char))
+    elseif Nemo.isprime(Nemo.FlintZZ(char))
       lens, cfs, exps   = convert_ff_singular_ideal_to_array(J, nvars, ngens)
     else
         error("At the moment GroebnerBasis only supports finite fields and the rationals.")
@@ -108,7 +109,7 @@ function f4(
     if 0 == char
         gb_cf_conv  = unsafe_load(gb_cf)
         jl_cf       = reinterpret(Ptr{BigInt}, gb_cf_conv)
-    elseif Nemo.isprime(FlintZZ(char))
+    elseif Nemo.isprime(Nemo.FlintZZ(char))
       gb_cf_conv  = Ptr{Ptr{Int32}}(gb_cf)
       jl_cf       = Base.unsafe_wrap(Array, unsafe_load(gb_cf_conv), nterms)
     end
@@ -117,7 +118,7 @@ function f4(
     if 0 == char
         basis = convert_qq_gb_array_to_singular_ideal(
           jl_ld, jl_len, jl_exp, jl_cf, R)
-    elseif Nemo.isprime(FlintZZ(char))
+    elseif Nemo.isprime(Nemo.FlintZZ(char))
         basis = convert_ff_gb_array_to_singular_ideal(
           jl_ld, jl_len, jl_exp, jl_cf, R)
     end
