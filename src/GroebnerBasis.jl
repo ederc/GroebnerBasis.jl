@@ -18,6 +18,7 @@ export f4, f5
 
 include("Benchmarks.jl")
 include("Example.jl")
+include("Interfaces.jl")
 include("F4.jl")
 include("SignatureGB.jl")
 
