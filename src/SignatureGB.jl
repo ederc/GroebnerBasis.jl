@@ -4,9 +4,9 @@
             sigorder::Int=0])
 
 Compute a Groebner basis of the given ideal I w.r.t. to the given monomial
-order using Faugere's F4 algorithm. The function takes a Singular ideal as
+order using Faugere's F5 algorithm. The function takes a Singular ideal as
 input and returns a Singular ideal. At the moment only finite fields up to
-31-bit and the rationals are supported as ground fields.
+32-bit are supported.
 
 # Arguments
 * `I::Singular.sideal`: ideal to compute a Groebner basis for.
