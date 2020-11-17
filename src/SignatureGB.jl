@@ -97,9 +97,10 @@ return the monomial least common multiple of mon_1 and mon_2.
 """
 function mon_lcm(
     mon_1::Array{exp_t},
-    mon_2::Array{exp_t}
+    mon_2::Array{exp_t},
+    stat::stat_t
 )
-    lcm = Array{exp_t}(undef, length(mon_1))
+    lcm = Array{exp_t}(undef, stat.numberVariables)
 
     for i=1:length(mon_1)
         lcm[i] = max(mon_1[i], mon_2[i])
