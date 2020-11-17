@@ -86,3 +86,61 @@ function f5(
         convert_ff_singular_ideal_to_signature_basis(J, stat, basis)
     end
 end
+
+
+#- Monomial arithmetic convenience functions -#
+
+"""
+    mon_lcm(mon_1::Array{exp_t}, mon_2::Array{exp_t})
+
+return the monomial least common multiple of mon_1 and mon_2.
+"""
+function mon_lcm(
+    mon_1::Array{exp_t},
+    mon_2::Array{exp_t}
+)
+    lcm = Array{exp_t}(undef, length(mon_1))
+
+    for i=1:length(mon_1)
+        lcm[i] = max(mon_1[i], mon_2[i])
+    end
+
+    return lcm
+end
+
+
+"""
+    divisibility(mon_1::Array{exp_t}, mon_2::Array{exp_t})
+
+return true if mon_1 divides mon_2.
+"""
+function divisibility(
+    mon_1::Array{exp_t},
+    mon_2::Array{exp_t}
+)
+    lamb = mon_lcm(mon_1, mon_2)
+
+    if lamb == mon_2
+        return true
+    end
+
+    return false
+end
+
+"""
+   sig_divisibility(sig_1::signature_t, sig_2::signature_t)
+
+return true if sig_1 divides sig_2.   
+"""
+function sig_divisibility(
+    sig_1::signature_t,
+    sig_2::signature_t
+)
+    if sig_1.position == sig_2.position
+        if divisibility(sig_1.monomial, sig_2.monomial)
+            return true
+        end
+    end
+
+    return false
+end
