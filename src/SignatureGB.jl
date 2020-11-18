@@ -87,6 +87,46 @@ function f5(
     end
 end
 
+#- Unfinished -#
+
+function gen_s_pair(
+    s_pol_1::sig_poly_pair,
+    s_pol_2::sig_poly_pair,
+    rewriters::Array{signature_t}
+    stat::stat_t
+)
+    # assume that the monomials are sorted by the monomial order
+    lt_1 = s_pol_1.monomials[1]
+    lt_2 = s_pol_2.monomials[1]
+    lambd = mon_lcm(lt_1, lt_2)
+    mon_1 = Array{exp_t}(undef, stat.numberVariables)
+    mon_2 = Array{exp_t}(undef, stat.numberVariables)
+
+    for i in 1:stat.numberVariables
+        mon_1[i] = lambd[i] - lt_1[i]
+        mon_2[i] = lambd[i] - lt_2[i]
+    end
+
+    sig_1 = mult_signature_by_mon(s_pol_1.signature, mon_1)
+    sig_2 = mult_signature_by_mon(s_pol_2.signature, mon_2)
+
+    if (sig_1 == sig_2 || rewriteable(sig_1, rewriters) || rewriteable(sig_2, rewriters))
+        return nothing
+    end
+
+    # here we need to use module monomial order
+
+    s_pair(sig_2, SVector(mon_1, mon_2), SVector(s_pol_1, s_pol_2))
+    
+end
+
+function rewriteable(
+    signature::signature_t,
+    rewriters::Array{signature_t}
+)
+    #- to be implemented -#
+end
+
 
 #- Monomial arithmetic convenience functions -#
 
@@ -144,4 +184,36 @@ function sig_divisibility(
     end
 
     return false
+end
+
+"""
+    mult_monomials(mon_1::Array{exp_t}, mon_2::Array{exp_t}, stat::stat_t)
+
+multiply two monomials by each other.
+"""
+function mult_monomials(
+    mon_1::Array{exp_t},
+    mon_2::Array{exp_t},
+    stat::stat_t
+)
+    res = Array{exp_t}(undef, stat.numberVariables)
+    for i=1:stat.numberVariables:
+        res[i] = mon_1[i] + mon_2[i]
+    end
+
+    res
+end
+
+"""
+    mult_signature_by_mon(signature::signature_t, mon::Array{exp_t}, stat::stat_t)
+
+Multiply a module monomial by a monomial.
+"""
+function mult_signature_by_mon(
+    signature::signature_t,
+    mon::Array{exp_t},
+    stat::stat_t
+)
+    res_mon = mult_monomials(mon, signature.monomial, stat)
+    signature_t(res_mon, signature.position)
 end
