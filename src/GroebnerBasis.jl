@@ -7,6 +7,7 @@ using Libdl
 using LibGit2
 using Dates
 using gb_jll
+using StaticArrays
 
 import Singular
 import Nemo
