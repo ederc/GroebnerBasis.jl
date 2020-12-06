@@ -59,7 +59,8 @@ function f5(
     basis.coefficients  = Array{Array{cf_t}}(undef, stat.numberGenerators)
     basis.monomials     = Array{Array{Array{exp_t}}}(undef, stat.numberGenerators)
 
-    H = Array{signature_t}(undef, (stat.numberVariables^2 / 2) - stat.numberVariables)
+    H = Array{signature_t}(undef, Int((stat.numberGenerators^2 - stat.numberGenerators) / 2))
+
     #= get monomial order =#
     monomialOrder = 0
     if monorder == :degrevlex
@@ -124,13 +125,15 @@ function gen_s_pair(
         mon_1[i] = lambd[i] - lt_1[i]
         mon_2[i] = lambd[i] - lt_2[i]
     end
-    
-    sig_1 = mult_signature_by_mon(basis.signatures[i_1], mon_1, stat)
-    sig_2 = mult_signature_by_mon(basis.signatures[i_2], mon_2, stat)
 
-    # first argument will be the element just added to G
-    rewriters = cat(syz_signatures, reverse(basis.signatures[i_2 + 1:pos_t(end)]); dims=1)
+    # this will be the element just added to G so we just check rewriteability w.r.t. H
+    sig_1 = mult_signature_by_mon(basis.signatures[i_1], mon_1, stat)
+    if rewriteable(sig_1, syz_signatures, stat)
+        return nothing
+    end
     
+    sig_2 = mult_signature_by_mon(basis.signatures[i_2], mon_2, stat)
+    rewriters = cat(syz_signatures, reverse(basis.signatures[i_2 + 1:pos_t(end)]); dims=1)
     if (sig_1 == sig_2 || rewriteable(sig_2, rewriters, stat))
         return nothing
     end
