@@ -59,6 +59,7 @@ function f5(
     basis.coefficients  = Array{Array{cf_t}}(undef, stat.numberGenerators)
     basis.monomials     = Array{Array{Array{exp_t}}}(undef, stat.numberGenerators)
 
+    H = Array{signature_t}(undef, (stat.numberVariables^2 / 2) - stat.numberVariables)
     #= get monomial order =#
     monomialOrder = 0
     if monorder == :degrevlex
@@ -85,13 +86,27 @@ function f5(
     else
         convert_ff_singular_ideal_to_signature_basis(J, stat, basis)
     end
+
+    #= store trivial syzygies =#
+
+    ind = 1
+    if signatureOrder == 0
+        for j in 1:stat.numberGenerators
+            for i in 1:j-1
+                H[ind] = signature_t(first(basis.monomials[i]), j)
+                ind += 1
+            end
+        end
+    else
+        #- to be implemented -#
+    end
 end
 
-#- Unfinished -#
+#= Unfinished =#
 
 function gen_s_pair(
-    i_1::CartesianIndex{1},
-    i_2::CartesianIndex{1},
+    i_1::pos_t,
+    i_2::pos_t,
     syz_signatures::Array{signature_t},
     basis::basis_t,
     monomialOrder::Int,
@@ -114,7 +129,7 @@ function gen_s_pair(
     sig_2 = mult_signature_by_mon(basis.signatures[i_2], mon_2, stat)
 
     # first argument will be the element just added to G
-    rewriters = cat(syz_signatures, reverse(basis.signatures[CartesianIndex(i_2):CartesianIndex(end)])[1:end-1]; dims=1) # this is so bad
+    rewriters = cat(syz_signatures, reverse(basis.signatures[i_2 + 1:pos_t(end)]); dims=1)
     
     if (sig_1 == sig_2 || rewriteable(sig_2, rewriters, stat))
         return nothing
@@ -145,7 +160,7 @@ function rewriteable(
     return false
 end
 
-#- Monomial arithmetic convenience functions -#
+#= Monomial arithmetic convenience functions =#
 
 """
     mon_lcm(mon_1::Array{exp_t}, mon_2::Array{exp_t})

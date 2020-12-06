@@ -4,7 +4,7 @@ const pos_t = UInt32
 const deg_t = UInt16
 const exp_t = UInt16
 
-export stat_t, signature_t, sig_poly_pair, s_pair, basis_t
+export stat_t, pos_t, signature_t, s_pair, basis_t
 
 mutable struct stat_t
     numberVariables::Int
@@ -21,7 +21,7 @@ end
 struct s_pair
     signature::signature_t
     mult_monomials::SVector{2, Array{exp_t}}
-    indices::SVector{2, CartesianIndex{1}}
+    indices::SVector{2, pos_t}
 end
 
 mutable struct basis_t
