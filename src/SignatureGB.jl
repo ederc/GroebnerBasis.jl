@@ -128,13 +128,13 @@ function gen_s_pair(
 
     # this will be the element just added to G so we just check rewriteability w.r.t. H
     sig_1 = mult_signature_by_mon(basis.signatures[i_1], mon_1, stat)
-    if rewriteable(sig_1, syz_signatures, stat)
+    if rewritable(sig_1, syz_signatures, stat)
         return nothing
     end
     
     sig_2 = mult_signature_by_mon(basis.signatures[i_2], mon_2, stat)
     rewriters = cat(syz_signatures, reverse(basis.signatures[i_2 + 1:pos_t(end)]); dims=1)
-    if (sig_1 == sig_2 || rewriteable(sig_2, rewriters, stat))
+    if (sig_1 == sig_2 || rewritable(sig_2, rewriters, stat))
         return nothing
     end
 
@@ -150,7 +150,7 @@ function gen_s_pair(
     
 end
 
-function rewriteable(
+function rewritable(
     signature::signature_t,
     rewriters::Array{signature_t},
     stat::stat_t
