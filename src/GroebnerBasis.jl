@@ -23,6 +23,7 @@ include("Typedefs.jl")
 include("Interfaces.jl")
 include("F4.jl")
 include("SignatureGB.jl")
+include("Orders.jl")
 
 const pkgdir  = realpath(joinpath(dirname(@__FILE__), ".."))
 const libdir   = joinpath(pkgdir, "deps", "usr", "lib")

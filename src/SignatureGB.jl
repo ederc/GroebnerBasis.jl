@@ -58,7 +58,8 @@ function f5(
     basis.numberTerms   = Array{len_t}(undef, stat.numberGenerators)
     basis.coefficients  = Array{Array{cf_t}}(undef, stat.numberGenerators)
     basis.monomials     = Array{Array{Array{exp_t}}}(undef, stat.numberGenerators)
-
+    basis.signatures    = Array{signature_t}(undef, stat.numberGenerators)
+    
     H = Array{signature_t}(undef, Int((stat.numberGenerators^2 - stat.numberGenerators) / 2))
 
     #= get monomial order =#
@@ -94,7 +95,7 @@ function f5(
     if signatureOrder == 0
         for j in 1:stat.numberGenerators
             for i in 1:j-1
-                H[ind] = signature_t(first(basis.monomials[i]), j)
+                H[ind] = signature_t(first(basis.monomials[i]), sum(first(basis.monomials[i])),j)
                 ind += 1
             end
         end
@@ -126,20 +127,32 @@ function gen_s_pair(
         mon_2[i] = lambd[i] - lt_2[i]
     end
 
-    # this will be the element just added to G so we just check rewriteability w.r.t. H
     sig_1 = mult_signature_by_mon(basis.signatures[i_1], mon_1, stat)
-    if rewriteable(sig_1, syz_signatures, stat)
+    sig_2 = mult_signature_by_mon(basis.signatures[i_2], mon_2, stat)
+    
+    if sig_1 == sig_2
         return nothing
     end
-    
-    sig_2 = mult_signature_by_mon(basis.signatures[i_2], mon_2, stat)
-    rewriters = cat(syz_signatures, reverse(basis.signatures[i_2 + 1:pos_t(end)]); dims=1)
-    if (sig_1 == sig_2 || rewriteable(sig_2, rewriters, stat))
+
+    # this will be the element just added to G so we just check rewriteability w.r.t. H
+    if rewriteable(sig_1, syz_signatures, stat)
         return nothing
     end
 
     if signatureOrder == 0
-        if pot(sig_2, sig_1, monomialOrder)
+        if sig_2.position < sig_1.position
+            if rewriteable(sig_2, syz_signatures, stat)
+                return nothing
+            end
+        end
+    else
+        if rewriteable(sig_2, i_2, basis.signatures, syz_signatures, stat)
+            return nothing
+        end
+    end
+
+    if signatureOrder == 0
+        if pot(sig_2, sig_1, sig_2.degree, sig_1.degree, stat, monomialOrder)
             return s_pair(sig_1, SVector(mon_1, mon_2), SVector(i_1, i_2))
         end
     else
@@ -152,16 +165,36 @@ end
 
 function rewriteable(
     signature::signature_t,
-    rewriters::Array{signature_t},
+    syz::Array{signature_t},
     stat::stat_t
 )
-    for a in reverse(rewriters)
+    for a in syz
         if sig_divisibility(a, signature, stat)
             return true
         end
     end
     return false
 end
+
+function rewriteable(
+    signature::signature_t,
+    ind_gen::pos_t,
+    basis_signatures::Array{signature_t},
+    syz::Array{signature_t},
+    stat::stat_t
+)
+    if rewriteable(signature, syz, stat)
+        return true
+    end
+
+    for i in ind_gen+1:stat.numberGenerators
+        if sig_divisibility(basis_signatures[i], signature, stat)
+            return true
+        end
+    end
+    false
+end
+
 
 #= Monomial arithmetic convenience functions =#
 
@@ -252,52 +285,5 @@ function mult_signature_by_mon(
     stat::stat_t
 )
     res_mon = mult_monomials(mon, signature.monomial, stat)
-    signature_t(res_mon, signature.position)
+    signature_t(res_mon, sum(res_mon), signature.position)
 end
-
-#- (Module) monomial orders -#
-
-"""
-    degrevlex(mon_1::Array{exp_t}, mon_2::Array{exp_t}
-
-Return true if mon_1 < mon_2 in the degrevlex ordering.
-)
-
-"""    
-function degrevlex(
-    mon_1::Array{exp_t},
-    mon_2::Array{exp_t}
-)
-    s, t = sum(mon_1), sum(mon_2)
-    if s == t
-        for I in Iterators.reverse(zip(mon_1, mon_2))
-            if I[1] == I[2]
-                continue
-            else
-                return  I[2] < I[1]
-            end
-        end
-    end
-    return s < t
-
-end
-
-"""
-    pot(sig_1::signature_t, sig_2::signature_t, monorder::Int)
-
-Return true if sig_1 < sig_2 w.r.t. the pot extension of monorder.
-)
-
-"""
-function pot(
-    sig_1::signature_t,
-    sig_2::signature_t,
-    monorder::Int
-)
-    if sig_1.position == sig_2.position && monorder == 0
-        return degrevlex(sig_1.monomial, sig_2.monomial)
-    end
-    return sig_1.position < sig_2.position
-
-end
-

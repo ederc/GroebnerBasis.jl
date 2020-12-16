@@ -15,6 +15,7 @@ end
 
 struct signature_t
     monomial::Array{exp_t}
+    degree::deg_t
     position::pos_t
 end
 
