@@ -237,6 +237,25 @@ function divisibility(
     return false
 end
 
+function divisor(
+    mon_1::Array{exp_t},
+    mon_2::Array{exp_t},
+    stat::stat_t
+)
+    div = Array{exp_t}(undef, stat.numberVariables)
+
+    for i in 1:stat.numberVariables
+        if mon_1[i] <= mon_2[i]
+            div[i] = mon_2[i] - mon_1[i]
+        else
+            return nothing
+        end
+    end
+
+    return div
+end
+
+
 """
    sig_divisibility(sig_1::signature_t, sig_2::signature_t)
 
