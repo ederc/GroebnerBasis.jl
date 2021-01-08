@@ -152,7 +152,7 @@ function gen_s_pair(
     end
 
     if signatureOrder == 0
-        if pot(sig_2, sig_1, sig_2.degree, sig_1.degree, stat, monomialOrder)
+        if pot(sig_2, sig_1, stat, monomialOrder)
             return s_pair(sig_1, SVector(mon_1, mon_2), SVector(i_1, i_2))
         end
     else
