@@ -8,6 +8,7 @@ struct lex{N} <: MonomialOrder{N} end
 lex(N) = lex{N}()
 ordervector(::Lex{N}, monomial::Array{exp_t}) where N = monomial
 
+# probably better to just use s-vectors for static compilation...
 struct degrevlex{N} <: MonomialOrder{N} end
 degrevlex(N) = degrevlex{N}()
 @generated function ordervector(::degrevlex{N},
