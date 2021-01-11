@@ -1,9 +1,10 @@
-mutable struct macaulay_matrix
+mutable struct macaulay_matrix{N, M}
     # first index = pos in pair array, 2nd = pos in pair
     non_basis::Array{SVector{2, pos_t}}
-    in_basis::Array{Tuple{signature_t, pos_t, Array{exp_t}}}
+    in_basis::Array{Tuple{signature_t{N, M}, pos_t, SVector{N, exp_t}}}
+    # need to sort by signature when initializing
     row_indices::Array{pos_t}
-    columns::Set{Array{exp_t}}
+    columns::Set{SVector{N, exp_t}}
     # careful with how you initialize this!
     indexed::Array{Array{pos_t}}
 end
@@ -12,9 +13,9 @@ end
 For each monomial in B, find the corresponding index in A or 0 if it doesn't exist.
 """
 function index_monomials(
-    A::Array{Array{exp_t}},
-    B::Set{Array{exp_t}}
-)
+    A::Array{SVector{exp_t}},
+    B::Set{SVector{N, exp_t}}
+) where N
     indexed = zeros(pos_t, length(B))
     pos = 1
 
@@ -29,11 +30,11 @@ function index_monomials(
 end
 
 function index_monomials(
-    A::Array{Array{exp_t}},
-    multiplier::Array{exp_t},
-    B::Set{Array{exp_t}},
+    A::Array{SVector{N, exp_t}},
+    multiplier::SVector{N, exp_t},
+    B::Set{SVector{N, exp_t}},
     stat::stat_t
-)
+) where N
     for (m, j) in enumerate(A)
         @inbounds A[j] = [m[i] + multiplier[i] for i in 1:stat.numberGenerators]
     end
@@ -43,22 +44,21 @@ function index_monomials(
 """
 Find the non-rewriteble reducer of minimial signature in basis for a given monomial.
 """
-function find_reducers(
-    monomial::Array{exp_t},
-    basis::basis_t,
+function find_reducer(
+    monomial::SVector{N, exp_t},
+    basis::basis_t{N, M},
     syz_signatures::Array{signature_t},
-    signatureOrder::Int,
-    monomialOrder::Int
+    signatureOrder::ModuleOrder{N, MO},
     stat::stat_t
-)
+) where {MO, N, M}
     reducer = nothing
 
     for i in reverse(1:stat.numberGenerators)
-        @inbounds c = divisor(monomial, basis.monomials[i][1], stat)
+        @inbounds c = divisor(monomial, basis.monomials[i][1])
         if c != nothing
-            @inbounds sig = mult_signature_by_mon(basis.signatures[i], c, stat)
+            @inbounds sig = mult_signature_by_mon(basis.signatures[i], c)
             # need to fix orders, this is the absolute worst
-            if reducer != nothing && signatureOrder = 0 && pot(reducer[1], sig, stat, monomialOrder) && rewriteable(sig, i, basis.signatures, syz_signatures, stat)
+            if reducer != nothing && lt(signatureOrder, reducer[1], sig) && rewriteable(sig, i, basis.signatures, syz_signatures, stat)
                 continue
             else
                 reducer = (sig, i, c)
