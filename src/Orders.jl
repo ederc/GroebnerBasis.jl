@@ -2,68 +2,50 @@
 CREDIT: Pierre Lairez - https://gitlab.lip6.fr/lairez/RationalIntegrals.jl/-/blob/master/src/termorder.jl=#
 
 
+@generated function insert(
+    a::SVector{N, T},
+    b::T
+) where {N, T}
+    quote
+        SVector{$(N+1)}([b, $([:(a[$i]) for i=1:N]...)])
+    end
+end
+
+@generated function append(
+    a::SVector{N, T},
+    b::T
+) where {N, T}
+    quote
+        SVector{$(N+1)}[$([:(a[$i]) for i=1:N]...), b]
+    end
+end
+
 abstract type MonomialOrder{N} end
+abstract type ModuleOrder{N, MO} end
 
 struct lex{N} <: MonomialOrder{N} end
 lex(N) = lex{N}()
-ordervector(::Lex{N}, monomial::Array{exp_t}) where N = monomial
+ordervector(::lex{N}, monomial::SVector{N, exp_t}) where N = monomial
 
-# probably better to just use s-vectors for static compilation...
 struct degrevlex{N} <: MonomialOrder{N} end
 degrevlex(N) = degrevlex{N}()
-@generated function ordervector(::degrevlex{N},
-                     monomial::Array{exp_t}) where N
-    sum = :(monomial[1])
-    for i in 2:N
-        sum = :(monomial[$i] + $sum)
-    end
-    quote [$sum, $([:(-monomial[$i]) for i in reverse(1:N-1)]...)] end
+ordervector(::degrevlex{N}, monomial::SVector{N, exp_t}) where N = insert(deleteat(reverse(-monomial), N), sum(monomial))
+
+# this is not ideal, we store the degree, but recompute it above
+struct pot{N, MO} <: ModuleOrder{N, MO} end
+pot(N, MO) = pot{N, MO}()
+function ordervector(::pot{N, MO},
+                     sig::signature_t{N, M}) where {MO, N, M}
+    insert(ordervector(MO, sig.monomial), exp_t(sig.position))
 end
 
-"""
-    degrevlex(mon_1::Array{exp_t}, mon_2::Array{exp_t}
-
-Return true if mon_1 < mon_2 in the degrevlex ordering.
-)
-
-"""    
-function degrevlex(
-    mon_1::Array{exp_t},
-    mon_2::Array{exp_t},
-    deg_1::deg_t,
-    deg_2::deg_t,
-    stat::stat_t
-)
-    if deg_1 == deg_2
-        for i=0:stat.numberVariables-1
-            ind = stat.numberVariables - i
-            if mon_1[ind] == mon_2[ind]
-                continue
-            else
-                return  mon_2[ind] < mon_1[ind]
-            end
-        end
+@inline @generated function compare(a::SVector{N, T},
+                            b::SVector{N, T}) where {N, T}
+    quote
+        $([:(a[$i] < b[$i] && return true ; a[$i] > b[$i] && return false) for i in 1:N]...)
+        return false
     end
-    return deg_1 < deg_2
-
 end
 
-"""
-    pot(sig_1::signature_t, sig_2::signature_t, monorder::Int)
-
-Return true if sig_1 < sig_2 w.r.t. the pot extension of monorder.
-)
-
-"""
-function pot(
-    sig_1::signature_t,
-    sig_2::signature_t,
-    stat::stat_t,
-    monorder::Int
-)
-    if sig_1.position == sig_2.position && monorder == 0
-        return degrevlex(sig_1.monomial, sig_2.monomial, sig_1.degree, sig_2.degree, stat)
-    end
-    return sig_1.position < sig_2.position
-
-end
+lt(t::MonomialOrder{N}, mon_1::SVector{N, exp_t}, mon_2::SVector{N, exp_t}) where N = compare(ordervector(t, mon_1), ordervector(t, mon_2))
+lt(m::ModuleOrder{N, MO}, sig_1::signature_t{N, M}, sig_2::signature_t{N, M}) where {MO, N, M} = compare(ordervector(m, sig_1), ordervector(m, sig_2))
