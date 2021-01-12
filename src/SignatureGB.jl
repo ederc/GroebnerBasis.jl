@@ -235,6 +235,12 @@ multiply two monomials by each other.
 """
 mult_monomials(mon_1::SVector{N, exp_t}, mon_2::SVector{N, exp_t}) where N = SVector{N}([mon_1[i] + mon_2[i] for i=1:N])
 
+function mult_by_monomial(
+    mon::SVector{N, exp_t},
+    pol::Array{SVector{N, exp_t}}
+) where N
+    map(a -> mult_monomials(mon, a), pol)
+end
 
 """
 Multiply a module monomial by a monomial.
