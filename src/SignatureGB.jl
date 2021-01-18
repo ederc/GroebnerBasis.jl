@@ -200,21 +200,13 @@ function divisibility(
     return false
 end
 
+# not great
 function divisor(
     mon_1::SVector{N, exp_t},
-    mon_2::SVector{N, exp_t},
+    mon_2::SVector{N, exp_t}
 ) where N
-    div = Array{exp_t}(undef, stat.numberVariables)
-
-    for i in 1:stat.numberVariables
-        if mon_1[i] <= mon_2[i]
-            div[i] = mon_2[i] - mon_1[i]
-        else
-            return nothing
-        end
-    end
-
-    return SVector{N}(div)
+    !(divisibility(mon_1, mon_2)) && return nothing
+    SVector{N, exp_t}([mon_2[i] - mon_1[i] for i=1:N])
 end
 
 
@@ -233,7 +225,7 @@ end
 """
 multiply two monomials by each other.
 """
-mult_monomials(mon_1::SVector{N, exp_t}, mon_2::SVector{N, exp_t}) where N = SVector{N}([mon_1[i] + mon_2[i] for i=1:N])
+mult_monomials(mon_1::SVector{N, exp_t}, mon_2::SVector{N, exp_t}) where N = SVector{N, exp_t}([mon_1[i] + mon_2[i] for i=1:N])
 
 function mult_by_monomial(
     mon::SVector{N, exp_t},
@@ -247,7 +239,7 @@ Multiply a module monomial by a monomial.
 """
 function mult_signature_by_mon(
     signature::signature_t{N, M},
-    mon::SVector{N, exp_t},
+    mon::SVector{N, exp_t}
 ) where {N, M}
     res_mon = mult_monomials(mon, signature.monomial)
     signature_t{N, M}(res_mon, sum(res_mon), signature.position)
