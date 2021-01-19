@@ -36,9 +36,11 @@ function convert_ff_singular_ideal_to_signature_basis(
         id::Singular.sideal,
         stat::stat_t,
         basis::basis_t
-        )
+)
+    one = zeros(exp_t, stat.numberVariables)
     for i=1:stat.numberGenerators
         basis.numberTerms[i]  = Singular.length(id[i])
+        basis.signatures[i]   = signature_t(one, deg_t(0), pos_t(i))
         basis.coefficients[i] = Array{cf_t}(undef, basis.numberTerms[i])
         basis.monomials[i]    = Array{Array{exp_t}}(undef, basis.numberTerms[i])
         cc  = 1

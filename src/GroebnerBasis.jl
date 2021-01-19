@@ -20,9 +20,11 @@ export f4, f5
 include("Benchmarks.jl")
 include("Example.jl")
 include("Typedefs.jl")
+include("Orders.jl")
 include("Interfaces.jl")
 include("F4.jl")
 include("SignatureGB.jl")
+include("SymbolicPP.jl")
 
 const pkgdir  = realpath(joinpath(dirname(@__FILE__), ".."))
 const libdir   = joinpath(pkgdir, "deps", "usr", "lib")

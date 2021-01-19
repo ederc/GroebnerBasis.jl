@@ -58,7 +58,8 @@ function f5(
     basis.numberTerms   = Array{len_t}(undef, stat.numberGenerators)
     basis.coefficients  = Array{Array{cf_t}}(undef, stat.numberGenerators)
     basis.monomials     = Array{Array{Array{exp_t}}}(undef, stat.numberGenerators)
-
+    basis.signatures    = Array{signature_t}(undef, stat.numberGenerators)
+    
     H = Array{signature_t}(undef, Int((stat.numberGenerators^2 - stat.numberGenerators) / 2))
 
     #= get monomial order =#
@@ -94,7 +95,7 @@ function f5(
     if signatureOrder == 0
         for j in 1:stat.numberGenerators
             for i in 1:j-1
-                H[ind] = signature_t(first(basis.monomials[i]), j)
+                H[ind] = signature_t(first(basis.monomials[i]), sum(first(basis.monomials[i])),j)
                 ind += 1
             end
         end
@@ -108,196 +109,136 @@ end
 function gen_s_pair(
     i_1::pos_t,
     i_2::pos_t,
-    syz_signatures::Array{signature_t},
-    basis::basis_t,
-    monomialOrder::Int,
-    signatureOrder::Int,
+    syz_signatures::Array{signature_t{N, M}},
+    basis::basis_t{N, M},
+    signatureOrder::ModuleOrder{N, MO},
     stat::stat_t
-)
+) where {N, M, MO}
     # assume that the monomials are sorted by the monomial order
     lt_1 = first(basis.monomials[i_1])
     lt_2 = first(basis.monomials[i_2])
-    lambd = mon_lcm(lt_1, lt_2, stat)
-    mon_1 = Array{exp_t}(undef, stat.numberVariables)
-    mon_2 = Array{exp_t}(undef, stat.numberVariables)
+    lambd = mon_lcm(lt_1, lt_2)
 
-    for i in 1:stat.numberVariables
-        mon_1[i] = lambd[i] - lt_1[i]
-        mon_2[i] = lambd[i] - lt_2[i]
-    end
+    mon_1 = SVector{N}([@inbounds lambd[i] - lt_1[i] for i=1:N])
+    mon_2 = SVector{N}([@inbounds lambd[i] - lt_2[i] for i=1:N])
+    
+    sig_1 = mult_signature_by_mon(basis.signatures[i_1], mon_1)
+    sig_2 = mult_signature_by_mon(basis.signatures[i_2], mon_2)
+    
+    sig_1 == sig_2 && return nothing
 
     # this will be the element just added to G so we just check rewriteability w.r.t. H
-    sig_1 = mult_signature_by_mon(basis.signatures[i_1], mon_1, stat)
-    if rewritable(sig_1, syz_signatures, stat)
-        return nothing
-    end
-    
-    sig_2 = mult_signature_by_mon(basis.signatures[i_2], mon_2, stat)
-    rewriters = cat(syz_signatures, reverse(basis.signatures[i_2 + 1:pos_t(end)]); dims=1)
-    if (sig_1 == sig_2 || rewritable(sig_2, rewriters, stat))
-        return nothing
-    end
+    rewriteable(sig_1, syz_signatures) && return nothing
 
-    if signatureOrder == 0
-        if pot(sig_2, sig_1, monomialOrder)
-            return s_pair(sig_1, SVector(mon_1, mon_2), SVector(i_1, i_2))
+    if typeof(signatureOrder) == pot{N, MO}
+        if sig_2.position < sig_1.position
+            if rewriteable(sig_2, syz_signatures)
+                return nothing
+            end
         end
     else
-        #- other sig order to be implemented -#
+        if rewriteable(sig_2, i_2, basis.signatures, syz_signatures, stat)
+            return nothing
+        end
     end
 
-    s_pair(sig_2, SVector(mon_1, mon_2), SVector(i_1, i_2))
+    lt(signatureOrder, sig_2, sig_1) && return s_pair(sig_1, SVector(mon_1, mon_2), SVector(i_1, i_2))
     
+    s_pair(sig_2, SVector(mon_1, mon_2), SVector(i_1, i_2))
 end
 
-function rewritable(
-    signature::signature_t,
-    rewriters::Array{signature_t},
-    stat::stat_t
-)
-    for a in reverse(rewriters)
-        if sig_divisibility(a, signature, stat)
+function rewriteable(
+    signature::signature_t{N, M},
+    syz::Array{signature_t{N, M}}
+) where {N, M}
+    for a in syz
+        if sig_divisibility(a, signature)
             return true
         end
     end
     return false
 end
+
+function rewriteable(
+    signature::signature_t{N, M},
+    ind_gen::pos_t,
+    basis_signatures::Array{signature_t{N, M}},
+    syz::Array{signature_t{N, M}},
+    stat::stat_t
+) where {N, M}
+    if rewriteable(signature, syz)
+        return true
+    end
+
+    for i in ind_gen+1:stat.numberGenerators
+        if sig_divisibility(basis_signatures[i], signature)
+            return true
+        end
+    end
+    false
+end
+
 
 #= Monomial arithmetic convenience functions =#
 
 """
-    mon_lcm(mon_1::Array{exp_t}, mon_2::Array{exp_t})
-
 return the monomial least common multiple of mon_1 and mon_2.
 """
-function mon_lcm(
-    mon_1::Array{exp_t},
-    mon_2::Array{exp_t},
-    stat::stat_t
-)
-    lcm = Array{exp_t}(undef, stat.numberVariables)
-
-    for i=1:length(mon_1)
-        lcm[i] = max(mon_1[i], mon_2[i])
-    end
-
-    return lcm
-end
-
+mon_lcm(mon_1::SVector{N, exp_t}, mon_2::SVector{N, exp_t}) where N = SVector{N}([max(mon_1[i], mon_2[i]) for i=1:N])
 
 """
-    divisibility(mon_1::Array{exp_t}, mon_2::Array{exp_t})
-
 return true if mon_1 divides mon_2.
 """
 function divisibility(
-    mon_1::Array{exp_t},
-    mon_2::Array{exp_t},
-    stat::stat_t
-)
-    lamb = mon_lcm(mon_1, mon_2, stat)
-
-    if lamb == mon_2
-        return true
-    end
+    mon_1::SVector{N, exp_t},
+    mon_2::SVector{N, exp_t}
+) where N
+    mon_2 == mon_lcm(mon_1, mon_2) && return true
 
     return false
 end
+
+# not great
+function divisor(
+    mon_1::SVector{N, exp_t},
+    mon_2::SVector{N, exp_t}
+) where N
+    !(divisibility(mon_1, mon_2)) && return nothing
+    SVector{N, exp_t}([mon_2[i] - mon_1[i] for i=1:N])
+end
+
 
 """
    sig_divisibility(sig_1::signature_t, sig_2::signature_t)
-
-return true if sig_1 divides sig_2.   
 """
 function sig_divisibility(
-    sig_1::signature_t,
-    sig_2::signature_t,
-    stat::stat_t
-)
-    if sig_1.position == sig_2.position
-        if divisibility(sig_1.monomial, sig_2.monomial, stat)
-            return true
-        end
-    end
+    sig_1::signature_t{N, M},
+    sig_2::signature_t{N, M},
+) where {N, M}
+    sig_1.position == sig_2.position && divisibility(sig_1.monomial, sig_2.monomial) && return true
 
     return false
 end
 
 """
-    mult_monomials(mon_1::Array{exp_t}, mon_2::Array{exp_t}, stat::stat_t)
-
 multiply two monomials by each other.
 """
-function mult_monomials(
-    mon_1::Array{exp_t},
-    mon_2::Array{exp_t},
-    stat::stat_t
-)
-    res = Array{exp_t}(undef, stat.numberVariables)
-    for i=1:stat.numberVariables
-        res[i] = mon_1[i] + mon_2[i]
-    end
+mult_monomials(mon_1::SVector{N, exp_t}, mon_2::SVector{N, exp_t}) where N = SVector{N, exp_t}([mon_1[i] + mon_2[i] for i=1:N])
 
-    res
+function mult_by_monomial(
+    mon::SVector{N, exp_t},
+    pol::Array{SVector{N, exp_t}}
+) where N
+    map(a -> mult_monomials(mon, a), pol)
 end
 
 """
-    mult_signature_by_mon(signature::signature_t, mon::Array{exp_t}, stat::stat_t)
-
 Multiply a module monomial by a monomial.
 """
 function mult_signature_by_mon(
-    signature::signature_t,
-    mon::Array{exp_t},
-    stat::stat_t
-)
-    res_mon = mult_monomials(mon, signature.monomial, stat)
-    signature_t(res_mon, signature.position)
+    signature::signature_t{N, M},
+    mon::SVector{N, exp_t}
+) where {N, M}
+    res_mon = mult_monomials(mon, signature.monomial)
+    signature_t{N, M}(res_mon, sum(res_mon), signature.position)
 end
-
-#- (Module) monomial orders -#
-
-"""
-    degrevlex(mon_1::Array{exp_t}, mon_2::Array{exp_t}
-
-Return true if mon_1 < mon_2 in the degrevlex ordering.
-)
-
-"""    
-function degrevlex(
-    mon_1::Array{exp_t},
-    mon_2::Array{exp_t}
-)
-    s, t = sum(mon_1), sum(mon_2)
-    if s == t
-        for I in Iterators.reverse(zip(mon_1, mon_2))
-            if I[1] == I[2]
-                continue
-            else
-                return  I[2] < I[1]
-            end
-        end
-    end
-    return s < t
-
-end
-
-"""
-    pot(sig_1::signature_t, sig_2::signature_t, monorder::Int)
-
-Return true if sig_1 < sig_2 w.r.t. the pot extension of monorder.
-)
-
-"""
-function pot(
-    sig_1::signature_t,
-    sig_2::signature_t,
-    monorder::Int
-)
-    if sig_1.position == sig_2.position && monorder == 0
-        return degrevlex(sig_1.monomial, sig_2.monomial)
-    end
-    return sig_1.position < sig_2.position
-
-end
-
