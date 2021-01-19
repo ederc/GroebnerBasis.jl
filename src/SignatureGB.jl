@@ -130,7 +130,6 @@ function gen_s_pair(
     # this will be the element just added to G so we just check rewriteability w.r.t. H
     rewriteable(sig_1, syz_signatures) && return nothing
 
-
     if typeof(signatureOrder) == pot{N, MO}
         if sig_2.position < sig_1.position
             if rewriteable(sig_2, syz_signatures)
@@ -146,7 +145,6 @@ function gen_s_pair(
     lt(signatureOrder, sig_2, sig_1) && return s_pair(sig_1, SVector(mon_1, mon_2), SVector(i_1, i_2))
     
     s_pair(sig_2, SVector(mon_1, mon_2), SVector(i_1, i_2))
-    
 end
 
 function rewriteable(
