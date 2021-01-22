@@ -39,6 +39,14 @@ function ordervector(::pot{N, MO},
     insert(ordervector(MO, sig.monomial), exp_t(sig.position))
 end
 
+struct top{N, MO} <: ModuleOrder{N, MO} end
+top(N, MO) = top{N, MO}()
+function ordervector(::pot{N, MO},
+                     sig::signature_t{N, M}) where {MO, N, M}
+    append(ordervector(MO, sig.monomial), exp_t(sig.position))
+end
+
+
 @inline @generated function compare(a::SVector{N, T},
                             b::SVector{N, T}) where {N, T}
     quote

@@ -1,30 +1,31 @@
-struct macaulay_matrix{N, M}
+mutable struct macaulay_matrix{N, M}
+    n_cols::Int
     columns::Array{SVector{N, exp_t}}
     row_sigs::Array{signature_t{N, M}}
-    indices::Array{pos_t}
+    entries::Array{Array{cf_t}}
     indexed::Array{Array{pos_t}}
 end
 
 """
-For each monomial in B, find the corresponding index in A or 0 if it doesn't exist.
+For each monomial in A, find the corresponding index in B.
 """
 # ÄNDERN
 function index_monomials(
     A::Array{SVector{N, exp_t}},
     B::Array{SVector{N, exp_t}}
 ) where N
-    indexed = zeros(pos_t, length(B))
-    pos = 1
-
-    for (j, m) in enumerate(B)
-        pos > length(A) && return indexed
-        @inbounds if m == A[pos]
-            @inbounds indexed[j] = pos
-            pos += 1
+    i_2 = 1
+    indexed = Array{pos_t}(undef, length(A))
+    for i in 1:length(A)
+        for j in i_2:length(B)
+            if A[i] == B[j]
+                indexed[i] = j
+                i_2 = j + 1
+                break
+            end
         end
     end
-
-    return indexed
+    indexed
 end
 
 """
@@ -98,9 +99,9 @@ function symbolic_pp(
     # excellent coding
     done = [m for m in done]
     comp = (a, b) -> lt(MO, a, b)
-    sort!(done, lt = comp)
+    sort!(done, lt = comp, rev = true)
     for row in mult_rows
-        sort!(row, lt = comp)
+        sort!(row, lt = comp, rev = true)
         push!(indexed, index_monomials(row, done))
     end
     
@@ -108,7 +109,7 @@ function symbolic_pp(
     comp = (a, b) -> lt(signatureOrder, a, b)
     sort!(tosort, lt = comp, by = x -> x[1])
     
-    macaulay_matrix{N, M}(done, map(x -> x[1], tosort), map(x -> x[2], tosort), map(x -> x[3], tosort))
+    macaulay_matrix{N, M}(length(done), done, map(x -> x[1], tosort), map(x -> basis.coefficients[x[2]], tosort), map(x -> x[3], tosort))
 end
     
         
