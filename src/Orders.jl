@@ -16,7 +16,7 @@ end
     b::T
 ) where {N, T}
     quote
-        SVector{$(N+1)}[$([:(a[$i]) for i=1:N]...), b]
+        SVector{$(N+1)}([$([:(a[$i]) for i=1:N]...), b])
     end
 end
 

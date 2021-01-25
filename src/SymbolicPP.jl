@@ -1,5 +1,6 @@
 mutable struct macaulay_matrix{N, M}
-    n_cols::Int
+    n_cols::pos_t
+    n_rows::pos_t
     columns::Array{SVector{N, exp_t}}
     row_sigs::Array{signature_t{N, M}}
     entries::Array{Array{cf_t}}
@@ -109,7 +110,7 @@ function symbolic_pp(
     comp = (a, b) -> lt(signatureOrder, a, b)
     sort!(tosort, lt = comp, by = x -> x[1])
     
-    macaulay_matrix{N, M}(length(done), done, map(x -> x[1], tosort), map(x -> basis.coefficients[x[2]], tosort), map(x -> x[3], tosort))
+    macaulay_matrix{N, M}(pos_t(length(done)), pos_t(length(row_sigs)), done, map(x -> x[1], tosort), map(x -> basis.coefficients[x[2]], tosort), map(x -> x[3], tosort))
 end
     
         
