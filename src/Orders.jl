@@ -16,7 +16,7 @@ end
     b::T
 ) where {N, T}
     quote
-        SVector{$(N+1)}[$([:(a[$i]) for i=1:N]...), b]
+        SVector{$(N+1)}([$([:(a[$i]) for i=1:N]...), b])
     end
 end
 
@@ -38,6 +38,14 @@ function ordervector(::pot{N, MO},
                      sig::signature_t{N, M}) where {MO, N, M}
     insert(ordervector(MO, sig.monomial), exp_t(sig.position))
 end
+
+struct top{N, MO} <: ModuleOrder{N, MO} end
+top(N, MO) = top{N, MO}()
+function ordervector(::pot{N, MO},
+                     sig::signature_t{N, M}) where {MO, N, M}
+    append(ordervector(MO, sig.monomial), exp_t(sig.position))
+end
+
 
 @inline @generated function compare(a::SVector{N, T},
                             b::SVector{N, T}) where {N, T}
