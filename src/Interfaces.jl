@@ -33,11 +33,11 @@ function convert_ff_singular_ideal_to_array(
 end
 
 function convert_ff_singular_ideal_to_signature_basis(
-        id::Singular.sideal,
-        stat::stat_t,
-        basis::basis_t
-)
-    one = zeros(exp_t, stat.numberVariables)
+    id::Singular.sideal,
+    stat::stat_t,
+    basis::basis_t{N, M}
+) where {N, M}
+    one = @SVector zeros(exp_t, N)
     for i=1:stat.numberGenerators
         basis.numberTerms[i]  = Singular.length(id[i])
         basis.signatures[i]   = signature_t(one, deg_t(0), pos_t(i))

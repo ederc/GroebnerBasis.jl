@@ -41,7 +41,7 @@ function f5(
         reducegb::Int=0,              # reduce final basis
         infolevel::Int=0,             # info level for print outs
         monorder::Symbol=:degrevlex, # monomial order
-        sigorder::Int=0               # signature order
+        sigorder::Symbol=:pot         # signature order
         )
     R     = I.base_ring
     # skip zero generators in ideal
@@ -55,25 +55,29 @@ function f5(
     stat.numberGenerators = Singular.ngens(J)
 
     basis = basis_t()
-    basis.numberTerms   = Array{len_t}(undef, stat.numberGenerators)
-    basis.coefficients  = Array{Array{cf_t}}(undef, stat.numberGenerators)
-    basis.monomials     = Array{Array{Array{exp_t}}}(undef, stat.numberGenerators)
-    basis.signatures    = Array{signature_t}(undef, stat.numberGenerators)
+    basis.numberTerms   = Array(Array{len_t}(undef, stat.numberGenerators))
+    basis.coefficients  = Array(Array{Array{cf_t}}(undef, stat.numberGenerators))
+    basis.monomials     = Array(Array{Array{Array{exp_t}}}(undef, stat.numberGenerators))
+    basis.signatures    = Array(Array{signature_t}(undef, stat.numberGenerators))
     
     H = Array{signature_t}(undef, Int((stat.numberGenerators^2 - stat.numberGenerators) / 2))
 
     #= get monomial order =#
-    monomialOrder = 0
     if monorder == :degrevlex
-        monomialOrder = 0
+        monomialOrder = degrevlex(stat.numberVariables)
     end
     if monorder == :lex
-        monomialOrder = 1
+        monomialOrder = lex(stat.numberVariables)
     end
 
     #= get signature order =#
-    signatureOrder  = sigorder
-
+    if sigorder == :pot
+        signatureOrder = pot(stat.numberVariables, monomialOrder)
+    end
+    if sigorder == :top
+        signatureOrder = top(stat.numberVariables, monomialOrder)
+    end
+    
     #= get field characteristic =#
     stat.characteristic = Singular.characteristic(R)
     if ! Nemo.isprime(Nemo.FlintZZ(stat.characteristic))
@@ -90,21 +94,27 @@ function f5(
     end
 
     #= store trivial syzygies =#
-
     ind = 1
-    if signatureOrder == 0
-        for j in 1:stat.numberGenerators
-            for i in 1:j-1
-                H[ind] = signature_t(first(basis.monomials[i]), sum(first(basis.monomials[i])),j)
-                ind += 1
-            end
+    for j in 1:stat.numberGenerators
+        for i in 1:j-1
+            sig_1 = mult_signature_by_mon(basis.signatures[i], first(basis.monomials[i]))
+            sig_2 = mult_signature_by_mon(basis.signatures[i], first(basis.monomials[j]))
+            lt(signatureOrder, sig_1, sig_2) ? H[ind] = sig_2 : H_ind = sig_1
+            ind += 1
         end
-    else
-        #- to be implemented -#
     end
 end
 
 #= Unfinished =#
+
+# function to initialize initial generators as s-pairs
+function gen_s_pair(
+    i::pos_t,
+    basis::basis_t{N, M}
+) where {N, M}
+    one = @SVector zeros(exp_t, N)
+    s_pair{N, M}(basis.signatures[i], @SVector [one, one], @SVector [i, zero(i)])
+end
 
 function gen_s_pair(
     i_1::pos_t,
@@ -170,7 +180,7 @@ function rewriteable(
         return true
     end
 
-    for i in ind_gen+1:stat.numberGenerators
+    for i in max(stat.start, ind_gen + 1):stat.numberGenerators
         if sig_divisibility(basis_signatures[i], signature)
             return true
         end

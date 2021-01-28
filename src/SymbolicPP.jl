@@ -42,7 +42,7 @@ function find_reducer!(
 ) where {MO, N, M}
     reducer = nothing
 
-    for i in reverse(1:stat.numberGenerators)
+    for i in reverse(stat.start:stat.numberGenerators)
         @inbounds c = divisor(basis.monomials[i][1], monomial)
         if c != nothing
             @inbounds sig = mult_signature_by_mon(basis.signatures[i], c)

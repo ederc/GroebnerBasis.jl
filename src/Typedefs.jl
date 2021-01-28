@@ -1,4 +1,4 @@
-const len_t = UInt32
+#const len_t = UInt32
 const cf_t  = UInt32
 const pos_t = UInt32
 const deg_t = UInt16
@@ -10,7 +10,8 @@ mutable struct stat_t
     numberVariables::Int
     numberGenerators::Int
     characteristic::Int
-    stat_t()  = new()
+    start::Int
+    stat_t(a, b, c) = stat_t(a, b, c, b + 1)
 end
 
 struct signature_t{N, M}
