@@ -41,7 +41,7 @@ end
 
 struct top{N, MO} <: ModuleOrder{N, MO} end
 top(N, MO) = top{N, MO}()
-function ordervector(::pot{N, MO},
+function ordervector(::top{N, MO},
                      sig::signature_t{N, M}) where {MO, N, M}
     append(ordervector(MO, sig.monomial), exp_t(sig.position))
 end
