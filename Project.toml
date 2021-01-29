@@ -15,8 +15,8 @@ gb_jll = "006bdf2e-00d8-555c-bee2-993406487cbf"
 
 [compat]
 BinaryProvider = "^0.5.8"
-Nemo = "^0.18.1"
-Singular = "^0.3, ^0.4"
+Nemo = "^0.19"
+Singular = "^0.4"
 julia = "1.3"
 
 [extras]
