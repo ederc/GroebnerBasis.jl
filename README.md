@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/ederc/GroebnerBasis.jl.svg?branch=master)](https://travis-ci.org/ederc/GroebnerBasis.jl)
 
 This is a julia library which provides an interface between **Singular**
-(https://github.com/Singular/Sources) and **gb** (https://github.com/ederc/gb).
+(https://github.com/Singular/Singular) and **gb** (https://github.com/ederc/gb).
 
 It depends on **Singular.jl** (https://github.com/oscar-system/Singular.jl) for using
 Singular in julia.
