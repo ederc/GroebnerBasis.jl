@@ -12,9 +12,6 @@ using StaticArrays
 import Singular
 import Nemo
 
-export Singular
-export Nemo
-
 export f4, f5
 
 include("Benchmarks.jl")
