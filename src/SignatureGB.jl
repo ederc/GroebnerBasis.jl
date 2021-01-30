@@ -54,13 +54,13 @@ function f5(
     stat.numberVariables  = Singular.nvars(R)
     stat.numberGenerators = Singular.ngens(J)
 
-    basis = basis_t()
+    basis = basis_t{stat.numberVariables, stat.numberGenerators}()
     basis.numberTerms   = Array(Array{len_t}(undef, stat.numberGenerators))
     basis.coefficients  = Array(Array{Array{cf_t}}(undef, stat.numberGenerators))
     basis.monomials     = Array(Array{Array{Array{exp_t}}}(undef, stat.numberGenerators))
-    basis.signatures    = Array(Array{signature_t}(undef, stat.numberGenerators))
+    basis.signatures    = Array(Array{signature_t{stat.numberVariables, stat.numberGenerators}}(undef, stat.numberGenerators))
     
-    H = Array{signature_t}(undef, Int((stat.numberGenerators^2 - stat.numberGenerators) / 2))
+    H = Array{signature_t{stat.numberVariables, stat.numberGenerators}}(undef, Int((stat.numberGenerators^2 - stat.numberGenerators) / 2))
 
     #= get monomial order =#
     if monorder == :degrevlex
@@ -79,7 +79,7 @@ function f5(
     end
     
     #= get field characteristic =#
-    stat.characteristic = Singular.characteristic(R)
+    stat.characteristic = cf_t(Singular.characteristic(R))
     if ! Nemo.isprime(Nemo.FlintZZ(stat.characteristic))
         error("At the moment GroebnerBasis only supports finite fields and the rationals.")
         return 0
@@ -99,10 +99,49 @@ function f5(
         for i in 1:j-1
             sig_1 = mult_signature_by_mon(basis.signatures[i], first(basis.monomials[i]))
             sig_2 = mult_signature_by_mon(basis.signatures[i], first(basis.monomials[j]))
-            lt(signatureOrder, sig_1, sig_2) ? H[ind] = sig_2 : H_ind = sig_1
+            lt(signatureOrder, sig_1, sig_2) ? H[ind] = sig_2 : H[ind] = sig_1
             ind += 1
         end
     end
+
+    #= initial generators as s-pairs =#
+    pairset = s_pair{stat.numberVariables, stat.numberGenerators}[]
+    for i in 1:stat.numberGenerators:
+        push!(pairset, gen_s_pair(i, basis))
+    end
+    sort!(pairset, by = (pair -> pair.degree))
+
+    #= main loop =#
+    while !(isempty(pairset))
+        mon_poly_pairs = select_by_degree(pairset)
+        leadterms = [mult_monomials(mon_poly_pairs[i][1], first(basis.monomials[mon_poly_pairs[i][2]])) for i in 1:2:length(mon_poly_pairs)]
+        mat = symbolic_pp(basis, H, signatureOrder, stat, mon_poly_pairs)
+        mat = reduction!(mat, stat.characteristic)
+
+        for i in reverse(1:mat.n_rows)
+            if isempty(mat.indexed[i])
+                push!(H, row_sigs[i])
+                pairset = new_rewriter!(pairset, row_sigs[i])
+            end
+            mat.columns[mat.indexed[i]] in leadterms && continue
+            # new gb element
+            push!(basis.numberTerms, len_t(length(mat.indexed[i])))
+            push!(basis.coefficients, mat.entries[i])
+            push!(basis.monomials, [mat.columns[j] for j in mat.indexed[i]])
+            push!(basis.signatures, mat.row_sigs[i])
+            pairset = new_rewriter!(pairset, row_sigs[i])
+            j = pos_t(length(basis_signatures))
+            for i in stat.start + 1:j
+                pair = gen_s_pair(pos_t(i), j, H, basis, signatureOrder, stat)
+                pair != nothing && push!(pairset, pair)
+            end
+        end
+        sort!(pairset, by = (pair -> pair.degree))
+        # TODO: generate new trivial syzygy signatures
+                
+    end
+end
+    
 end
 
 #= Unfinished =#
@@ -113,7 +152,7 @@ function gen_s_pair(
     basis::basis_t{N, M}
 ) where {N, M}
     one = @SVector zeros(exp_t, N)
-    s_pair{N, M}(basis.signatures[i], @SVector [one, one], @SVector [i, zero(i)])
+    s_pair{N, M}(basis.signatures[i], @SVector [one, one], @SVector [i, zero(i)], basis)
 end
 
 function gen_s_pair(
@@ -152,9 +191,9 @@ function gen_s_pair(
         end
     end
 
-    lt(signatureOrder, sig_2, sig_1) && return s_pair(sig_1, SVector(mon_1, mon_2), SVector(i_1, i_2))
+    lt(signatureOrder, sig_2, sig_1) && return s_pair(sig_1, SVector(mon_1, mon_2), SVector(i_1, i_2), basis)
     
-    s_pair(sig_2, SVector(mon_1, mon_2), SVector(i_1, i_2))
+    s_pair(sig_2, SVector(mon_1, mon_2), SVector(i_1, i_2), basis)
 end
 
 function rewriteable(
@@ -188,6 +227,42 @@ function rewriteable(
     false
 end
 
+function new_rewriter!(
+    pairset::Array{s_pair{N, M}},
+    sig::signature_t{N, M}
+) where {N, M}
+    for (pair, i) in enumerate(pairset)
+        if sig_divisibility(sig, pair.signature)
+            deleteat!(pairset, i)
+            continue
+        end
+        
+        other_sig = mult_signature_by_mon(basis.signatures[pair.indices[2]], pair.mult_monomials[2])
+        if sig_divisibility(sig, other_sig)
+            deleteat!(pairset, i)
+            continue
+        end
+    end
+    pairset
+end
+
+# select all s_pairs of minimal degree provided the pairset is sorted by degree
+# this might not update pairset correctly
+function select_by_degree(
+    pairset::Array{s_pair{N,M}}
+) where {N, M}
+    mon_poly_pairs = Array{Tuple{SVector{N, exp_t}}, pos_t}
+    degree = pairset[1].degree
+    for (s-pair, i) in enumerate(pairset)
+        if s-pair.degree == degree
+            append!(mon_poly_pairs, [ (s-pair.mult_monomials[i], s-pair.indices[i]) for i = 1:2])
+            deleteat!(pairset, i)
+            continue
+        end
+        return mon_poly_pairs
+    end
+    mon_poly_pairs
+end
 
 #= Monomial arithmetic convenience functions =#
 
