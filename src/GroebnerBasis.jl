@@ -12,9 +12,6 @@ using StaticArrays
 import Singular
 import Nemo
 
-export Singular
-export Nemo
-
 export f4, f5
 
 include("Benchmarks.jl")
@@ -49,7 +46,7 @@ function __init__()
 end
 
 function versioninfo()
-    print("GroebnerBasis v0.1.0\n")
+    print("GroebnerBasis v0.2.0\n")
     gbrepo = dirname(dirname(@__FILE__))
 
     print("GroebnerBasis: ")
