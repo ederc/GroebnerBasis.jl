@@ -1,4 +1,4 @@
-#const len_t = UInt32
+const len_t = UInt32
 const cf_t  = UInt32
 const pos_t = UInt32
 const deg_t = UInt16
@@ -9,9 +9,9 @@ export stat_t, pos_t, signature_t, s_pair, basis_t
 mutable struct stat_t
     numberVariables::Int
     numberGenerators::Int
-    characteristic::Int
+    characteristic::UInt32
     start::Int
-    stat_t(a, b, c) = new(a, b, c, b + 1)
+    stat_t(a, b, c) = new(a, b, UInt32(c), b + 1)
 end
 
 struct signature_t{N, M}
