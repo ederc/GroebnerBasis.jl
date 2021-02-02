@@ -58,6 +58,7 @@ function reduction!(
     char::cf_t
 ) where {N, M}
     for i in reverse(1:Mat.n_rows)
+        isempty(Mat.indexed[i]) && continue
         piv_ind = Mat.indexed[i][1]
         for j in 1:i-1
             Mat.indexed[j][1] > piv_ind && !(piv_ind in Mat.indexed[j]) && continue
@@ -66,5 +67,4 @@ function reduction!(
             Mat.indexed[j] = new_indexed
         end
     end
-    Mat
 end

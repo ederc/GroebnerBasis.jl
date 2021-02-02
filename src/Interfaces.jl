@@ -33,16 +33,15 @@ function convert_ff_singular_ideal_to_array(
 end
 
 function convert_ff_singular_ideal_to_signature_basis(
-        id::Singular.sideal,
-        stat::stat_t,
-        basis::basis_t
-)
-    one = zeros(exp_t, stat.numberVariables)
-    for i=1:stat.numberGenerators
+    id::Singular.sideal,
+    basis::basis_t{N, M}
+) where {N, M}
+    one = @SVector zeros(exp_t, N)
+    for i=1:M
         basis.numberTerms[i]  = Singular.length(id[i])
-        basis.signatures[i]   = signature_t(one, deg_t(0), pos_t(i))
+        basis.signatures[i]   = signature_t{N, M}(one, deg_t(0), pos_t(i))
         basis.coefficients[i] = Array{cf_t}(undef, basis.numberTerms[i])
-        basis.monomials[i]    = Array{Array{exp_t}}(undef, basis.numberTerms[i])
+        basis.monomials[i]    = Array{SVector{N, exp_t}}(undef, basis.numberTerms[i])
         cc  = 1
         ec  = 1
         for c in Singular.coeffs(id[i])
@@ -50,10 +49,7 @@ function convert_ff_singular_ideal_to_signature_basis(
             cc += 1
         end
         for e in Singular.exponent_vectors(id[i])
-            basis.monomials[i][ec]    = Array{exp_t}(undef, stat.numberGenerators)
-            for j = 1:stat.numberVariables
-                basis.monomials[i][ec][j] = exp_t(e[j])
-            end
+            basis.monomials[i][ec]    = SVector{N, exp_t}(e)
             ec +=  1
         end
     end

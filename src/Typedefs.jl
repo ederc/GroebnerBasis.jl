@@ -9,8 +9,9 @@ export stat_t, pos_t, signature_t, s_pair, basis_t
 mutable struct stat_t
     numberVariables::Int
     numberGenerators::Int
-    characteristic::Int
-    stat_t()  = new()
+    characteristic::UInt32
+    start::Int
+    stat_t(a, b, c) = new(a, b, UInt32(c), b + 1)
 end
 
 struct signature_t{N, M}
@@ -23,6 +24,8 @@ struct s_pair{N, M}
     signature::signature_t{N, M}
     mult_monomials::SVector{2, SVector{N, exp_t}}
     indices::SVector{2, pos_t}
+    degree::deg_t
+    s_pair{N, M}(a, b, c, basis) where {N, M} = new(a, b, c, sum(b[1]) + sum(first(basis.monomials[c[1]])))
 end
 
 mutable struct basis_t{N, M}
