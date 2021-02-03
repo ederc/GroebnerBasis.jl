@@ -1,13 +1,3 @@
-mutable struct macaulay_matrix{N, M}
-    n_cols::pos_t
-    n_rows::pos_t
-    columns::Array{SVector{N, exp_t}}
-    row_sigs::Array{signature_t{N, M}}
-    entries::Array{Array{cf_t}}
-    basis_indices::Array{pos_t}
-    indexed::Array{Array{pos_t}}
-end
-
 """
 For each monomial in A, find the corresponding index in B.
 """

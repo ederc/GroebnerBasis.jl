@@ -37,3 +37,13 @@ mutable struct basis_t{N, M}
     signatures::Array{signature_t{N, M}}
     basis_t{N, M}() where {N, M} = new()
 end
+
+mutable struct macaulay_matrix{N, M}
+    n_cols::pos_t
+    n_rows::pos_t
+    columns::Array{SVector{N, exp_t}}
+    row_sigs::Array{signature_t{N, M}}
+    entries::Array{Array{cf_t}}
+    basis_indices::Array{pos_t}
+    indexed::Array{Array{pos_t}}
+end
