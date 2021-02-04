@@ -37,11 +37,13 @@ function find_reducer!(
         @inbounds c = divisor(basis.monomials[i][1], monomial[1])
         if c != nothing
             @inbounds sig = mult_signature_by_mon(basis.signatures[i], c)
-            if reducer != nothing && lt(signatureOrder, reducer[1], sig) && rewriteable(sig, i, basis.signatures, syz_signatures, stat)
+            if reducer != nothing && lt(signatureOrder, reducer[1], sig) && rewriteable(sig, pos_t(i), basis.signatures, syz_signatures, stat)
                 continue
             else
-                !(lt(signatureOrder, sig, monomial[2])) && continue
                 reducer = (sig, i, c)
+                if !(lt(signatureOrder, sig, monomial[2]))
+                    reducer = nothing
+                end
             end
         end
     end

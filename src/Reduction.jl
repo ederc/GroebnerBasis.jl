@@ -61,6 +61,7 @@ function reduction!(
         isempty(Mat.indexed[i]) && continue
         piv_ind = Mat.indexed[i][1]
         for j in 1:i-1
+            isempty(Mat.indexed[j]) && continue
             Mat.indexed[j][1] > piv_ind && !(piv_ind in Mat.indexed[j]) && continue
             new_row, new_indexed = reduce_dense_row(Mat.entries[j], Mat.entries[i], Mat.indexed[j], Mat.indexed[i], piv_ind, Mat.n_cols, char)
             Mat.entries[j] = new_row

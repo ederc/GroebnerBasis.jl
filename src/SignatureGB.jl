@@ -106,39 +106,42 @@ function f5(
     for i in 1:stat.numberGenerators
         push!(pairset, gen_s_pair(pos_t(i), basis))
     end
-    sort!(pairset, by = (pair -> pair.degree), rev = true)
+    sort!(pairset, by = (pair -> pair.degree))
 
     #= main loop =#
     while !(isempty(pairset))
         mon_poly_pairs = select_by_degree!(pairset)
         mat = symbolic_pp(basis, H, signatureOrder, stat, mon_poly_pairs)
-        leadterms = Set(mat.columns[mat.indexed[i][1]] for i in 1:mat.n_rows)
+        leadterms = Set((mat.row_sigs[i], mat.columns[mat.indexed[i][1]]) for i in 1:mat.n_rows)
+        print("\n")
+        print(mat.row_sigs)
+        print("\n")
         reduction!(mat, stat.characteristic)
         
         for i in reverse(1:mat.n_rows)
             if isempty(mat.indexed[i])
-                push!(H, row_sigs[i])
-                new_rewriter!(pairset, row_sigs[i], basis, zero(pos_t))
-            end
-            
-            mat.basis_indices[i] >= stat.start && mat.columns[mat.indexed[i][1]] in leadterms && continue
-            # new gb element
-            push!(basis.numberTerms, len_t(length(mat.indexed[i])))
-            push!(basis.coefficients, mat.entries[i])
-            push!(basis.monomials, [mat.columns[j] for j in mat.indexed[i]])
-            push!(basis.signatures, mat.row_sigs[i])
-            stat.numberGenerators += 1
-            j = pos_t(length(basis.signatures))
-            new_rewriter!(pairset, mat.row_sigs[i], basis, j)
-            gen_trivial_syzygies!(H, basis, stat, signatureOrder, j)
-            for i in stat.start:j
-                pair = gen_s_pair(j, pos_t(i), H, basis, signatureOrder, stat)
-                pair != nothing && push!(pairset, pair)
+                push!(H, mat.row_sigs[i])
+                new_rewriter!(pairset, mat.row_sigs[i], basis, zero(pos_t))
+            else
+                mat.basis_indices[i] >= stat.start && (mat.row_sigs[i], mat.columns[mat.indexed[i][1]]) in leadterms && continue
+                # new gb element
+                push!(basis.numberTerms, len_t(length(mat.indexed[i])))
+                push!(basis.coefficients, mat.entries[i])
+                push!(basis.monomials, [mat.columns[j] for j in mat.indexed[i]])
+                push!(basis.signatures, mat.row_sigs[i])
+                stat.numberGenerators += 1
+                j = pos_t(length(basis.signatures))
+                new_rewriter!(pairset, mat.row_sigs[i], basis, j)
+                gen_trivial_syzygies!(H, basis, stat, signatureOrder, j)
+                for i in stat.start:j
+                    pair = gen_s_pair(j, pos_t(i), H, basis, signatureOrder, stat)
+                    pair != nothing && push!(pairset, pair)
+                end
             end
         end
-                
+        sort!(pairset, by = (pair -> pair.degree))
     end
-    basis
+    convert_signature_basis_to_ff_singular_ideal(I, basis, stat)
 end
 
 function gen_trivial_syzygies!(
@@ -250,11 +253,13 @@ function new_rewriter!(
             push!(to_delete, i)
             continue
         end
-        
-        other_sig = mult_signature_by_mon(basis.signatures[pair.indices[2]], pair.mult_monomials[2])
-        if pos_t(i) != pair.indices[2] && sig_divisibility(sig, other_sig)
-            push!(to_delete, i)
-            continue
+
+        if pair.indices[2] != pos_t(0)
+            other_sig = mult_signature_by_mon(basis.signatures[pair.indices[2]], pair.mult_monomials[2])
+            if pos_t(i) != pair.indices[2] && sig_divisibility(sig, other_sig)
+                push!(to_delete, i)
+                continue
+            end
         end
     end
     deleteat!(pairset, to_delete)
