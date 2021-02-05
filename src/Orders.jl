@@ -1,7 +1,6 @@
 #= (Module) monomial orders
 CREDIT: Pierre Lairez - https://gitlab.lip6.fr/lairez/RationalIntegrals.jl/-/blob/master/src/termorder.jl=#
 
-
 @generated function insert(
     a::SVector{N, T},
     b::T

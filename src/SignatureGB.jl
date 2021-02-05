@@ -112,10 +112,7 @@ function f5(
     while !(isempty(pairset))
         mon_poly_pairs = select_by_degree!(pairset)
         mat = symbolic_pp(basis, H, signatureOrder, stat, mon_poly_pairs)
-        leadterms = Set((mat.row_sigs[i], mat.columns[mat.indexed[i][1]]) for i in 1:mat.n_rows)
-        print("\n")
-        print(mat.row_sigs)
-        print("\n")
+        leadterms = Set(mat.columns[mat.indexed[i][1]] for i in 1:mat.n_rows)
         reduction!(mat, stat.characteristic)
         
         for i in reverse(1:mat.n_rows)
@@ -123,8 +120,9 @@ function f5(
                 push!(H, mat.row_sigs[i])
                 new_rewriter!(pairset, mat.row_sigs[i], basis, zero(pos_t))
             else
-                mat.basis_indices[i] >= stat.start && (mat.row_sigs[i], mat.columns[mat.indexed[i][1]]) in leadterms && continue
+                mat.basis_indices[i] >= stat.start && mat.columns[mat.indexed[i][1]] in leadterms && continue
                 # new gb element
+                push!(leadterms, mat.columns[mat.indexed[i][1]])
                 push!(basis.numberTerms, len_t(length(mat.indexed[i])))
                 push!(basis.coefficients, mat.entries[i])
                 push!(basis.monomials, [mat.columns[j] for j in mat.indexed[i]])
