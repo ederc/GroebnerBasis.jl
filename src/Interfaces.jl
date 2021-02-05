@@ -55,6 +55,24 @@ function convert_ff_singular_ideal_to_signature_basis(
     end
 end
 
+function convert_signature_basis_to_ff_singular_ideal(
+    id::Singular.sideal,
+    basis::basis_t{N, M},
+    stat::stat_t
+) where {N, M}
+    R = id.base_ring
+    gens = []
+    for i in stat.start:stat.numberGenerators
+        C = Singular.MPolyBuildCtx(R)
+        for (j, m) in enumerate(basis.monomials[i])
+            n = Array([Int64(e) for e in m])
+            Singular.push_term!(C, R.base_ring(basis.coefficients[i][j]), n)
+        end
+        push!(gens, Singular.finish(C))
+    end
+    Singular.Ideal(R, gens...)
+end
+
 function convert_qq_singular_ideal_to_array(
         id::Singular.sideal,
         nvars::Int,
