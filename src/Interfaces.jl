@@ -70,7 +70,9 @@ function convert_signature_basis_to_ff_singular_ideal(
         end
         push!(gens, Singular.finish(C))
     end
-    Singular.Ideal(R, gens...)
+    G = Singular.Ideal(R, gens...)
+    G.isGB = true
+    G
 end
 
 function convert_qq_singular_ideal_to_array(
