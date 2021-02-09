@@ -102,7 +102,7 @@ function f5(
     end
 
     #= initial generators as s-pairs =#
-    pairset = s_pair{stat.numberVariables, stat.numberGenerators}[]
+    pairset = s_pair{stat.numberVariables, stat.start - 1}[]
     for i in 1:stat.numberGenerators
         push!(pairset, gen_s_pair(pos_t(i), basis))
     end
@@ -110,9 +110,9 @@ function f5(
 
     #= main loop =#
     while !(isempty(pairset))
-        mon_poly_pairs = select_by_degree!(pairset)
-        mat = symbolic_pp(basis, H, signatureOrder, stat, mon_poly_pairs)
-        leadterms = Set(mat.columns[mat.indexed[i][1]] for i in 1:mat.n_rows)
+        mon_poly_pairs, flags = select_by_degree!(pairset)
+        mat = symbolic_pp(basis, H, signatureOrder, stat, mon_poly_pairs, flags)
+        leadterms = Set((mat.row_sigs[i], mat.columns[mat.indexed[i][1]]) for i in 1:mat.n_rows)
         reduction!(mat, stat.characteristic)
         
         for i in reverse(1:mat.n_rows)
@@ -120,9 +120,9 @@ function f5(
                 push!(H, mat.row_sigs[i])
                 new_rewriter!(pairset, mat.row_sigs[i], basis, zero(pos_t))
             else
-                mat.basis_indices[i] >= stat.start && mat.columns[mat.indexed[i][1]] in leadterms && continue
+                mat.basis_indices[i] >= stat.start && (mat.row_sigs[i], mat.columns[mat.indexed[i][1]]) in leadterms && continue
                 # new gb element
-                push!(leadterms, mat.columns[mat.indexed[i][1]])
+                push!(leadterms, (mat.row_sigs[i], mat.columns[mat.indexed[i][1]]))
                 push!(basis.numberTerms, len_t(length(mat.indexed[i])))
                 push!(basis.coefficients, mat.entries[i])
                 push!(basis.monomials, [mat.columns[j] for j in mat.indexed[i]])
@@ -137,7 +137,6 @@ function f5(
                 end
             end
         end
-        sort!(pairset, by = (pair -> pair.degree))
     end
     convert_signature_basis_to_ff_singular_ideal(I, basis, stat)
 end
@@ -149,7 +148,8 @@ function gen_trivial_syzygies!(
     signatureOrder::ModuleOrder{N, MO},
     j::pos_t
 ) where {N, M, MO}
-    for i in 1:stat.start-1
+    for i in stat.start:stat.numberGenerators
+        i == j && continue
         sig_1 = mult_signature_by_mon(basis.signatures[i], first(basis.monomials[j]))
         sig_2 = mult_signature_by_mon(basis.signatures[j], first(basis.monomials[i]))
         lt(signatureOrder, sig_1, sig_2) ? push!(H, sig_2) : push!(H, sig_1)
@@ -247,14 +247,14 @@ function new_rewriter!(
 ) where {N, M}
     to_delete = Int[]
     for (i, pair) in enumerate(pairset)
-        if pos_t(i) != pair.indices[1] && sig_divisibility(sig, pair.signature)
+        if sig_divisibility(sig, pair.signature)
             push!(to_delete, i)
             continue
         end
 
         if pair.indices[2] != pos_t(0)
             other_sig = mult_signature_by_mon(basis.signatures[pair.indices[2]], pair.mult_monomials[2])
-            if pos_t(i) != pair.indices[2] && sig_divisibility(sig, other_sig)
+            if sig_divisibility(sig, other_sig)
                 push!(to_delete, i)
                 continue
             end
@@ -269,20 +269,27 @@ function select_by_degree!(
     pairset::Array{s_pair{N,M}}
 ) where {N, M}
     mon_poly_pairs = Tuple{SVector{N, exp_t}, pos_t}[]
+    flags = Bool[]
     degree = pairset[1].degree
     to_delete = Int[]
     for (i, spair) in enumerate(pairset)
         if spair.degree == degree
             push!(mon_poly_pairs, (spair.mult_monomials[1], spair.indices[1]))
-            spair.indices[2] != zero(spair.indices[2]) && push!(mon_poly_pairs, (spair.mult_monomials[2], spair.indices[2]))
+            if spair.indices[2] == zero(spair.indices[2])
+                push!(flags, true)
+                continue
+            end
+            push!(mon_poly_pairs, (spair.mult_monomials[2], spair.indices[2]))
+            push!(flags, false)
+            push!(flags, false)
             push!(to_delete, i)
             continue
         end
         deleteat!(pairset, to_delete)
-        return mon_poly_pairs
+        return mon_poly_pairs, flags
     end
     deleteat!(pairset, to_delete)
-    mon_poly_pairs
+    mon_poly_pairs, flags
 end
 
 #= Monomial arithmetic convenience functions =#
