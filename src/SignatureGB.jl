@@ -118,6 +118,7 @@ function f5(
         for i in reverse(1:mat.n_rows)
             if isempty(mat.indexed[i])
                 push!(H, mat.row_sigs[i])
+                println("row reduced to zero in index $(mat.row_sigs[i].position)")
                 new_rewriter!(pairset, mat.row_sigs[i], basis, zero(pos_t))
             else
                 mat.basis_indices[i] >= stat.start && (mat.row_sigs[i], mat.columns[mat.indexed[i][1]]) in leadterms && continue
