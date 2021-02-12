@@ -111,14 +111,23 @@ function f5(
     #= main loop =#
     while !(isempty(pairset))
         mon_poly_pairs, flags = select_by_degree!(pairset)
+        printstyled("pair signatures\n"; color =:green)
+        for elem in mon_poly_pairs
+            println(mult_signature_by_mon(basis.signatures[elem[2]], elem[1]))
+        end
         mat = symbolic_pp(basis, H, signatureOrder, stat, mon_poly_pairs, flags)
         leadterms = Set((mat.row_sigs[i], mat.columns[mat.indexed[i][1]]) for i in 1:mat.n_rows)
+        printstyled("row signatures\n"; color =:yellow)
+        for (i, sig) in enumerate(mat.row_sigs)
+            println(sig)
+        end
         reduction!(mat, stat.characteristic)
         
         for i in reverse(1:mat.n_rows)
             if isempty(mat.indexed[i])
                 push!(H, mat.row_sigs[i])
                 println("row reduced to zero in index $(mat.row_sigs[i].position)")
+                println(mat.row_sigs[i])
                 new_rewriter!(pairset, mat.row_sigs[i], basis, zero(pos_t))
             else
                 mat.basis_indices[i] >= stat.start && (mat.row_sigs[i], mat.columns[mat.indexed[i][1]]) in leadterms && continue
@@ -132,11 +141,16 @@ function f5(
                 j = pos_t(length(basis.signatures))
                 new_rewriter!(pairset, mat.row_sigs[i], basis, j)
                 gen_trivial_syzygies!(H, basis, stat, signatureOrder, j)
-                for i in stat.start:j
+                for i in stat.start:j-1
                     pair = gen_s_pair(j, pos_t(i), H, basis, signatureOrder, stat)
                     pair != nothing && push!(pairset, pair)
                 end
             end
+        end
+        printstyled("basis signatures, lead terms\n"; color =:red)
+        for i in stat.start:stat.numberGenerators
+            println(basis.signatures[i])
+            println(first(basis.monomials[i]))
         end
     end
     convert_signature_basis_to_ff_singular_ideal(I, basis, stat)
@@ -203,6 +217,10 @@ function gen_s_pair(
             return nothing
         end
     end
+
+    printstyled("generated pair between $(i_1+1-stat.start) and $(i_2+1-stat.start)\n", color =:blue)
+    println(sig_1)
+    println(sig_2)
 
     lt(signatureOrder, sig_2, sig_1) && return s_pair{N, M}(sig_1, SVector(mon_1, mon_2), SVector(i_1, i_2), basis)
     
