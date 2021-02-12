@@ -112,17 +112,19 @@ function f5(
     while !(isempty(pairset))
         mon_poly_pairs, flags = select_by_degree!(pairset)
         mat = symbolic_pp(basis, H, signatureOrder, stat, mon_poly_pairs, flags)
-        leadterms = Set((mat.row_sigs[i], mat.columns[mat.indexed[i][1]]) for i in 1:mat.n_rows)
+        leadterms = Set([mat.columns[mat.indexed[i][1]] for i in 1:mat.n_rows])
         reduction!(mat, stat.characteristic)
         
         for i in reverse(1:mat.n_rows)
             if isempty(mat.indexed[i])
                 push!(H, mat.row_sigs[i])
+                println("row reduced to zero in index $(mat.row_sigs[i].position)")
+                println(mat.row_sigs[i])
                 new_rewriter!(pairset, mat.row_sigs[i], basis, zero(pos_t))
             else
-                mat.basis_indices[i] >= stat.start && (mat.row_sigs[i], mat.columns[mat.indexed[i][1]]) in leadterms && continue
+                mat.basis_indices[i] >= stat.start && mat.columns[mat.indexed[i][1]] in leadterms && continue
                 # new gb element
-                push!(leadterms, (mat.row_sigs[i], mat.columns[mat.indexed[i][1]]))
+                push!(leadterms, mat.columns[mat.indexed[i][1]])
                 push!(basis.numberTerms, len_t(length(mat.indexed[i])))
                 push!(basis.coefficients, mat.entries[i])
                 push!(basis.monomials, [mat.columns[j] for j in mat.indexed[i]])
@@ -131,7 +133,7 @@ function f5(
                 j = pos_t(length(basis.signatures))
                 new_rewriter!(pairset, mat.row_sigs[i], basis, j)
                 gen_trivial_syzygies!(H, basis, stat, signatureOrder, j)
-                for i in stat.start:j
+                for i in stat.start:j-1
                     pair = gen_s_pair(j, pos_t(i), H, basis, signatureOrder, stat)
                     pair != nothing && push!(pairset, pair)
                 end
@@ -191,16 +193,9 @@ function gen_s_pair(
     # this will be the element just added to G so we just check rewriteability w.r.t. H
     rewriteable(sig_1, syz_signatures) && return nothing
 
-    if typeof(signatureOrder) == pot{N, MO}
-        if sig_2.position < sig_1.position
-            if rewriteable(sig_2, syz_signatures)
-                return nothing
-            end
-        end
-    else
-        if rewriteable(sig_2, i_2, basis.signatures, syz_signatures, stat)
-            return nothing
-        end
+
+    if rewriteable(sig_2, i_2, basis.signatures, syz_signatures, stat)
+        return nothing
     end
 
     lt(signatureOrder, sig_2, sig_1) && return s_pair{N, M}(sig_1, SVector(mon_1, mon_2), SVector(i_1, i_2), basis)
