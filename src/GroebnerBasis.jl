@@ -11,6 +11,7 @@ using StaticArrays
 
 import Singular
 import Nemo
+import Hecke
 
 export f4, f5
 
