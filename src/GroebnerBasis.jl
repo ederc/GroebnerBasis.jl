@@ -13,7 +13,7 @@ import Singular
 import Nemo
 import Hecke
 
-export f4, f5
+export f4, f5, msolve
 
 include("Benchmarks.jl")
 include("Example.jl")
@@ -24,7 +24,7 @@ include("F4.jl")
 include("Reduction.jl")
 include("SymbolicPP.jl")
 include("SignatureGB.jl")
-#include("Msolve.jl")
+include("Msolve.jl")
 
 const pkgdir  = realpath(joinpath(dirname(@__FILE__), ".."))
 const libdir   = joinpath(pkgdir, "deps", "usr", "lib")
