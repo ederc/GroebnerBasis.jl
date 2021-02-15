@@ -43,7 +43,9 @@ mutable struct macaulay_matrix{N, M}
     n_rows::pos_t
     columns::Array{SVector{N, exp_t}}
     row_sigs::Array{signature_t{N, M}}
-    entries::Array{Array{cf_t}}
+    entries::Array{SparseVector{cf_t}}
     basis_indices::Array{pos_t}
-    indexed::Array{Array{pos_t}}
+    flags
 end
+macaulay_matrix{N, M}(n_cols, n_rows, columns, row_sigs, entries, basis_indices) where {N, M} =
+    macaulay_matrix{N, M}(n_cols, n_rows, columns, row_sigs, entries, basis_indices, falses(n_rows))

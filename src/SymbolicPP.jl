@@ -91,17 +91,21 @@ function symbolic_pp(
     # excellent coding
     done = [m for m in done]
     comp = (a, b) -> lt(MO, a, b)
-    sort!(done, lt = comp, rev = true)
-    for row in mult_rows
-        sort!(row, lt = comp, rev = true)
-        push!(indexed, index_monomials(row, done))
-    end
+    sort!(done, lt = comp, rev = true)    
     
-    tosort = [(row_sigs[i], indices[i], indexed[i]) for i in eachindex(mult_rows)]
+    tosort = [(row_sigs[i], indices[i], mult_rows[i]) for i in eachindex(mult_rows)]
     comp = (a, b) -> lt(signatureOrder, a, b)
     sort!(tosort, lt = comp, by = x -> x[1], rev=true)
     
-    macaulay_matrix{N, M}(pos_t(length(done)), pos_t(length(row_sigs)), done, map(x -> x[1], tosort), map(x -> basis.coefficients[x[2]], tosort), map(x -> x[2], tosort), map(x -> x[3], tosort))
+    macaulay_matrix{N, M}(pos_t(length(done)),
+                          pos_t(length(row_sigs)),
+                          done,
+                          map(x -> x[1], tosort),
+                          map(x -> SparseVector(length(done),
+                                                Array{Int}(indexin(x[3], done)),
+                                                basis.coefficients[x[2]]),
+                              tosort),
+                          map(x -> x[2], tosort))
 end
     
         

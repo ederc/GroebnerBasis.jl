@@ -8,6 +8,7 @@ using LibGit2
 using Dates
 using gb_jll
 using StaticArrays
+using SparseArrays
 
 import Singular
 import Nemo

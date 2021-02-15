@@ -112,22 +112,20 @@ function f5(
     while !(isempty(pairset))
         mon_poly_pairs, flags = select_by_degree!(pairset)
         mat = symbolic_pp(basis, H, signatureOrder, stat, mon_poly_pairs, flags)
-        leadterms = Set([mat.columns[mat.indexed[i][1]] for i in 1:mat.n_rows])
         reduction!(mat, stat.characteristic)
         
         for i in reverse(1:mat.n_rows)
-            if isempty(mat.indexed[i])
+            if iszero(mat.entries[i].nzind)
                 push!(H, mat.row_sigs[i])
                 println("row reduced to zero in index $(mat.row_sigs[i].position)")
                 println(mat.row_sigs[i])
                 new_rewriter!(pairset, mat.row_sigs[i], basis, zero(pos_t))
             else
-                mat.basis_indices[i] >= stat.start && mat.columns[mat.indexed[i][1]] in leadterms && continue
+                mat.basis_indices[i] >= stat.start && !(mat.flags[i]) && continue
                 # new gb element
-                push!(leadterms, mat.columns[mat.indexed[i][1]])
-                push!(basis.numberTerms, len_t(length(mat.indexed[i])))
-                push!(basis.coefficients, mat.entries[i])
-                push!(basis.monomials, [mat.columns[j] for j in mat.indexed[i]])
+                push!(basis.numberTerms, len_t(length(mat.entries[i].nzind)))
+                push!(basis.coefficients, nonzeros(mat.entries[i]))
+                push!(basis.monomials, [mat.columns[j] for j in mat.entries[i].nzind])
                 push!(basis.signatures, mat.row_sigs[i])
                 stat.numberGenerators += 1
                 j = pos_t(length(basis.signatures))
