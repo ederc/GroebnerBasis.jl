@@ -1,3 +1,38 @@
+function get_rational_parametrization_from_msolve_output(
+        param::Array{Any, 1}
+    )
+    C, x  = Nemo.PolynomialRing(Nemo.FlintQQ,"x")
+
+    elim  = 0*x
+    ctr   = 0
+    for cf in param[4][2]
+        elim  +=  cf*x^ctr
+        ctr   +=  1
+    end
+
+    denom = 0*x
+    ctr   = 0
+    for cf in param[5][2]
+        denom +=  cf*x^ctr
+        ctr   +=  1
+    end
+
+    size  = param[2]-1
+    p = Array{Nemo.PolyElem,1}(undef, size)
+    c = Array{BigInt,1}(undef, size)
+    for i in 1:size
+        p[i]  = 0*x
+        ctr   = 0
+        for cf in param[6][i][1][2]
+            p[i]  +=  cf*x^ctr
+            ctr   +=  1
+        end
+        c[i]  = (-1) * param[6][i][2]
+    end
+
+    return elim, denom, p, c
+end
+
 function get_rational_parametrization(
         nr::Int32,
         lens::Array{Int32,1},
@@ -27,7 +62,7 @@ function get_rational_parametrization(
         for j in 1:lens[i]-1
             p[k]  +=  BigInt(unsafe_load(cfs, j+ctr))*x^(j-1)
         end
-        c[k]  =   BigInt(unsafe_load(cfs, lens[i]+ctr))
+        c[k]  =   (-1) * BigInt(unsafe_load(cfs, lens[i]+ctr))
         ctr   +=  lens[i]
         k     +=  1
     end
@@ -43,7 +78,8 @@ function msolve_file_interface(
                                       # in symbolic preprocessing
         resetht::Int=0,               # resetting global hash table
         laopt::Int=2,                 # linear algebra option
-        output_file::String="/dev/NULL", # output 
+        input_file::String="/tmp/in.ms", # msolve input file
+        output_file::String="/tmp/out.ms", # msolve output file
         infolevel::Int=0              # info level for print outs
         )
     if Sys.islinux()
@@ -76,7 +112,7 @@ function msolve_file_interface(
         #= lib = Libdl.dlopen(libgb) =#
         sym = Libdl.dlsym(lib, :f4_julia)
         # generate msolve input file
-        io  = open("input.ms", "w")
+        io  = open("/tmp/input.ms", "w")
         write(io, string(vars[1]))
         [write(io, ",",string(vars[i])) for i in 2:nvars]
         write(io, "\n")
@@ -107,11 +143,6 @@ Compute the solution set of the given ideal I using the msolve C library. The fu
 * `max_nr_pairs::Int=0`:  maximal number of pairs selected for one F4 matrix; default is
                       0, i.e. no restriction. If matrices get too big or consume
                       too much memory this is a good parameter to play with.
-* `reset_ht::Int=0`: Resets the hash table after `resetht` steps in the algorthm;
-                    default is 0, i.e. no resetting at all. Since we add
-                    monomials to the matrices which are only used for reduction
-                    purposes, but have no further meaning in the basis, this
-                    parameter might also help when memory get a problem.
 * `la_option::Int=2`: option for linear algebra to be used in F4. there are different
                   linear algebra routines implemented:
     -  `1`: exact sparse-dense computation,
@@ -132,10 +163,11 @@ function msolve(
         nr_thrds::Int=1,                      # number of threads
         max_nr_pairs::Int=0,                  # number of pairs maximally chosen
                                               # in symbolic preprocessing
-        reset_ht::Int=0,                      # resetting global hash table
         la_option::Int=2,                     # linear algebra option
         print_gb::Int=0,                      # printing of modular Groebner basis
         info_level::Int=0,                    # info level for print outs
+        input_file::String="/tmp/in.ms",      # msolve input file
+        output_file::String="/tmp/out.ms",    # msolve output file
         precision::Int=67                     # precision of the solution set
         )
     R     = I.base_ring
@@ -146,6 +178,7 @@ function msolve(
     # get number of variables
     nr_vars = Singular.nvars(R)
     nr_gens = Singular.ngens(J)
+    vars    = Singular.gens(R)
 
     variable_names  = Array{String, 1}(undef, nr_vars)
     for i in 1:nr_vars
@@ -172,57 +205,88 @@ function msolve(
         error("At the moment GroebnerBasis only supports finite fields and the rationals.")
     end
     dir = joinpath(dirname(pathof(GroebnerBasis)),"../deps")
-    lib = Libdl.dlopen("$dir/libmsolve.so.0.2.0")
-    sym = Libdl.dlsym(lib, :msolve_julia)
+#=     lib = Libdl.dlopen("$dir/libmsolve.so.0.2.0")
+ =     sym = Libdl.dlsym(lib, :msolve_julia)
+ =
+ =     res_ld    = ccall(:malloc, Ptr{Cint}, (Csize_t, ), sizeof(Cint))
+ =     res_dim   = ccall(:malloc, Ptr{Cint}, (Csize_t, ), sizeof(Cint))
+ =     res_dquot = ccall(:malloc, Ptr{Cint}, (Csize_t, ), sizeof(Cint))
+ =     res_len   = ccall(:malloc, Ptr{Ptr{Cint}}, (Csize_t, ), sizeof(Ptr{Cint}))
+ =     res_cf    = ccall(:malloc, Ptr{Ptr{Cvoid}}, (Csize_t, ), sizeof(Ptr{Cvoid}))
+ =     ccall(sym, Cvoid,
+ =         (Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{Ptr{Cint}}, Ptr{Cvoid},
+ =          Ptr{Cint}, Ptr{Cvoid}, Ptr{Ptr{Cchar}}, Ptr{Cchar}, Int, Int, Int, Int,
+ =          Int, Int, Int, Int, Int, Int, Int, Int),
+ =         res_ld, res_dim, res_dquot, res_len, res_cf, lens, exps, cfs, variable_names,
+ =         out_file, field_char, mon_order, nr_vars, nr_gens, initial_hts, nr_thrds,
+ =         max_nr_pairs, reset_ht, la_option, print_gb, genericity_handling, info_level)
+ =     Libdl.dlclose(lib)
+ =     # convert to julia array, also give memory management to julia
+ =     jl_ld     = unsafe_load(res_ld)
+ =     jl_dim    = unsafe_load(res_dim)
+ =     jl_dquot  = unsafe_load(res_dquot)
+ =
+ =     jl_len    = Base.unsafe_wrap(Array, unsafe_load(res_len), jl_ld)
+ =     nterms  = 0
+ =     [nterms += jl_len[i] for i=1:jl_ld]
+ =     if 0 == field_char
+ =         res_cf_conv = unsafe_load(res_cf)
+ =         jl_cf       = reinterpret(Ptr{BigInt}, res_cf_conv)
+ =     elseif Nemo.isprime(Nemo.FlintZZ(field_char))
+ =         res_cf_conv = unsafe_load(res_cf)
+ =         jl_cf       = reinterpret(Ptr{Int}, res_cf_conv)
+ =     end
+ =     elim, den, p, c = get_rational_parametrization(jl_ld, jl_len, jl_cf) =#
+ #
+    # generate msolve input file
+    io  = open(input_file, "w")
+    write(io, string(vars[1]))
+    [write(io, ",",string(vars[i])) for i in 2:nr_vars]
+    write(io, "\n")
+    write(io, string(field_char),"\n")
+    [write(io, string(J[i]),",\n") for i in 1:nr_gens]
+    write(io, string(J[nr_gens]))
+    close(io)
+    cmd = `$dir/msolve-binary -v$info_level -l$la_option -m$max_nr_pairs -s$initial_hts -t $nr_thrds -f $input_file -o $output_file`
+    run(cmd)
 
-    res_ld    = ccall(:malloc, Ptr{Cint}, (Csize_t, ), sizeof(Cint))
-    res_dim   = ccall(:malloc, Ptr{Cint}, (Csize_t, ), sizeof(Cint))
-    res_dquot = ccall(:malloc, Ptr{Cint}, (Csize_t, ), sizeof(Cint))
-    res_len   = ccall(:malloc, Ptr{Ptr{Cint}}, (Csize_t, ), sizeof(Ptr{Cint}))
-    res_cf    = ccall(:malloc, Ptr{Ptr{Cvoid}}, (Csize_t, ), sizeof(Ptr{Cvoid}))
-    ccall(sym, Cvoid,
-        (Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{Ptr{Cint}}, Ptr{Cvoid},
-         Ptr{Cint}, Ptr{Cvoid}, Ptr{Ptr{Cchar}}, Ptr{Cchar}, Int, Int, Int, Int,
-         Int, Int, Int, Int, Int, Int, Int, Int),
-        res_ld, res_dim, res_dquot, res_len, res_cf, lens, exps, cfs, variable_names,
-        out_file, field_char, mon_order, nr_vars, nr_gens, initial_hts, nr_thrds,
-        max_nr_pairs, reset_ht, la_option, print_gb, genericity_handling, info_level)
-    Libdl.dlclose(lib)
-    # convert to julia array, also give memory management to julia
-    jl_ld     = unsafe_load(res_ld)
-    jl_dim    = unsafe_load(res_dim)
-    jl_dquot  = unsafe_load(res_dquot)
+    #= read msolve result, i.e. rational parametrization data =#
+    of    = read(output_file, String)
 
-    #= check for positive dimension or no solution or other problems =#
-    if jl_dim < -1
+    #= maybe some problem appeared during msolve's computation =#
+    if length(of) == 0
         println("A problem appeared during msolve's computation, no solution delivered.")
         return nothing
     end
-    if jl_dim == -1
+
+    of    = replace(of, "\n" => "")
+    of    = replace(of, ":" => "")
+    param = eval(Meta.parse(of)) 
+
+    dim       = param[1]
+    dim_quot  = param[3]
+
+    #= check for positive dimension or no solution or other problems =#
+    if dim < -1
+        println("A problem appeared during msolve's computation, no solution delivered.")
+        return nothing
+    end
+    if dim == -1
         println("System fails genericity: Try to add a random linear form with a new")
         println("variable (smallest w.r.t. DRL) to the input system and start again.")
         return nothing
     end
-    if jl_dim > 0
+    if dim > 0
         println("The ideal has positive dimension, no solution delivered.")
         return nothing
     end
-    if (jl_dim == 0) && (jl_dquot == 0)
+    if (dim == 0) && (dim_quot == 0)
         println("The ideal has no solution.")
         return nothing
     end
 
-    jl_len    = Base.unsafe_wrap(Array, unsafe_load(res_len), jl_ld)
-    nterms  = 0
-    [nterms += jl_len[i] for i=1:jl_ld]
-    if 0 == field_char
-        res_cf_conv = unsafe_load(res_cf)
-        jl_cf       = reinterpret(Ptr{BigInt}, res_cf_conv)
-    elseif Nemo.isprime(Nemo.FlintZZ(field_char))
-        res_cf_conv = unsafe_load(res_cf)
-        jl_cf       = reinterpret(Ptr{Int}, res_cf_conv)
-    end
-    elim, den, p, c = get_rational_parametrization(jl_ld, jl_len, jl_cf)
+
+    elim, den, p, c = get_rational_parametrization_from_msolve_output(param)
 
     #= get all solutions of elim, also complex ones,
      = real ones are isolated =#
@@ -246,7 +310,7 @@ function msolve(
         tmp = Array{Rational{Int}}(undef, nr_vars)
         d = Nemo.evaluate(den, sols[i])
         for j = 1:nr_vars-1
-            tmp[j]       = -1 * rationalize(Int, BigFloat(real(Nemo.evaluate(p[j], sols[i]) / (d*c[j]))))
+            tmp[j]       = rationalize(Int, BigFloat(real(Nemo.evaluate(p[j], sols[i]) / (d*c[j]))))
             tmp[nr_vars] = rationalize(Int, BigFloat(real(sols[i])))
         end
         variety[i]  = tmp
