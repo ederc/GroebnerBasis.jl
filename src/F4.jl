@@ -84,9 +84,9 @@ function f4(
     else
         error("At the moment GroebnerBasis only supports finite fields and the rationals.")
     end
-    dir = joinpath(dirname(pathof(GroebnerBasis)),"../deps")
-    lib = Libdl.dlopen("$dir/libmsolve.so.0.2.0")
-    #= lib = Libdl.dlopen(libgb) =#
+    #= dir = joinpath(dirname(pathof(GroebnerBasis)),"../deps")
+     = lib = Libdl.dlopen("$dir/libmsolve.so.0.2.0") =#
+    lib = Libdl.dlopen(libgb)
     sym = Libdl.dlsym(lib, :f4_julia)
 
     gb_ld   = ccall(:malloc, Ptr{Cint}, (Csize_t, ), sizeof(Cint))
