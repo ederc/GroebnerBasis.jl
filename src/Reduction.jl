@@ -16,7 +16,11 @@ function reduction!(
         buffer = Array{UInt64}(Mat.entries[i])
         
         for j in firstind(Mat.entries[i]):Mat.n_cols
-            (iszero(pivots[j]) || pivots[j] < i) && continue
+            (iszero(pivots[j]) || pivots[j] < i ) && continue
+            if Mat.row_sigs[i] == Mat.row_sigs[pivots[j]]
+                println("WARNING: two rows in the same signature. Should not happen!")
+                continue
+            end
             if j == firstind(Mat.entries[i])
                 Mat.flags[i] = true
             end

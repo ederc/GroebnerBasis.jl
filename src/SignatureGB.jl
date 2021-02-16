@@ -123,6 +123,12 @@ function f5(
             else
                 mat.basis_indices[i] >= stat.start && !(mat.flags[i]) && continue
                 # new gb element
+                for (j, sig) in enumerate(mat.row_sigs)
+                    j == i && continue
+                    if sig == mat.row_sigs[i]
+                        mat.flags[j] = false
+                    end
+                end
                 push!(basis.numberTerms, len_t(length(mat.entries[i].nzind)))
                 push!(basis.coefficients, nonzeros(mat.entries[i]))
                 push!(basis.monomials, [mat.columns[j] for j in mat.entries[i].nzind])
@@ -180,6 +186,8 @@ function gen_s_pair(
     lt_1 = first(basis.monomials[i_1])
     lt_2 = first(basis.monomials[i_2])
     lambd = mon_lcm(lt_1, lt_2)
+    # exclude s-pairs with a priori syzygy signature
+    lambd == mult_monomials(lt_1, lt_2) && return nothing
 
     mon_1 = SVector{N}([@inbounds lambd[i] - lt_1[i] for i=1:N])
     mon_2 = SVector{N}([@inbounds lambd[i] - lt_2[i] for i=1:N])
@@ -271,6 +279,7 @@ function select_by_degree!(
             push!(mon_poly_pairs, (spair.mult_monomials[1], spair.indices[1]))
             if spair.indices[2] == zero(spair.indices[2])
                 push!(flags, true)
+                push!(to_delete, i)
                 continue
             end
             push!(mon_poly_pairs, (spair.mult_monomials[2], spair.indices[2]))

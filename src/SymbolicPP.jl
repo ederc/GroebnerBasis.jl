@@ -62,12 +62,13 @@ function symbolic_pp(
     row_sigs = signature_t{N, M}[]
     todo = Set{SVector{N, exp_t}}([])
     done = Set{SVector{N, exp_t}}([])
-    indices = [mon_pair[2] for mon_pair in mon_poly_pairs]
+    indices = pos_t[]
     indexed = Array{pos_t}[]
 
     for (i, pair) in enumerate(mon_poly_pairs)
-        new_row = mult_by_monomial(pair[1], basis.monomials[pair[2]])
         new_sig = mult_signature_by_mon(basis.signatures[pair[2]], pair[1])
+        push!(indices, pair[2])
+        new_row = mult_by_monomial(pair[1], basis.monomials[pair[2]])
         !(flags[i]) && push!(done, new_row[1])
         union!(todo, new_row)
         push!(mult_rows, new_row)
@@ -91,7 +92,10 @@ function symbolic_pp(
     # excellent coding
     done = [m for m in done]
     comp = (a, b) -> lt(MO, a, b)
-    sort!(done, lt = comp, rev = true)    
+    sort!(done, lt = comp, rev = true)
+    for row in mult_rows
+        sort!(row, lt = comp, rev = true)
+    end
     
     tosort = [(row_sigs[i], indices[i], mult_rows[i]) for i in eachindex(mult_rows)]
     comp = (a, b) -> lt(signatureOrder, a, b)
