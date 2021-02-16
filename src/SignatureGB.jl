@@ -137,6 +137,7 @@ function f5(
                 end
             end
         end
+        sort!(pairset, by = (pair -> pair.degree))
     end
     convert_signature_basis_to_ff_singular_ideal(I, basis, stat)
 end

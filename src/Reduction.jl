@@ -15,7 +15,7 @@ function reduction!(
     for i in reverse(1:Mat.n_rows-1)
         buffer = Array{UInt64}(Mat.entries[i])
         
-        for j in Mat.entries[i].nzind
+        for j in firstind(Mat.entries[i]):Mat.n_cols
             (iszero(pivots[j]) || pivots[j] < i) && continue
             if j == firstind(Mat.entries[i])
                 Mat.flags[i] = true
@@ -34,6 +34,5 @@ function reduction!(
             Mat.entries[i][k] = (Mat.entries[i][k] * mult) % char
         end
         pivots[firstind(Mat.entries[i])] = i
-            
     end
 end
