@@ -15,8 +15,11 @@ function reduction!(
     for i in reverse(1:Mat.n_rows-1)
         buffer = Array{UInt64}(Mat.entries[i])
         
-        for j in firstind(Mat.entries[i]):Mat.n_cols
-            (iszero(buffer[j]) || pivots[j] < i || iszero(pivots[j])) && continue
+        for j in Mat.entries[i].nzind
+            (iszero(pivots[j]) || pivots[j] < i) && continue
+            if j == firstind(Mat.entries[i])
+                Mat.flags[i] = true
+            end
             mult = addinv(buffer[j], char)
             addmodp = (a, b) -> (a + b) % char
             for k in Mat.entries[pivots[j]].nzind
@@ -31,7 +34,6 @@ function reduction!(
             Mat.entries[i][k] = (Mat.entries[i][k] * mult) % char
         end
         pivots[firstind(Mat.entries[i])] = i
-        mat.flags[i] = true
             
     end
 end
