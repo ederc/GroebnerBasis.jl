@@ -13,7 +13,7 @@ import Singular
 import Nemo
 import Hecke
 
-export f4, f5, msolve
+export f4, f5, msolve, solve_rational_parametrization
 
 include("Benchmarks.jl")
 include("Example.jl")
