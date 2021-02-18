@@ -76,8 +76,6 @@ function solve_rational_parametrization(rat_param::Array{Any,1}, precision::Int=
     den   = rat_param[2]
     p     = rat_param[3]
     c     = rat_param[4]
-    println(typeof(p))
-    println(typeof(c))
 
     #= get all solutions of elim, also complex ones,
      = real ones are isolated =#
@@ -190,8 +188,7 @@ Compute the solution set of the given ideal I using the msolve C library. The fu
 * `max_nr_pairs::Int=0`:  maximal number of pairs selected for one F4 matrix; default is
                       0, i.e. no restriction. If matrices get too big or consume
                       too much memory this is a good parameter to play with.
-* `la_option::Int=2`: option for linear algebra to be used in F4. there are different
-                  linear algebra routines implemented:
+* `la_option::Int=2`: option for linear algebra to be used in F4. there are different linear algebra routines implemented:
     -  `1`: exact sparse-dense computation,
     -  `2`: exact sparse computation, (default)
     - `42`: probabilistic sparse-dense computation,
@@ -199,8 +196,7 @@ Compute the solution set of the given ideal I using the msolve C library. The fu
     - `44`: probabilistic sparse computation.
 * `info_level::Int=0`: info level for printout:
     - `0`: no printout (default),
-    - `1`:  a summary of the computational data is printed at the beginning and
-    the end of the computation,
+    - `1`:  a summary of the computational data is printed at the beginning and the end of the computation,
     - `2`: also dynamical information for each round resp. matrix is printed.
 * `input_file::String="/tmp/in.ms"`: input file name for msolve binary; default: /tmp/in.ms.
 * `output_file::String="/tmp/in.ms"`: output file name for msolve binary; default: /tmp/out.ms.
