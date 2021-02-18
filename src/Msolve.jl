@@ -30,7 +30,7 @@ function get_rational_parametrization_from_msolve_output(
         c[i]  = (-1) * param[6][i][2]
     end
 
-    return elim, denom, p, c
+    return [elim, denom, p, c]
 end
 
 function get_rational_parametrization(
@@ -68,6 +68,51 @@ function get_rational_parametrization(
     end
 
     return elim, denom, p, c
+end
+
+function solve_rational_parametrization(rat_param::Array{Any,1}, precision::Int=67)
+
+    elim  = rat_param[1]
+    den   = rat_param[2]
+    p     = rat_param[3]
+    c     = rat_param[4]
+
+    #= get all solutions of elim, also complex ones,
+     = real ones are isolated =#
+    sols  = []
+    #= @time =# append!(sols, Hecke._roots(elim, precision))
+
+    #= get real solutions =#
+    del = []
+    for i in 1:length(sols)
+        if Nemo.isreal(sols[i]) == false
+            append!(del, i)
+        end
+    end
+
+    #= remove non-real solutions =#
+    deleteat!(sols, del)
+
+    #= generate solution set for system =#
+    variety = Array{Array{Rational{Int}, 1}, 1}(undef, length(sols))
+    #= @time =# for i in 1:length(sols)
+        tmp = Array{Rational{Int}}(undef, length(p)+1)
+        d = Nemo.evaluate(den, sols[i])
+        for j = 1:length(p)
+            tmp[j]       = rationalize(Int, BigFloat(real(Nemo.evaluate(p[j], sols[i]) / (d*c[j]))))
+            tmp[length(p)+1] = rationalize(Int, BigFloat(real(sols[i])))
+        end
+        variety[i]  = tmp
+    end
+
+    return variety
+
+    #= for k in 1:nr_gens
+     =     for v in variety
+     =         println(BigInt(numerator(GroebnerBasis.Singular.evaluate(I[k], v)))/BigInt(denominator(GroebnerBasis.Singular.evaluate(I[k], v))))
+     =     end
+     =     println("")
+     = end =#
 end
 
 function msolve_file_interface(
@@ -129,9 +174,9 @@ function msolve_file_interface(
 end
 
 """
-    msolve(I[, hts::Int=17, nthrds::Int=1, maxpairs::Int=0, resetht::Int=0,
-            laopt::Int=1, reducegb::Int=0, pbmfiles::Int=0,
-            infolevel::Int=0, monorder::Symbol=:degrevlex])
+    msolve(I[, initial_hts::Int=17, nr_thrds::Int=1, max_nr_pairs::Int=0,
+            la_option::Int=1, infolevel::Int=0, input_file::String="/tmp/in.ms",
+            output_file="/tmp/out.ms", precision::Int=67, get_param::Bool=false])
 
 Compute the solution set of the given ideal I using the msolve C library. The function takes a Singular ideal as input and returns a Singular ideal. At the moment only QQ is supported as ground field..
 
@@ -143,8 +188,7 @@ Compute the solution set of the given ideal I using the msolve C library. The fu
 * `max_nr_pairs::Int=0`:  maximal number of pairs selected for one F4 matrix; default is
                       0, i.e. no restriction. If matrices get too big or consume
                       too much memory this is a good parameter to play with.
-* `la_option::Int=2`: option for linear algebra to be used in F4. there are different
-                  linear algebra routines implemented:
+* `la_option::Int=2`: option for linear algebra to be used in F4. there are different linear algebra routines implemented:
     -  `1`: exact sparse-dense computation,
     -  `2`: exact sparse computation, (default)
     - `42`: probabilistic sparse-dense computation,
@@ -152,10 +196,12 @@ Compute the solution set of the given ideal I using the msolve C library. The fu
     - `44`: probabilistic sparse computation.
 * `info_level::Int=0`: info level for printout:
     - `0`: no printout (default),
-    - `1`:  a summary of the computational data is printed at the beginning and
-    the end of the computation,
+    - `1`:  a summary of the computational data is printed at the beginning and the end of the computation,
     - `2`: also dynamical information for each round resp. matrix is printed.
+* `input_file::String="/tmp/in.ms"`: input file name for msolve binary; default: /tmp/in.ms.
+* `output_file::String="/tmp/in.ms"`: output file name for msolve binary; default: /tmp/out.ms.
 * `precision::Int=67`: precision for computing solutions; default is 67.
+* `get_param::Bool=false`: get rational parametrization of solution set; default is false.
 """
 function msolve(
         I::Singular.sideal;                   # input generators
@@ -164,11 +210,12 @@ function msolve(
         max_nr_pairs::Int=0,                  # number of pairs maximally chosen
                                               # in symbolic preprocessing
         la_option::Int=2,                     # linear algebra option
-        print_gb::Int=0,                      # printing of modular Groebner basis
         info_level::Int=0,                    # info level for print outs
         input_file::String="/tmp/in.ms",      # msolve input file
         output_file::String="/tmp/out.ms",    # msolve output file
-        precision::Int=67                     # precision of the solution set
+        precision::Int=67,                    # precision of the solution set
+        get_param::Bool=false                 # return rational parametrization of
+                                              # solution set
         )
     R     = I.base_ring
     # skip zero generators in ideal
@@ -247,7 +294,7 @@ function msolve(
     [write(io, string(J[i]),",\n") for i in 1:nr_gens]
     write(io, string(J[nr_gens]))
     close(io)
-    cmd = `$dir/msolve-binary -v$info_level -l$la_option -m$max_nr_pairs -s$initial_hts -t $nr_thrds -f $input_file -o $output_file`
+    #= @time =# cmd = `$dir/msolve-binary -v$info_level -l$la_option -m$max_nr_pairs -s$initial_hts -t $nr_thrds -f $input_file -o $output_file`
     run(cmd)
 
     #= read msolve result, i.e. rational parametrization data =#
@@ -286,41 +333,13 @@ function msolve(
     end
 
 
-    elim, den, p, c = get_rational_parametrization_from_msolve_output(param)
+    #= @time =# rat_param = get_rational_parametrization_from_msolve_output(param)
 
-    #= get all solutions of elim, also complex ones,
-     = real ones are isolated =#
-    sols  = []
-    append!(sols, Hecke._roots(elim, precision))
+    variety = solve_rational_parametrization(rat_param)
 
-    #= get real solutions =#
-    del = []
-    for i in 1:length(sols)
-        if Nemo.isreal(sols[i]) == false
-            append!(del, i)
-        end
+    if get_param  ==   true
+        return rat_param, variety
+    else
+        return variety
     end
-
-    #= remove non-real solutions =#
-    deleteat!(sols, del)
-
-    #= generate solution set for system =#
-    variety = Array{Array{Rational{Int}, 1}, 1}(undef, length(sols))
-    for i in 1:length(sols)
-        tmp = Array{Rational{Int}}(undef, nr_vars)
-        d = Nemo.evaluate(den, sols[i])
-        for j = 1:nr_vars-1
-            tmp[j]       = rationalize(Int, BigFloat(real(Nemo.evaluate(p[j], sols[i]) / (d*c[j]))))
-            tmp[nr_vars] = rationalize(Int, BigFloat(real(sols[i])))
-        end
-        variety[i]  = tmp
-    end
-
-    #= for k in 1:nr_gens
-     =     for v in variety
-     =         println(BigInt(numerator(GroebnerBasis.Singular.evaluate(I[k], v)))/BigInt(denominator(GroebnerBasis.Singular.evaluate(I[k], v))))
-     =     end
-     =     println("")
-     = end =#
-    return variety
 end
