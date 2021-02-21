@@ -37,7 +37,8 @@ function find_reducer!(
         @inbounds c = divisor(basis.monomials[i][1], monomial)
         if c != nothing
             @inbounds sig = mult_signature_by_mon(basis.signatures[i], c)
-            if reducer != nothing && lt(signatureOrder, reducer[1], sig) && rewriteable(sig, pos_t(i), basis.signatures, syz_signatures, stat)
+            rewriteable(sig, pos_t(i), basis.signatures, syz_signatures, stat) && continue
+            if reducer != nothing && lt(signatureOrder, reducer[1], sig)
                 continue
             else
                 reducer = (sig, i, c)
@@ -56,23 +57,22 @@ function symbolic_pp(
     signatureOrder::ModuleOrder{N, MO},
     stat::stat_t,
     mon_poly_pairs::Array{Tuple{SVector{N, exp_t}, pos_t}},
+    sigs::Array{signature_t{N, M}},
     flags::Array{Bool}
 ) where {N, M, MO}
     mult_rows = Array{SVector{N, exp_t}}[]
-    row_sigs = signature_t{N, M}[]
+    row_sigs = sigs
     todo = Set{SVector{N, exp_t}}([])
     done = Set{SVector{N, exp_t}}([])
     indices = pos_t[]
     indexed = Array{pos_t}[]
 
     for (i, pair) in enumerate(mon_poly_pairs)
-        new_sig = mult_signature_by_mon(basis.signatures[pair[2]], pair[1])
         push!(indices, pair[2])
         new_row = mult_by_monomial(pair[1], basis.monomials[pair[2]])
         !(flags[i]) && push!(done, new_row[1])
         union!(todo, new_row)
         push!(mult_rows, new_row)
-        push!(row_sigs, new_sig)
     end
 
     while todo != done
@@ -97,12 +97,12 @@ function symbolic_pp(
         sort!(row, lt = comp, rev = true)
     end
     
-    tosort = [(row_sigs[i], indices[i], mult_rows[i]) for i in eachindex(mult_rows)]
+    tosort = unique([(row_sigs[i], indices[i], mult_rows[i]) for i in eachindex(mult_rows)])
     comp = (a, b) -> lt(signatureOrder, a, b)
     sort!(tosort, lt = comp, by = x -> x[1], rev=true)
     
     macaulay_matrix{N, M}(pos_t(length(done)),
-                          pos_t(length(row_sigs)),
+                          pos_t(length(tosort)),
                           done,
                           map(x -> x[1], tosort),
                           map(x -> SparseVector(length(done),

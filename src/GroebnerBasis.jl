@@ -9,6 +9,7 @@ using Dates
 using gb_jll
 using StaticArrays
 using SparseArrays
+using Profile
 
 import Singular
 import Nemo

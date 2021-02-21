@@ -22,10 +22,11 @@ end
 
 struct s_pair{N, M}
     signature::signature_t{N, M}
+    lower_sig::signature_t{N, M}
     mult_monomials::SVector{2, SVector{N, exp_t}}
     indices::SVector{2, pos_t}
     degree::deg_t
-    s_pair{N, M}(a, b, c, basis) where {N, M} = new(a, b, c, sum(b[1]) + sum(first(basis.monomials[c[1]])))
+    s_pair{N, M}(a, b, c, d, basis) where {N, M} = new(a, b, c, d, sum(c[1]) + sum(first(basis.monomials[d[1]])))
 end
 
 mutable struct basis_t{N, M}
