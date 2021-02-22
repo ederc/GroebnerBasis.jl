@@ -42,7 +42,7 @@ function f5(
         infolevel::Int=0,             # info level for print outs
         monorder::Symbol=:degrevlex, # monomial order
         sigorder::Symbol=:pot         # signature order
-        )
+)
     R     = I.base_ring
     # skip zero generators in ideal
     ptr = Singular.libSingular.id_Copy(I.ptr, R.ptr)
@@ -110,24 +110,28 @@ function f5(
 
     #= main loop =#
     while !(isempty(pairset))
-        mon_poly_pairs, flags = select_by_degree!(pairset)
-        mat = symbolic_pp(basis, H, signatureOrder, stat, mon_poly_pairs, flags)
-        leadterms = Set([mat.columns[mat.indexed[i][1]] for i in 1:mat.n_rows])
+        mon_poly_pairs, sigs, flags = select_by_degree!(pairset)
+        mat = symbolic_pp(basis, H, signatureOrder, stat, mon_poly_pairs, sigs, flags)        
         reduction!(mat, stat.characteristic)
         
         for i in reverse(1:mat.n_rows)
-            if isempty(mat.indexed[i])
+            if iszero(mat.entries[i].nzind)
                 push!(H, mat.row_sigs[i])
-                println("row reduced to zero in index $(mat.row_sigs[i].position)")
-                println(mat.row_sigs[i])
+                #println("row reduced to zero in index $(mat.row_sigs[i].position)")
+                #println(mat.row_sigs[i])
                 new_rewriter!(pairset, mat.row_sigs[i], basis, zero(pos_t))
             else
-                mat.basis_indices[i] >= stat.start && mat.columns[mat.indexed[i][1]] in leadterms && continue
+                mat.basis_indices[i] >= stat.start && !(mat.flags[i]) && continue
                 # new gb element
-                push!(leadterms, mat.columns[mat.indexed[i][1]])
-                push!(basis.numberTerms, len_t(length(mat.indexed[i])))
-                push!(basis.coefficients, mat.entries[i])
-                push!(basis.monomials, [mat.columns[j] for j in mat.indexed[i]])
+                for (j, sig) in enumerate(mat.row_sigs)
+                    j == i && continue
+                    if sig == mat.row_sigs[i]
+                        mat.flags[j] = false
+                    end
+                end
+                push!(basis.numberTerms, len_t(length(mat.entries[i].nzind)))
+                push!(basis.coefficients, nonzeros(mat.entries[i]))
+                push!(basis.monomials, [mat.columns[j] for j in mat.entries[i].nzind])
                 push!(basis.signatures, mat.row_sigs[i])
                 stat.numberGenerators += 1
                 j = pos_t(length(basis.signatures))
@@ -139,8 +143,10 @@ function f5(
                 end
             end
         end
+        sort!(pairset, by = (pair -> pair.degree))
     end
-    convert_signature_basis_to_ff_singular_ideal(I, basis, stat)
+    # convert_signature_basis_to_ff_singular_ideal(I, basis, stat)
+    nothing
 end
 
 function gen_trivial_syzygies!(
@@ -165,7 +171,7 @@ function gen_s_pair(
     basis::basis_t{N, M}
 ) where {N, M}
     one = SVector{N}(zeros(exp_t, N))
-    s_pair{N, M}(basis.signatures[i], SVector{2}([one, one]), SVector{2}([i, zero(i)]), basis)
+    s_pair{N, M}(basis.signatures[i], signature_t{N, M}(one, deg_t(1), pos_t(0)), SVector{2}([one, one]), SVector{2}([i, zero(i)]), basis)
 end
 
 function gen_s_pair(
@@ -181,6 +187,8 @@ function gen_s_pair(
     lt_1 = first(basis.monomials[i_1])
     lt_2 = first(basis.monomials[i_2])
     lambd = mon_lcm(lt_1, lt_2)
+    # exclude s-pairs with a priori syzygy signature
+    lambd == mult_monomials(lt_1, lt_2) && return nothing
 
     mon_1 = SVector{N}([@inbounds lambd[i] - lt_1[i] for i=1:N])
     mon_2 = SVector{N}([@inbounds lambd[i] - lt_2[i] for i=1:N])
@@ -198,9 +206,9 @@ function gen_s_pair(
         return nothing
     end
 
-    lt(signatureOrder, sig_2, sig_1) && return s_pair{N, M}(sig_1, SVector(mon_1, mon_2), SVector(i_1, i_2), basis)
+    lt(signatureOrder, sig_2, sig_1) && return s_pair{N, M}(sig_1, sig_2, SVector(mon_1, mon_2), SVector(i_1, i_2), basis)
     
-    s_pair{N, M}(sig_2, SVector(mon_1, mon_2), SVector(i_1, i_2), basis)
+    s_pair{N, M}(sig_2, sig_1, SVector(mon_1, mon_2), SVector(i_1, i_2), basis)
 end
 
 function rewriteable(
@@ -248,8 +256,7 @@ function new_rewriter!(
         end
 
         if pair.indices[2] != pos_t(0)
-            other_sig = mult_signature_by_mon(basis.signatures[pair.indices[2]], pair.mult_monomials[2])
-            if sig_divisibility(sig, other_sig)
+            if sig_divisibility(sig, pair.lower_sig)
                 push!(to_delete, i)
                 continue
             end
@@ -264,27 +271,32 @@ function select_by_degree!(
     pairset::Array{s_pair{N,M}}
 ) where {N, M}
     mon_poly_pairs = Tuple{SVector{N, exp_t}, pos_t}[]
+    sigs = signature_t{N, M}[]
     flags = Bool[]
     degree = pairset[1].degree
     to_delete = Int[]
     for (i, spair) in enumerate(pairset)
         if spair.degree == degree
+            (spair.mult_monomials[1], spair.indices[1]) in mon_poly_pairs && continue
             push!(mon_poly_pairs, (spair.mult_monomials[1], spair.indices[1]))
+            push!(sigs, spair.signature)
             if spair.indices[2] == zero(spair.indices[2])
                 push!(flags, true)
+                push!(to_delete, i)
                 continue
             end
             push!(mon_poly_pairs, (spair.mult_monomials[2], spair.indices[2]))
+            push!(sigs, spair.lower_sig)
             push!(flags, false)
             push!(flags, false)
             push!(to_delete, i)
             continue
         end
         deleteat!(pairset, to_delete)
-        return mon_poly_pairs, flags
+        return mon_poly_pairs, sigs, flags
     end
     deleteat!(pairset, to_delete)
-    mon_poly_pairs, flags
+    mon_poly_pairs, sigs, flags
 end
 
 #= Monomial arithmetic convenience functions =#
@@ -297,13 +309,14 @@ mon_lcm(mon_1::SVector{N, exp_t}, mon_2::SVector{N, exp_t}) where N = SVector{N}
 """
 return true if mon_1 divides mon_2.
 """
-function divisibility(
-    mon_1::SVector{N, exp_t},
-    mon_2::SVector{N, exp_t}
+@generated function divisibility(
+    a::SVector{N, exp_t},
+    b::SVector{N, exp_t}
 ) where N
-    mon_2 == mon_lcm(mon_1, mon_2) && return true
-
-    return false
+    quote
+        $([:(a[$i] > b[$i] && return false) for i in 1:N]...)
+        return true
+    end
 end
 
 # not great
@@ -323,7 +336,7 @@ function sig_divisibility(
     sig_1::signature_t{N, M},
     sig_2::signature_t{N, M},
 ) where {N, M}
-    sig_1.position == sig_2.position && divisibility(sig_1.monomial, sig_2.monomial) && return true
+    sig_1.position == sig_2.position && sig_1.degree <= sig_2.degree && divisibility(sig_1.monomial, sig_2.monomial) && return true
 
     return false
 end
