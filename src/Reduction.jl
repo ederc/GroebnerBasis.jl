@@ -17,9 +17,12 @@ function reduction!(
         buffer = Array{UInt64}(Mat.entries[i])
         
         for j in firstind(Mat.entries[i]):Mat.n_cols
-            (iszero(pivots[j]) || pivots[j] < i ) && continue
+            (iszero(buffer[j]) || iszero(pivots[j]) || pivots[j] < i ) && continue
             if j == firstind(Mat.entries[i])
                 Mat.flags[i] = true
+            end
+            if Mat.row_sigs[i] == Mat.row_sigs[pivots[j]]
+                println("two rows in same signature")
             end
             mult = addinv(buffer[j], char)
             for k in Mat.entries[pivots[j]].nzind
