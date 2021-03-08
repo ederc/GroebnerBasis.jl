@@ -117,8 +117,8 @@ function f5(
         for i in reverse(1:mat.n_rows)
             if iszero(mat.entries[i].nzind)
                 push!(H, mat.row_sigs[i])
-                #println("row reduced to zero in index $(mat.row_sigs[i].position)")
-                #println(mat.row_sigs[i])
+                println("row reduced to zero in index $(mat.row_sigs[i].position)")
+                println(mat.row_sigs[i])
                 new_rewriter!(pairset, mat.row_sigs[i], basis, zero(pos_t))
             else
                 mat.basis_indices[i] >= stat.start && !(mat.flags[i]) && continue
