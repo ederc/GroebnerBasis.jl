@@ -1,6 +1,6 @@
 name = "GroebnerBasis"
 uuid = "e39c9192-ea4d-5e15-9584-a488c6d614bd"
-version = "0.3.0"
+version = "0.3.1"
 
 [deps]
 BinaryProvider = "b99e7846-7c00-51b0-8f62-c81ae34c0232"
@@ -17,8 +17,8 @@ gb_jll = "006bdf2e-00d8-555c-bee2-993406487cbf"
 
 [compat]
 BinaryProvider = "^0.5.8"
-Hecke = "0.9.1"
-Nemo = "^0.19"
+Hecke = "0.9.5"
+Nemo = "0.20.0"
 Singular = "^0.4"
 StaticArrays = "^0.11"
 julia = "1.3"
