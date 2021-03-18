@@ -3,16 +3,19 @@ function get_rational_parametrization_from_msolve_output(
     )
     C, x  = Nemo.PolynomialRing(Nemo.FlintQQ,"x")
 
+    varstr  = param[4]
+    linform = param[5]
+
     elim  = 0*x
     ctr   = 0
-    for cf in param[4][2]
+    for cf in param[6][2]
         elim  +=  cf*x^ctr
         ctr   +=  1
     end
 
     denom = 0*x
     ctr   = 0
-    for cf in param[5][2]
+    for cf in param[7][2]
         denom +=  cf*x^ctr
         ctr   +=  1
     end
@@ -23,14 +26,14 @@ function get_rational_parametrization_from_msolve_output(
     for i in 1:size
         p[i]  = 0*x
         ctr   = 0
-        for cf in param[6][i][1][2]
+        for cf in param[8][i][1][2]
             p[i]  +=  cf*x^ctr
             ctr   +=  1
         end
-        c[i]  = (-1) * param[6][i][2]
+        c[i]  = param[8][i][2]
     end
 
-    return [elim, denom, p, c]
+    return [varstr, linform, elim, denom, p, c]
 end
 
 function get_rational_parametrization(
@@ -335,6 +338,7 @@ function msolve(
     # of    = replace(of, ";" => "]")
     of    = replace(of, "2^" => "BigInt(2)^")
     of    = replace(of, "/" => "//")
+    of    = replace(of, "'" => "\"")
     tmp   = eval(Meta.parse(of))
 
     if typeof(tmp) == Nothing
@@ -365,7 +369,7 @@ function msolve(
             return nothing
         end
         rat_param = get_rational_parametrization_from_msolve_output(param)
-        return  sols, rat_param
+        return  rat_param, sols
     else
         return tmp
     end
