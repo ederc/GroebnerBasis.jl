@@ -3,16 +3,19 @@ function get_rational_parametrization_from_msolve_output(
     )
     C, x  = Nemo.PolynomialRing(Nemo.FlintQQ,"x")
 
+    varstr  = param[4]
+    linform = param[5]
+
     elim  = 0*x
     ctr   = 0
-    for cf in param[4][2]
+    for cf in param[6][2]
         elim  +=  cf*x^ctr
         ctr   +=  1
     end
 
     denom = 0*x
     ctr   = 0
-    for cf in param[5][2]
+    for cf in param[7][2]
         denom +=  cf*x^ctr
         ctr   +=  1
     end
@@ -23,14 +26,14 @@ function get_rational_parametrization_from_msolve_output(
     for i in 1:size
         p[i]  = 0*x
         ctr   = 0
-        for cf in param[6][i][1][2]
+        for cf in param[8][i][1][2]
             p[i]  +=  cf*x^ctr
             ctr   +=  1
         end
-        c[i]  = (-1) * param[6][i][2]
+        c[i]  = param[8][i][2]
     end
 
-    return [elim, denom, p, c]
+    return [varstr, linform, elim, denom, p, c]
 end
 
 function get_rational_parametrization(
@@ -70,37 +73,51 @@ function get_rational_parametrization(
     return elim, denom, p, c
 end
 
-function solve_rational_parametrization(rat_param::Array{Any,1}, precision::Int=67)
+function get_real_roots_from_rational_parametrization(param::Array{Any,1}, precision::Int=67)
 
-    elim  = rat_param[1]
-    den   = rat_param[2]
-    p     = rat_param[3]
-    c     = rat_param[4]
+    elim  = param[1]
 
     #= get all solutions of elim, also complex ones,
-     = real ones are isolated =#
-    sols  = []
-    #= @time =# append!(sols, Hecke._roots(elim, precision))
-
-    #= get real solutions =#
-    del = []
-    for i in 1:length(sols)
-        if Nemo.isreal(sols[i]) == false
-            append!(del, i)
+    = real ones are isolated =#
+    roots = Hecke._roots(elim, precision)
+    nr_real_roots = 0
+    for r in roots
+        if Nemo.isreal(r)
+            nr_real_roots +=  1
+        end
+    end
+    real_roots = Array{Nemo.fmpq}(undef, nr_real_roots)
+    ctr = 1
+    for r in roots
+        if Nemo.isreal(r)
+            real_roots[ctr] = Nemo.fmpq(rationalize(Int,BigFloat(real(r))))
+            ctr += 1
         end
     end
 
-    #= remove non-real solutions =#
-    deleteat!(sols, del)
+    fmpq_roots = Array{Nemo.fmpq}(undef, length(real_roots))
+    for r in real_roots
+        fmpq_roots = r
+    end
 
+    return real_roots
+end
+
+function get_solutions(roots::Array{Nemo.fmpq,1}, param::Array{Any,1})
+
+    den   = param[2]
+    p     = param[3]
+    c     = param[4]
+
+    println("den: ", typeof(den))
     #= generate solution set for system =#
-    variety = Array{Array{Rational{Int}, 1}, 1}(undef, length(sols))
-    #= @time =# for i in 1:length(sols)
-        tmp = Array{Rational{Int}}(undef, length(p)+1)
-        d = Nemo.evaluate(den, sols[i])
+    variety = Array{Array{Nemo.fmpq, 1}, 1}(undef, length(roots))
+    #= @time =# for i in 1:length(roots)
+        tmp = Array{Nemo.fmpq}(undef, length(p)+1)
+        d = Nemo.evaluate(den, roots[i])
         for j = 1:length(p)
-            tmp[j]       = rationalize(Int, BigFloat(real(Nemo.evaluate(p[j], sols[i]) / (d*c[j]))))
-            tmp[length(p)+1] = rationalize(Int, BigFloat(real(sols[i])))
+            tmp[j]       = Nemo.evaluate(p[j], roots[i]) // (d*c[j])
+            tmp[length(p)+1] = roots[i]
         end
         variety[i]  = tmp
     end
@@ -113,6 +130,13 @@ function solve_rational_parametrization(rat_param::Array{Any,1}, precision::Int=
      =     end
      =     println("")
      = end =#
+end
+
+function solve_rational_parametrization(param::Array{Any,1}; precision::Int=67)
+    roots = get_real_roots_from_rational_parametrization(param, precision)
+    sols  = get_solutions(roots, param)
+
+    return sols
 end
 
 function msolve_file_interface(
@@ -166,7 +190,7 @@ function msolve_file_interface(
         write(io, string(J[ngens]))
         close(io)
         dir = joinpath(dirname(pathof(GroebnerBasis)),"../deps/")
-        cmd = `$dir/msolve-binary -v$infolevel -l$laopt -m$maxpairs -s$hts -f input.ms -o t.res`
+        cmd = `$dir/msolve-binary -v2 -l$laopt -m$maxpairs -s$hts -f input.ms -o t.res`
         run(cmd)
     else
         error("msolve supports at the moment only x86 Linux with AVX2 support.")
@@ -200,7 +224,7 @@ Compute the solution set of the given ideal I using the msolve C library. The fu
     - `2`: also dynamical information for each round resp. matrix is printed.
 * `input_file::String="/tmp/in.ms"`: input file name for msolve binary; default: /tmp/in.ms.
 * `output_file::String="/tmp/in.ms"`: output file name for msolve binary; default: /tmp/out.ms.
-* `precision::Int=67`: precision for computing solutions; default is 67.
+* `precision::Int=67`: precision for computing solutions; default is 32.
 * `get_param::Bool=false`: get rational parametrization of solution set; default is false.
 """
 function msolve(
@@ -213,7 +237,7 @@ function msolve(
         info_level::Int=0,                    # info level for print outs
         input_file::String="/tmp/in.ms",      # msolve input file
         output_file::String="/tmp/out.ms",    # msolve output file
-        precision::Int=67,                    # precision of the solution set
+        precision::Int=64,                    # precision of the solution set
         get_param::Bool=false                 # return rational parametrization of
                                               # solution set
         )
@@ -242,6 +266,8 @@ function msolve(
 
     #= monomial order defaults to zero =#
     mon_order = 0
+
+    get_parametrization = Int(get_param == true)
 
     # convert Singular ideal to flattened arrays of ints
     if 0 == field_char
@@ -291,10 +317,10 @@ function msolve(
     [write(io, ",",string(vars[i])) for i in 2:nr_vars]
     write(io, "\n")
     write(io, string(field_char),"\n")
-    [write(io, string(J[i]),",\n") for i in 1:nr_gens]
-    write(io, string(J[nr_gens]))
+    [write(io, replace(string(J[i])," "=>""),",\n") for i in 1:nr_gens-1]
+    write(io, replace(string(J[nr_gens])," "=>""))
     close(io)
-    #= @time =# cmd = `$dir/msolve-binary -v$info_level -l$la_option -m$max_nr_pairs -s$initial_hts -t $nr_thrds -f $input_file -o $output_file`
+    #= @time =# cmd = `$dir/msolve-binary -v$info_level -l$la_option -P$get_parametrization -m$max_nr_pairs -s$initial_hts -t $nr_thrds -p $precision -f $input_file -o $output_file`
     run(cmd)
 
     #= read msolve result, i.e. rational parametrization data =#
@@ -306,40 +332,67 @@ function msolve(
         return nothing
     end
 
+    of    = replace(of, " " => "")
     of    = replace(of, "\n" => "")
-    of    = replace(of, ":" => "")
-    param = eval(Meta.parse(of)) 
+    of    = replace(of, "]:" => "]")
+    # of    = replace(of, ";" => "]")
+    of    = replace(of, "2^" => "BigInt(2)^")
+    of    = replace(of, "/" => "//")
+    of    = replace(of, "'" => "\"")
+    tmp   = eval(Meta.parse(of))
 
-    dim       = param[1]
-    dim_quot  = param[3]
-
-    #= check for positive dimension or no solution or other problems =#
-    if dim < -1
+    if typeof(tmp) == Nothing
         println("A problem appeared during msolve's computation, no solution delivered.")
         return nothing
     end
-    if dim == -1
-        println("System fails genericity: Try to add a random linear form with a new")
-        println("variable (smallest w.r.t. DRL) to the input system and start again.")
-        return nothing
-    end
-    if dim > 0
-        println("The ideal has positive dimension, no solution delivered.")
-        return nothing
-    end
-    if (dim == 0) && (dim_quot == 0)
-        println("The ideal has no solution.")
-        return nothing
-    end
-
-
-    #= @time =# rat_param = get_rational_parametrization_from_msolve_output(param)
-
-    variety = solve_rational_parametrization(rat_param)
-
-    if get_param  ==   true
-        return rat_param, variety
+    if get_param
+        param     = tmp[1]
+        sols      = tmp[2]
+        dim       = param[1]
+        dim_quot  = param[3]
+        #= check for positive dimension or no solution or other problems =#
+        if dim < -1
+            println("A problem appeared during msolve's computation, no solution delivered.")
+            return nothing
+        end
+        if dim == -1
+            println("System fails genericity: Try to add a random linear form with a new")
+            println("variable (smallest w.r.t. DRL) to the input system and start again.")
+            return nothing
+        end
+        if dim > 0
+            println("The ideal has positive dimension, no solution delivered.")
+            return nothing
+        end
+        if (dim == 0) && (dim_quot == 0)
+            println("The ideal has no solution.")
+            return nothing
+        end
+        rat_param = get_rational_parametrization_from_msolve_output(param)
+        return  rat_param, sols
     else
-        return variety
+        return tmp
     end
 end
+#     println("rri ",real_roots_intervals)
+#     println(typeof(real_roots_intervals))
+#     println("param", param)
+#     println(typeof(param))
+#
+#     real_roots  = Array{Nemo.fmpq,1}(undef, length(real_roots_intervals))
+#     for (idx, r) in  enumerate(real_roots_intervals)
+#         real_roots[idx] =  Nemo.fmpq((r[1]+r[2])//2)
+#     end
+#     println("real roots ", typeof(real_roots), " => ",real_roots)
+#
+#     #= @time =# rat_param = get_rational_parametrization_from_msolve_output(param)
+#
+#     variety = get_solutions(real_roots, rat_param)
+#     #= variety = solve_rational_parametrization(rat_param) =#
+#
+#     if get_param  ==   true
+#         return rat_param, variety
+#     else
+#         return variety
+#     end
+# end

@@ -8,6 +8,7 @@ using LibGit2
 using Dates
 using gb_jll
 using StaticArrays
+using SparseArrays
 
 import Singular
 import Nemo
@@ -49,7 +50,7 @@ function __init__()
 end
 
 function versioninfo()
-    print("GroebnerBasis v0.3.0\n")
+    print("GroebnerBasis v0.3.2\n")
     gbrepo = dirname(dirname(@__FILE__))
 
     print("GroebnerBasis: ")

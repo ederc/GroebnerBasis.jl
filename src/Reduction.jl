@@ -3,70 +3,39 @@ function addinv(a, p)
     c < 0 && return p + c
     return p - c
 end
+addmodp(a, b, p) = (a + b) % p
+firstind(v::SparseVector{T, I}) where {T, I} = v.nzind[1]
 
-function build_sparse_row(
-    row::Array{cf_t},
-    indexed::Array{pos_t},
-    start::pos_t,
-    endd::pos_t
-)
-    sparse_row = Array{cf_t}([])
-    for i in start:length(indexed)
-        if i == 1
-            diff = indexed[1] - 1
-        else
-            diff = indexed[i] - indexed[i-1] - 1
-        end
-        append!(sparse_row, zeros(cf_t, diff))
-        push!(sparse_row, row[i])
-    end
-    append!(sparse_row, zeros(endd - length(indexed)))
-    sparse_row
-end
-
-# can be improved, no need to store the entire row_1, shoudl probably make char static
-function reduce_dense_row(
-    row_1::Array{cf_t},
-    row_2::Array{cf_t},
-    indexed_1::Array{pos_t},
-    indexed_2::Array{pos_t},
-    piv_ind::pos_t,
-    n_cols::pos_t,
-    char::cf_t
-)
-    # init buffer using indexed_1
-    buffer = build_sparse_row(row_1, indexed_1, pos_t(1), n_cols)
-    # compute_multiplier
-    multiplier = Int32(buffer[piv_ind] * invmod(row_2[1], char))  % char # buffer[1] / row_2[1]
-    for (j, i) in enumerate(indexed_2)
-        res = (Int32(buffer[i]) + addinv(multiplier * Int32(row_2[j]), char)) % char
-        buffer[i] =  cf_t(res)# buffer[i] - multiplier * row_2[j]
-    end
-    new_row = Array{cf_t}([])
-    new_indexed = Array{pos_t}([])
-    for (i, coeff) in enumerate(buffer)
-        coeff == cf_t(0) && continue
-        push!(new_indexed, i)
-        push!(new_row, coeff)
-    end
-    return new_row, new_indexed
-end
-
-# right now this does every possible reduction from bottom to top
 function reduction!(
     Mat::macaulay_matrix{N, M},
     char::cf_t
 ) where {N, M}
-    for i in reverse(1:Mat.n_rows)
-        isempty(Mat.indexed[i]) && continue
-        piv_ind = Mat.indexed[i][1]
-        for j in 1:i-1
-            isempty(Mat.indexed[j]) && continue
-            Mat.row_sigs[i] == Mat.row_sigs[j] && continue
-            Mat.indexed[j][1] > piv_ind && !(piv_ind in Mat.indexed[j]) && continue
-            new_row, new_indexed = reduce_dense_row(Mat.entries[j], Mat.entries[i], Mat.indexed[j], Mat.indexed[i], piv_ind, Mat.n_cols, char)
-            Mat.entries[j] = new_row
-            Mat.indexed[j] = new_indexed
+    pivots = zeros(UInt32, Mat.n_cols)
+    pivots[firstind(Mat.entries[end])] = Mat.n_rows
+
+    for i in reverse(1:Mat.n_rows-1)
+        buffer = Array{UInt64}(Mat.entries[i])
+        
+        for j in firstind(Mat.entries[i]):Mat.n_cols
+            (iszero(buffer[j]) || iszero(pivots[j]) || pivots[j] < i ) && continue
+            if j == firstind(Mat.entries[i])
+                Mat.flags[i] = true
+            end
+            if Mat.row_sigs[i] == Mat.row_sigs[pivots[j]]
+                println("two rows in same signature")
+            end
+            mult = addinv(buffer[j], char)
+            for k in Mat.entries[pivots[j]].nzind
+                buffer[k] = addmodp(buffer[k], mult * Mat.entries[pivots[j]][k], char)
+            end
         end
+
+        Mat.entries[i] = SparseVector(buffer)
+        iszero(Mat.entries[i].nzind) && continue
+        mult = invmod(Mat.entries[i][firstind(Mat.entries[i])], char)
+        for k in Mat.entries[i].nzind
+            Mat.entries[i][k] = (Mat.entries[i][k] * mult) % char
+        end
+        pivots[firstind(Mat.entries[i])] = i
     end
 end
