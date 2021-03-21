@@ -2,6 +2,10 @@ using GroebnerBasis
 using GroebnerBasis.Singular
 using Test
 
-include("GroebnerBasis-test.jl")
+include("test_examples.jl")
 
-test_all()
+@testset "GroebnerBasis" begin
+    include("F4-test.jl")
+    include("Msolve-test.jl")
+    include("Benchmarks-test.jl")
+end
