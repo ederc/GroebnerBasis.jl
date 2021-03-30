@@ -1,6 +1,6 @@
 # GroebnerBasis
 
-[![Build Status](https://travis-ci.org/ederc/GroebnerBasis.jl.svg?branch=master)](https://travis-ci.org/ederc/GroebnerBasis.jl)
+[![Build Status](https://github.com/ederc/GroebnerBasis.jl/workflows/Run%20tests/badge.svg)](https://github.com/ederc/GroebnerBasis.jl/actions?query=workflow%3A%22Run+tests%22)
 
 This is a julia library which provides an interface between **Singular**
 (https://github.com/Singular/Singular) and **gb** (https://github.com/ederc/gb).
