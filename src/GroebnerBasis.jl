@@ -50,7 +50,7 @@ function __init__()
 end
 
 function versioninfo()
-    print("GroebnerBasis v0.3.2\n")
+    print("GroebnerBasis v0.3.3\n")
     gbrepo = dirname(dirname(@__FILE__))
 
     print("GroebnerBasis: ")
