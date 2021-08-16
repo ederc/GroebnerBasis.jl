@@ -18,7 +18,7 @@ function convert_ff_singular_ideal_to_array(
     cc = 1 # coefficient counter
     ec = 0 # exponent vector counter
     for i = 1:Singular.ngens(id)
-        for c in Singular.coeffs(id[i])
+        for c in Singular.coefficients(id[i])
             cfs[cc] = Base.Int(c)
             cc += 1
         end
@@ -44,7 +44,7 @@ function convert_ff_singular_ideal_to_signature_basis(
         basis.monomials[i]    = Array{SVector{N, exp_t}}(undef, basis.numberTerms[i])
         cc  = 1
         ec  = 1
-        for c in Singular.coeffs(id[i])
+        for c in Singular.coefficients(id[i])
             basis.coefficients[i][cc] = cf_t(Int(c))
             cc += 1
         end
@@ -91,7 +91,7 @@ function convert_qq_singular_ideal_to_array(
     cc = 1 # coefficient counter
     ec = 0 # exponent vector counter
     for i = 1:Singular.ngens(id)
-        for c in Singular.coeffs(id[i])
+        for c in Singular.coefficients(id[i])
             cfs[cc] = Singular.libSingular.n_GetMPZ(numerator(c).ptr, Singular.ZZ.ptr)
             cc += 1
             cfs[cc] = Singular.libSingular.n_GetMPZ(denominator(c).ptr, Singular.ZZ.ptr)
